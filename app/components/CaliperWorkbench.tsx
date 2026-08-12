@@ -48,23 +48,258 @@ function getGeometry(width: number): Geometry {
   const side = Math.min(24, Math.max(8, width * 0.012));
   const fixedJawWidth = Math.min(78, Math.max(44, width * 0.061));
   const scaleToContactOffset = Math.min(68, Math.max(34, width * 0.052));
-  const endReserve = Math.min(78, Math.max(42, width * 0.052));
   const fixedContactX = side + fixedJawWidth;
   const mainZeroX = fixedContactX + scaleToContactOffset;
   const beamEnd = width - side;
-  const usableWidth = Math.max(
-    180,
-    beamEnd - mainZeroX - endReserve,
-  );
+  // The beam must accommodate both the 150 mm range and the longest supported
+  // vernier (49 divisions of 0.98 mm). Reserving that physical span keeps every
+  // complementary mark visible, including at the end of the measuring range.
+  const scaleLengthMm = 150 + 52;
+  const usableWidth = Math.max(180, beamEnd - mainZeroX - 12);
 
   return {
     side,
     fixedContactX,
     mainZeroX,
     scaleToContactOffset,
-    pixelsPerMm: usableWidth / 150,
+    pixelsPerMm: usableWidth / scaleLengthMm,
     beamEnd,
   };
+}
+
+interface InstrumentLayout extends Geometry {
+  beamY: number;
+  beamHeight: number;
+  beamBottom: number;
+  jawBottom: number;
+  contactTopY: number;
+  upperTipY: number;
+  movingScaleZeroX: number;
+  movingContactX: number;
+  externalJawSpan: number;
+  movingInternalRootX: number;
+  movingInternalFaceX: number;
+  internalShelfY: number;
+  sliderTop: number;
+  sliderRight: number;
+  upperPlateLeft: number;
+  upperPlateBottom: number;
+  vernierTop: number;
+  vernierBottom: number;
+  vernierStepPx: number;
+  screwX: number;
+  screwTop: number;
+  rollerX: number;
+  rollerRadius: number;
+}
+
+function getInstrumentLayout(
+  width: number,
+  height: number,
+  ticks: number,
+  scale: CaliperScale,
+): InstrumentLayout {
+  const geometry = getGeometry(width);
+  const valueMm = ticksToMm(ticks);
+  const movingScaleZeroX = geometry.mainZeroX + valueMm * geometry.pixelsPerMm;
+  const movingContactX = movingScaleZeroX - geometry.scaleToContactOffset;
+  const beamY = Math.min(192, Math.max(116, height * 0.27));
+  const beamHeight = Math.min(118, Math.max(78, height * 0.17));
+  const beamBottom = beamY + beamHeight;
+  const jawBottom = Math.min(height - 54, beamBottom + beamHeight * 2.65);
+  const contactTopY = beamBottom + beamHeight * 0.25;
+  const upperTipY = Math.max(18, beamY - beamHeight * 1.34);
+  const fixedJawSpan = geometry.fixedContactX - geometry.side;
+  const externalJawSpan = fixedJawSpan;
+  const movingInternalRootX = movingContactX - fixedJawSpan;
+  const movingInternalFaceX = movingContactX - fixedJawSpan * 0.52;
+  const internalShelfY = beamY - beamHeight * 0.34;
+  const sliderTop = beamY - beamHeight * 0.42;
+  const upperPlateLeft = movingContactX + Math.min(12, geometry.scaleToContactOffset * 0.18);
+  const upperPlateBottom = beamY + beamHeight * 0.18;
+  const vernierTop = beamY + beamHeight * 0.82;
+  const vernierBottom = vernierTop + beamHeight * 0.43;
+  const mainDivisionInMm =
+    scale.unit === "mm"
+      ? fractionToNumber(scale.mainScaleDivision)
+      : fractionToNumber(scale.mainScaleDivision) * 25.4;
+  const resolutionInMm = scale.stepTicks / CALIPER_TICKS_PER_MM;
+  const vernierStepPx = (mainDivisionInMm - resolutionInMm) * geometry.pixelsPerMm;
+  const vernierEndX = movingScaleZeroX + scale.vernierDivisions * vernierStepPx;
+  const sliderRight = Math.min(geometry.beamEnd - 4, vernierEndX + 18);
+  const screwX = movingScaleZeroX + Math.min(
+    168,
+    Math.max(68, (sliderRight - movingScaleZeroX) * 0.52),
+  );
+  const screwTop = sliderTop - 27;
+  const rollerX = Math.min(
+    geometry.beamEnd - 32,
+    movingContactX + Math.max(82, (sliderRight - movingContactX) * 0.86),
+  );
+  const rollerRadius = Math.min(36, Math.max(22, beamHeight * 0.36));
+
+  return {
+    ...geometry,
+    beamY,
+    beamHeight,
+    beamBottom,
+    jawBottom,
+    contactTopY,
+    upperTipY,
+    movingScaleZeroX,
+    movingContactX,
+    externalJawSpan,
+    movingInternalRootX,
+    movingInternalFaceX,
+    internalShelfY,
+    sliderTop,
+    sliderRight,
+    upperPlateLeft,
+    upperPlateBottom,
+    vernierTop,
+    vernierBottom,
+    vernierStepPx,
+    screwX,
+    screwTop,
+    rollerX,
+    rollerRadius,
+  };
+}
+
+function getExternalJawPath(
+  layout: InstrumentLayout,
+  contactX: number,
+  direction: -1 | 1,
+): Path2D {
+  const path = new Path2D();
+  const shoulderX = contactX + direction * layout.externalJawSpan;
+  const relievedShoulderX = contactX + direction * (layout.externalJawSpan - 9);
+  const heelX = contactX + direction * layout.externalJawSpan * 0.78;
+
+  path.moveTo(contactX, layout.contactTopY);
+  path.lineTo(shoulderX, layout.contactTopY);
+  path.lineTo(
+    shoulderX,
+    layout.contactTopY + layout.beamHeight * 0.23,
+  );
+  path.lineTo(
+    relievedShoulderX,
+    layout.contactTopY + layout.beamHeight * 0.27,
+  );
+  path.lineTo(heelX, layout.jawBottom - 28);
+  path.quadraticCurveTo(
+    heelX - direction * 5,
+    layout.jawBottom - 3,
+    contactX + direction * 22,
+    layout.jawBottom,
+  );
+  path.lineTo(contactX, layout.jawBottom);
+  path.closePath();
+  return path;
+}
+
+function getMovingExternalJawPath(layout: InstrumentLayout): Path2D {
+  return getExternalJawPath(layout, layout.movingContactX, 1);
+}
+
+function getMovingInternalJawPath(layout: InstrumentLayout): Path2D {
+  const path = new Path2D();
+  path.moveTo(layout.movingInternalRootX, layout.beamY + 1);
+  path.lineTo(layout.movingInternalRootX, layout.internalShelfY);
+  path.quadraticCurveTo(
+    layout.movingInternalRootX,
+    layout.upperTipY + layout.beamHeight * 0.58,
+    layout.movingInternalFaceX,
+    layout.upperTipY,
+  );
+  path.lineTo(layout.movingInternalFaceX, layout.internalShelfY);
+  path.lineTo(layout.movingScaleZeroX, layout.internalShelfY);
+  path.lineTo(layout.movingScaleZeroX, layout.beamY + 1);
+  path.closePath();
+  return path;
+}
+
+function isPointInMovingAssembly(
+  clientX: number,
+  clientY: number,
+  rect: DOMRect,
+  ticks: number,
+  scale: CaliperScale,
+  detailMode: boolean,
+): boolean {
+  const layout = getInstrumentLayout(rect.width, rect.height, ticks, scale);
+  let x = clientX - rect.left;
+  let y = clientY - rect.top;
+
+  if (detailMode) {
+    const zoom = 1.55;
+    const detailY = layout.beamY + layout.beamHeight * 0.72;
+    x = (x - rect.width * 0.5) / zoom + layout.movingScaleZeroX;
+    y = (y - rect.height * 0.56) / zoom + detailY;
+  }
+
+  const within = (
+    left: number,
+    top: number,
+    right: number,
+    bottom: number,
+    padding = 0,
+  ) =>
+    x >= left - padding &&
+    x <= right + padding &&
+    y >= top - padding &&
+    y <= bottom + padding;
+
+  const hitContext = document.createElement("canvas").getContext("2d");
+  const onExternalJaw =
+    hitContext?.isPointInPath(getMovingExternalJawPath(layout), x, y) ?? false;
+  const onInternalJaw =
+    hitContext?.isPointInPath(getMovingInternalJawPath(layout), x, y) ?? false;
+  const onUpperPlate = within(
+    layout.upperPlateLeft,
+    layout.sliderTop,
+    layout.sliderRight,
+    layout.upperPlateBottom,
+    5,
+  );
+  const onVernier = within(
+    layout.upperPlateLeft,
+    layout.vernierTop,
+    layout.sliderRight,
+    layout.vernierBottom,
+    5,
+  );
+  const onScrewHead = within(
+    layout.screwX - 16,
+    layout.screwTop,
+    layout.screwX + 16,
+    layout.screwTop + 10,
+    2,
+  );
+  const onScrewStem = within(
+    layout.screwX - 7,
+    layout.screwTop + 8,
+    layout.screwX + 7,
+    layout.sliderTop,
+    2,
+  );
+  const rollerDx = x - layout.rollerX;
+  const rollerDy = y - (layout.vernierBottom + 3);
+  const onRoller =
+    rollerDy >= -5 &&
+    rollerDy <= layout.rollerRadius + 7 &&
+    rollerDx * rollerDx + rollerDy * rollerDy <=
+      (layout.rollerRadius + 7) ** 2;
+
+  return (
+    onExternalJaw ||
+    onInternalJaw ||
+    onUpperPlate ||
+    onVernier ||
+    onScrewHead ||
+    onScrewStem ||
+    onRoller
+  );
 }
 
 function fractionToNumber(fraction: CaliperScale["mainScaleDivision"]): number {
@@ -79,26 +314,38 @@ function drawInstrument(
   scale: CaliperScale,
   dragging: boolean,
   detailMode: boolean,
+  readingLabel: string,
+  answerVisible: boolean,
 ) {
+  const layout = getInstrumentLayout(width, height, ticks, scale);
   const {
     side,
     fixedContactX,
     mainZeroX,
-    scaleToContactOffset,
     pixelsPerMm,
     beamEnd,
-  } = getGeometry(width);
-  const valueMm = ticksToMm(ticks);
-  const movingScaleZeroX = mainZeroX + valueMm * pixelsPerMm;
-  const movingContactX = movingScaleZeroX - scaleToContactOffset;
-  const beamY = Math.min(192, Math.max(116, height * 0.27));
-  const beamHeight = Math.min(118, Math.max(78, height * 0.17));
-  const beamBottom = beamY + beamHeight;
-  const jawBottom = Math.min(
-    height - 54,
-    beamBottom + beamHeight * 2.65,
-  );
-  const upperTipY = Math.max(18, beamY - beamHeight * 1.34);
+    beamY,
+    beamHeight,
+    beamBottom,
+    jawBottom,
+    contactTopY,
+    upperTipY,
+    movingScaleZeroX,
+    movingContactX,
+    movingInternalRootX,
+    internalShelfY,
+    sliderTop,
+    sliderRight,
+    upperPlateLeft,
+    upperPlateBottom,
+    vernierTop,
+    vernierBottom,
+    vernierStepPx,
+    screwX,
+    screwTop,
+    rollerX,
+    rollerRadius,
+  } = layout;
   const metal = "#c8c8c6";
   const metalLight = "#eeeeec";
   const metalMid = "#aaa9a7";
@@ -139,34 +386,33 @@ function drawInstrument(
   context.fillStyle = "#dededb";
   context.fillRect(side + 2, beamBottom - 9, beamEnd - side - 4, 7);
 
-  // Fixed external jaw: broad frame, narrow contact face and a long relieved leg.
-  context.beginPath();
-  context.moveTo(side, beamBottom - 7);
-  context.lineTo(fixedContactX + 10, beamBottom - 7);
-  context.lineTo(fixedContactX + 10, beamBottom + 34);
-  context.lineTo(fixedContactX, beamBottom + 38);
-  context.lineTo(fixedContactX, jawBottom - 22);
-  context.quadraticCurveTo(
-    fixedContactX - 5,
-    jawBottom - 3,
-    fixedContactX - 22,
-    jawBottom,
-  );
-  context.lineTo(side + Math.min(44, Math.max(30, width * 0.034)), jawBottom);
-  context.quadraticCurveTo(side + 22, jawBottom - 4, side + 17, jawBottom - 29);
-  context.lineTo(side, beamBottom + 7);
-  context.closePath();
+  // Both external jaws share one mirrored technical profile. The fixed frame
+  // keeps a short bridge to the beam, while the measuring legs themselves are
+  // geometrically identical around their contact faces.
   context.fillStyle = metal;
-  context.fill();
+  context.fillRect(
+    side,
+    beamBottom - 7,
+    fixedContactX - side + 10,
+    contactTopY - beamBottom + 7,
+  );
   context.strokeStyle = ink;
-  context.stroke();
+  context.strokeRect(
+    side,
+    beamBottom - 7,
+    fixedContactX - side + 10,
+    contactTopY - beamBottom + 7,
+  );
+  const fixedExternalJawPath = getExternalJawPath(layout, fixedContactX, -1);
+  context.fillStyle = metal;
+  context.fill(fixedExternalJawPath);
+  context.stroke(fixedExternalJawPath);
   context.fillStyle = metalDark;
-  context.fillRect(fixedContactX - 7, beamBottom + 35, 7, Math.max(22, jawBottom - beamBottom - 57));
+  context.fillRect(fixedContactX - 7, contactTopY, 7, Math.max(22, jawBottom - contactTopY));
 
   // Fixed internal jaw.
   const fixedJawSpan = fixedContactX - side;
   const fixedInternalFaceX = side + fixedJawSpan * 0.48;
-  const internalShelfY = beamY - beamHeight * 0.34;
   context.beginPath();
   context.moveTo(side, beamY + 1);
   context.lineTo(side, internalShelfY);
@@ -188,65 +434,24 @@ function drawInstrument(
 
   // Moving external jaw. Its long shoulder and tapered leg follow the
   // proportions of a universal caliper while preserving the exact contact.
-  const movingJawShoulder = movingContactX + Math.min(142, Math.max(82, width * 0.09));
-  const movingJawHeel = movingContactX + Math.min(108, Math.max(58, width * 0.07));
-  const movingJawTop = beamBottom + beamHeight * 0.25;
-  context.beginPath();
-  context.moveTo(movingContactX, movingJawTop);
-  context.lineTo(movingJawShoulder, movingJawTop);
-  context.lineTo(movingJawShoulder, movingJawTop + beamHeight * 0.23);
-  context.lineTo(movingJawShoulder - 9, movingJawTop + beamHeight * 0.27);
-  context.lineTo(movingJawHeel, jawBottom - 28);
-  context.quadraticCurveTo(
-    movingJawHeel - 5,
-    jawBottom - 3,
-    movingContactX + 22,
-    jawBottom,
-  );
-  context.lineTo(movingContactX, jawBottom);
-  context.closePath();
+  const movingExternalJawPath = getMovingExternalJawPath(layout);
   context.fillStyle = dragging ? "#b9b7b5" : metal;
-  context.fill();
+  context.fill(movingExternalJawPath);
   context.strokeStyle = ink;
-  context.stroke();
+  context.stroke(movingExternalJawPath);
   context.fillStyle = metalDark;
-  context.fillRect(movingContactX, movingJawTop + 1, 7, Math.max(22, jawBottom - movingJawTop - 1));
+  context.fillRect(movingContactX, contactTopY, 7, Math.max(22, jawBottom - contactTopY));
 
   // Moving internal jaw.
-  const movingInternalRootX = movingContactX - fixedJawSpan;
-  const movingInternalFaceX = movingContactX - fixedJawSpan * 0.52;
-  context.beginPath();
-  context.moveTo(movingInternalRootX, beamY + 1);
-  context.lineTo(movingInternalRootX, internalShelfY);
-  context.quadraticCurveTo(
-    movingInternalRootX,
-    upperTipY + beamHeight * 0.58,
-    movingInternalFaceX,
-    upperTipY,
-  );
-  context.lineTo(movingInternalFaceX, internalShelfY);
-  context.lineTo(movingScaleZeroX, internalShelfY);
-  context.lineTo(movingScaleZeroX, beamY + 1);
-  context.closePath();
+  const movingInternalJawPath = getMovingInternalJawPath(layout);
   context.fillStyle = dragging ? "#b9b7b5" : metal;
-  context.fill();
-  context.stroke();
+  context.fill(movingInternalJawPath);
+  context.stroke(movingInternalJawPath);
   context.fillStyle = metalDark;
   context.fillRect(movingInternalRootX, internalShelfY, 7, beamY - internalShelfY);
 
   // The reference cursor is a long bridge: an upper vernier plate and a
   // separate lower carriage. Their shared width is capped near the beam end.
-  const requestedSliderWidth = Math.min(445, Math.max(178, width * 0.26));
-  const sliderRight = Math.min(
-    beamEnd - 8,
-    movingScaleZeroX + requestedSliderWidth,
-  );
-  const sliderTop = beamY - beamHeight * 0.42;
-  const upperPlateLeft = movingContactX + Math.min(12, scaleToContactOffset * 0.18);
-  const upperPlateBottom = beamY + beamHeight * 0.18;
-  const vernierTop = beamY + beamHeight * 0.82;
-  const vernierBottom = vernierTop + beamHeight * 0.43;
-
   // Main scale.
   const isMetric = scale.unit === "mm";
   const mainDivisionInMm = isMetric
@@ -315,9 +520,6 @@ function drawInstrument(
 
   // Upper slider plate and direct vernier. A vernier step is one resolution
   // shorter than a main-scale division, so the aligned mark remains physical.
-  const resolutionInMm = scale.stepTicks / CALIPER_TICKS_PER_MM;
-  const vernierStepInMm = mainDivisionInMm - resolutionInMm;
-  const vernierStepPx = Math.max(2.15, vernierStepInMm * pixelsPerMm);
   context.fillStyle = metalLight;
   context.fillRect(upperPlateLeft, sliderTop, sliderRight - upperPlateLeft, upperPlateBottom - sliderTop);
   context.strokeStyle = ink;
@@ -356,14 +558,13 @@ function drawInstrument(
 
   for (let index = 0; index <= scale.vernierDivisions; index += 1) {
     const x = movingScaleZeroX + index * vernierStepPx;
-    if (x > sliderRight - 5) break;
     const major = index === 0 || index === scale.vernierDivisions || index % labelEvery === 0;
     const tickHeight = major ? beamHeight * 0.28 : beamHeight * 0.18;
     context.beginPath();
     context.moveTo(x, vernierTickTop);
     context.lineTo(x, vernierTickTop + tickHeight);
     context.stroke();
-    if (major && !(scale.vernierDivisions === 50 && index === 50)) {
+    if (major) {
       const labelValue =
         scale.vernierDivisions === 20
           ? index / 2
@@ -375,11 +576,6 @@ function drawInstrument(
   }
 
   // Lock screw with a short neck and a cylindrical head.
-  const screwX = movingScaleZeroX + Math.min(
-    168,
-    Math.max(68, (sliderRight - movingScaleZeroX) * 0.52),
-  );
-  const screwTop = sliderTop - 27;
   context.fillStyle = metalDark;
   context.fillRect(screwX - 7, screwTop + 8, 14, 19);
   context.strokeStyle = ink;
@@ -393,15 +589,11 @@ function drawInstrument(
   context.strokeRect(screwX - 16, screwTop, 32, 10);
 
   // Thumb roller.
-  const rollerX = Math.min(
-    beamEnd - 32,
-    movingContactX + Math.max(82, (sliderRight - movingContactX) * 0.86),
-  );
   context.beginPath();
   context.arc(
     rollerX,
     vernierBottom + 3,
-    Math.min(36, Math.max(22, beamHeight * 0.36)),
+    rollerRadius,
     0,
     Math.PI,
     false,
@@ -430,7 +622,9 @@ function drawInstrument(
   context.font = `500 ${Math.max(6, Math.min(8, width / 150))}px Arial, sans-serif`;
   context.fillText("Automações", markX + markSize + 6, markY + markSize * 0.86);
 
-  // Contact arrows make the measured span explicit without revealing the value.
+  // Contact arrows and their label are tied to the same exact reading used by
+  // the HTML readout. In practice mode the label becomes a neutral question
+  // mark, so the physical opening remains visible without leaking the answer.
   const dimensionY = Math.min(height - 14, jawBottom + 27);
   context.strokeStyle = accent;
   context.fillStyle = accent;
@@ -457,6 +651,34 @@ function drawInstrument(
   context.lineTo(movingContactX - 11, dimensionY + 5);
   context.closePath();
   context.fill();
+
+  const dimensionLabel = answerVisible
+    ? readingLabel.replace(/\s+(?:mm|in)$/u, "")
+    : "?";
+  const dimensionFontSize = Math.max(20, Math.min(36, width / 42));
+  context.font = `500 ${dimensionFontSize}px Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  const labelWidth = context.measureText(dimensionLabel).width + 24;
+  const openingWidth = Math.max(0, movingContactX - fixedContactX);
+  let labelCenterX = (fixedContactX + movingContactX) / 2;
+  if (labelWidth + 16 > openingWidth) {
+    labelCenterX = Math.min(
+      width - labelWidth / 2 - 8,
+      movingContactX + labelWidth / 2 + 18,
+    );
+  }
+  const labelCenterY = dimensionY - dimensionFontSize * 0.78;
+  const labelHeight = dimensionFontSize + 6;
+  context.fillStyle = "#ffffff";
+  context.fillRect(
+    labelCenterX - labelWidth / 2,
+    labelCenterY - labelHeight / 2,
+    labelWidth,
+    labelHeight,
+  );
+  context.fillStyle = ink;
+  context.fillText(dimensionLabel, labelCenterX, labelCenterY);
   context.restore();
 }
 
@@ -488,12 +710,15 @@ export function CaliperWorkbench() {
   );
   const [answerVisible, setAnswerVisible] = useState(true);
   const [dragging, setDragging] = useState(false);
+  const [movingAssemblyHovered, setMovingAssemblyHovered] = useState(false);
   const [detailMode, setDetailMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labRef = useRef<HTMLElement>(null);
   const dragOriginRef = useRef<{ clientX: number; ticks: number } | null>(null);
+  const activePointerRef = useRef<number | null>(null);
+  const lastMousePositionRef = useRef<{ clientX: number; clientY: number } | null>(null);
   const scale = CALIPER_SCALES[scaleId];
   const unit = scale.unit;
   const scalesForUnit = useMemo(() => getCaliperScalesForUnit(unit), [unit]);
@@ -538,7 +763,22 @@ export function CaliperWorkbench() {
         scale,
         dragging,
         detailMode,
+        reading,
+        answerVisible,
       );
+      const lastMousePosition = lastMousePositionRef.current;
+      if (lastMousePosition && !dragging) {
+        setMovingAssemblyHovered(
+          isPointInMovingAssembly(
+            lastMousePosition.clientX,
+            lastMousePosition.clientY,
+            rect,
+            ticks,
+            scale,
+            detailMode,
+          ),
+        );
+      }
     };
 
     render();
@@ -552,7 +792,21 @@ export function CaliperWorkbench() {
       observer.disconnect();
       window.cancelAnimationFrame(resizeFrame);
     };
-  }, [ticks, scale, dragging, detailMode]);
+  }, [ticks, scale, dragging, detailMode, reading, answerVisible]);
+
+  const pointerIsOnMovingAssembly = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return isPointInMovingAssembly(
+      event.clientX,
+      event.clientY,
+      rect,
+      ticks,
+      scale,
+      detailMode,
+    );
+  };
 
   const updateFromPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -567,23 +821,62 @@ export function CaliperWorkbench() {
   };
 
   const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (event.button !== 0) return;
+    if (event.pointerType !== "touch") {
+      lastMousePositionRef.current = {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      };
+    }
+    if (
+      event.button !== 0 ||
+      activePointerRef.current !== null ||
+      !pointerIsOnMovingAssembly(event)
+    ) {
+      return;
+    }
+    event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    activePointerRef.current = event.pointerId;
     dragOriginRef.current = { clientX: event.clientX, ticks };
     setDragging(true);
+    setMovingAssemblyHovered(true);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
-    updateFromPointer(event);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      updateFromPointer(event);
+      return;
+    }
+    if (event.pointerType !== "touch") {
+      lastMousePositionRef.current = {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      };
+      setMovingAssemblyHovered(pointerIsOnMovingAssembly(event));
+    }
   };
 
   const finishPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activePointerRef.current !== event.pointerId) return;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    activePointerRef.current = null;
     dragOriginRef.current = null;
     setDragging(false);
+    setMovingAssemblyHovered(
+      event.pointerType !== "touch" && pointerIsOnMovingAssembly(event),
+    );
+  };
+
+  const onLostPointerCapture = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    if (activePointerRef.current !== event.pointerId) return;
+    activePointerRef.current = null;
+    dragOriginRef.current = null;
+    setDragging(false);
+    setMovingAssemblyHovered(false);
   };
 
   const changeUnit = (nextUnit: MeasurementUnit) => {
@@ -745,7 +1038,7 @@ export function CaliperWorkbench() {
         <div className="instrument-stage">
           <canvas
             ref={canvasRef}
-            className={`caliper-canvas${dragging ? " is-dragging" : ""}`}
+            className={`caliper-canvas${movingAssemblyHovered ? " is-interactive" : ""}${dragging ? " is-dragging" : ""}`}
             role="slider"
             tabIndex={0}
             aria-label={`Abrir ou fechar o paquímetro. Resolução ${scale.label}.${detailMode ? " Escala ampliada." : ""}`}
@@ -757,6 +1050,13 @@ export function CaliperWorkbench() {
             onPointerMove={onPointerMove}
             onPointerUp={finishPointer}
             onPointerCancel={finishPointer}
+            onLostPointerCapture={onLostPointerCapture}
+            onPointerLeave={() => {
+              if (!dragging) {
+                lastMousePositionRef.current = null;
+                setMovingAssemblyHovered(false);
+              }
+            }}
             onKeyDown={onKeyDown}
           >
             Simulador de paquímetro universal. Use os controles para definir a medida.
