@@ -48,7 +48,7 @@ function getGeometry(width: number): Geometry {
   const side = Math.min(24, Math.max(8, width * 0.012));
   const fixedJawWidth = Math.min(78, Math.max(44, width * 0.061));
   const scaleToContactOffset = Math.min(68, Math.max(34, width * 0.052));
-  const endReserve = Math.min(122, Math.max(54, width * 0.09));
+  const endReserve = Math.min(188, Math.max(70, width * 0.14));
   const fixedContactX = side + fixedJawWidth;
   const mainZeroX = fixedContactX + scaleToContactOffset;
   const beamEnd = width - side;
@@ -91,14 +91,16 @@ function drawInstrument(
   const valueMm = ticksToMm(ticks);
   const movingScaleZeroX = mainZeroX + valueMm * pixelsPerMm;
   const movingContactX = movingScaleZeroX - scaleToContactOffset;
-  const beamY = Math.min(190, Math.max(130, height * 0.31));
-  const beamHeight = Math.min(116, Math.max(80, height * 0.2));
+  const beamY = width < 680
+    ? Math.min(height * 0.44, Math.max(166, height * 0.4))
+    : Math.min(196, Math.max(126, height * 0.305));
+  const beamHeight = Math.min(106, Math.max(72, height * 0.17));
   const beamBottom = beamY + beamHeight;
   const jawBottom = Math.min(
-    height - 58,
-    beamBottom + height * 0.34,
+    height - 42,
+    beamBottom + height * 0.43,
   );
-  const upperTipY = Math.max(18, beamY - height * 0.25);
+  const upperTipY = Math.max(18, beamY - height * 0.265);
   const metal = "#c8c8c6";
   const metalLight = "#eeeeec";
   const metalMid = "#aaa9a7";
@@ -139,21 +141,21 @@ function drawInstrument(
   context.fillStyle = "#dededb";
   context.fillRect(side + 2, beamBottom - 9, beamEnd - side - 4, 7);
 
-  // Fixed lower jaw.
+  // Fixed external jaw: broad frame, narrow contact face and a long relieved leg.
   context.beginPath();
   context.moveTo(side, beamBottom - 7);
-  context.lineTo(fixedContactX + 9, beamBottom - 7);
-  context.lineTo(fixedContactX + 9, beamBottom + 38);
+  context.lineTo(fixedContactX + 10, beamBottom - 7);
+  context.lineTo(fixedContactX + 10, beamBottom + 34);
   context.lineTo(fixedContactX, beamBottom + 38);
-  context.lineTo(fixedContactX, jawBottom - 24);
+  context.lineTo(fixedContactX, jawBottom - 22);
   context.quadraticCurveTo(
     fixedContactX - 5,
-    jawBottom - 7,
-    fixedContactX - 20,
+    jawBottom - 3,
+    fixedContactX - 22,
     jawBottom,
   );
-  context.lineTo(side + 39, jawBottom);
-  context.quadraticCurveTo(side + 25, jawBottom - 4, side + 20, jawBottom - 26);
+  context.lineTo(side + Math.min(44, Math.max(30, width * 0.034)), jawBottom);
+  context.quadraticCurveTo(side + 22, jawBottom - 4, side + 17, jawBottom - 29);
   context.lineTo(side, beamBottom + 7);
   context.closePath();
   context.fillStyle = metal;
@@ -161,12 +163,7 @@ function drawInstrument(
   context.strokeStyle = ink;
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(
-    fixedContactX - 6,
-    beamBottom + 39,
-    6,
-    Math.max(18, jawBottom - beamBottom - 64),
-  );
+  context.fillRect(fixedContactX - 7, beamBottom + 35, 7, Math.max(22, jawBottom - beamBottom - 57));
 
   // Fixed internal jaw.
   context.beginPath();
@@ -188,22 +185,20 @@ function drawInstrument(
   context.fillStyle = metalDark;
   context.fillRect(fixedContactX - 6, beamY - 49, 6, 50);
 
-  // Moving lower jaw. The measuring face is offset from the vernier zero,
-  // matching the construction of a real universal caliper.
-  const movingJawShoulder = Math.min(
-    movingScaleZeroX + 28,
-    movingContactX + Math.max(66, scaleToContactOffset + 24),
-  );
+  // Moving external jaw. Its long shoulder and tapered leg follow the
+  // proportions of a universal caliper while preserving the exact contact.
+  const movingJawShoulder = movingContactX + Math.min(158, Math.max(88, width * 0.125));
+  const movingJawHeel = movingContactX + Math.min(108, Math.max(54, width * 0.084));
   context.beginPath();
   context.moveTo(movingContactX, beamBottom - 7);
   context.lineTo(movingJawShoulder, beamBottom - 7);
-  context.lineTo(movingJawShoulder, beamBottom + 38);
-  context.lineTo(movingJawShoulder - 10, beamBottom + 38);
-  context.lineTo(movingContactX + 42, jawBottom - 27);
+  context.lineTo(movingJawShoulder, beamBottom + 34);
+  context.lineTo(movingJawShoulder - 9, beamBottom + 38);
+  context.lineTo(movingJawHeel, jawBottom - 28);
   context.quadraticCurveTo(
-    movingContactX + 36,
-    jawBottom - 5,
-    movingContactX + 19,
+    movingJawHeel - 5,
+    jawBottom - 3,
+    movingContactX + 22,
     jawBottom,
   );
   context.lineTo(movingContactX, jawBottom);
@@ -213,74 +208,41 @@ function drawInstrument(
   context.strokeStyle = ink;
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(
-    movingContactX,
-    beamBottom + 39,
-    6,
-    Math.max(18, jawBottom - beamBottom - 40),
-  );
+  context.fillRect(movingContactX, beamBottom + 35, 7, Math.max(22, jawBottom - beamBottom - 35));
 
   // Moving internal jaw.
   context.beginPath();
   context.moveTo(movingContactX, beamY + 1);
-  context.lineTo(movingContactX, beamY - 48);
+  context.lineTo(movingContactX, beamY - 50);
   context.quadraticCurveTo(
-    movingContactX + 10,
-    upperTipY + 19,
-    movingContactX + Math.max(42, scaleToContactOffset * 0.7),
+    movingContactX + 8,
+    upperTipY + 17,
+    movingContactX + Math.max(44, scaleToContactOffset * 0.76),
     upperTipY,
   );
   context.lineTo(
-    movingContactX + Math.max(42, scaleToContactOffset * 0.7),
-    beamY - 49,
+    movingContactX + Math.max(44, scaleToContactOffset * 0.76),
+    beamY - 50,
   );
-  context.lineTo(movingScaleZeroX, beamY - 49);
+  context.lineTo(movingScaleZeroX, beamY - 50);
   context.lineTo(movingScaleZeroX, beamY + 1);
   context.closePath();
   context.fillStyle = dragging ? "#b9b7b5" : metal;
   context.fill();
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(movingContactX, beamY - 49, 6, 50);
+  context.fillRect(movingContactX, beamY - 50, 7, 51);
 
-  // Slider bridge and lock screw.
-  const requestedSliderWidth = Math.min(360, Math.max(178, width * 0.29));
+  // The reference cursor is a long bridge: an upper vernier plate and a
+  // separate lower carriage. Their shared width is capped near the beam end.
+  const requestedSliderWidth = Math.min(372, Math.max(184, width * 0.3));
   const sliderRight = Math.min(
     beamEnd - 8,
     movingScaleZeroX + requestedSliderWidth,
   );
-  const sliderTop = beamY - Math.min(38, beamHeight * 0.42);
-  const sliderBottom = beamY + Math.min(28, beamHeight * 0.28);
-  context.fillStyle = metalLight;
-  context.fillRect(
-    movingScaleZeroX,
-    sliderTop,
-    sliderRight - movingScaleZeroX,
-    sliderBottom - sliderTop,
-  );
-  context.strokeStyle = ink;
-  context.strokeRect(
-    movingScaleZeroX,
-    sliderTop,
-    sliderRight - movingScaleZeroX,
-    sliderBottom - sliderTop,
-  );
-  context.fillStyle = "#d7d7d4";
-  context.fillRect(
-    movingScaleZeroX + 2,
-    sliderTop + 3,
-    Math.max(0, sliderRight - movingScaleZeroX - 4),
-    5,
-  );
-  const screwX = movingScaleZeroX + Math.min(
-    160,
-    Math.max(60, (sliderRight - movingScaleZeroX) * 0.52),
-  );
-  context.fillStyle = metalDark;
-  context.fillRect(screwX - 10, sliderTop - 20, 20, 19);
-  context.strokeRect(screwX - 10, sliderTop - 20, 20, 19);
-  context.fillStyle = ink;
-  context.fillRect(screwX - 14, sliderTop - 25, 28, 7);
+  const sliderTop = beamY - Math.min(36, beamHeight * 0.48);
+  const upperPlateLeft = movingContactX + Math.min(12, scaleToContactOffset * 0.18);
+  const upperPlateBottom = beamY + Math.min(48, beamHeight * 0.58);
 
   // Main scale.
   const isMetric = scale.unit === "mm";
@@ -288,7 +250,7 @@ function drawInstrument(
     ? fractionToNumber(scale.mainScaleDivision)
     : fractionToNumber(scale.mainScaleDivision) * 25.4;
   const mainTickCount = Math.floor(150 / mainDivisionInMm);
-  const scaleBaseY = beamY + beamHeight * 0.61;
+  const scaleBaseY = beamY + Math.max(12, beamHeight * 0.14);
   context.strokeStyle = ink;
   context.fillStyle = ink;
   context.lineWidth = Math.max(0.8, Math.min(1.35, width / 980));
@@ -303,10 +265,10 @@ function drawInstrument(
     if (isMetric) {
       const millimetres = index * mainDivisionInMm;
       if (Math.abs(millimetres % 10) < 0.0001) {
-        tickHeight = beamHeight * 0.36;
+        tickHeight = beamHeight * 0.42;
         label = String(Math.round(millimetres / 10));
       } else if (Math.abs(millimetres % 5) < 0.0001) {
-        tickHeight = beamHeight * 0.27;
+        tickHeight = beamHeight * 0.31;
       }
     } else if (scale.id === "in-1/128") {
       if (index % 16 === 0) {
@@ -336,39 +298,27 @@ function drawInstrument(
     if (label !== null) {
       context.font = `600 ${Math.max(10, Math.min(16, width / 78))}px Arial, sans-serif`;
       context.textAlign = "center";
-      context.fillText(label, x, scaleBaseY - 7);
+      context.fillText(label, x, scaleBaseY + tickHeight + Math.max(15, beamHeight * 0.2));
     }
   }
 
   context.font = `700 ${Math.max(9, Math.min(12, width / 96))}px Arial, sans-serif`;
   context.textAlign = "left";
   context.fillStyle = accent;
-  context.fillText(isMetric ? "mm" : "in", mainZeroX + 5, beamY + 20);
+  context.fillText(isMetric ? "mm" : "in", mainZeroX + 5, beamBottom - 8);
 
-  // Vernier scale. A direct vernier step is one resolution shorter than a
-  // division of the main scale, which makes the aligned mark physically true.
+  // Upper slider plate and direct vernier. A vernier step is one resolution
+  // shorter than a main-scale division, so the aligned mark remains physical.
   const resolutionInMm = scale.stepTicks / CALIPER_TICKS_PER_MM;
   const vernierStepInMm = mainDivisionInMm - resolutionInMm;
   const vernierStepPx = Math.max(2.15, vernierStepInMm * pixelsPerMm);
-  const maxVernierWidth = Math.max(62, beamEnd - movingContactX - 8);
-  const naturalVernierWidth = vernierStepPx * scale.vernierDivisions + 22;
-  const minimumBodyWidth = Math.min(
-    requestedSliderWidth + scaleToContactOffset,
-    Math.max(185, width * 0.27),
-  );
-  const vernierWidth = Math.min(
-    maxVernierWidth,
-    Math.max(naturalVernierWidth + scaleToContactOffset, minimumBodyWidth),
-  );
-  const vernierX = movingContactX;
-  const vernierY = beamBottom - 4;
-  const vernierHeight = Math.min(68, Math.max(54, height * 0.105));
-
   context.fillStyle = metalLight;
-  context.fillRect(vernierX, vernierY, vernierWidth, vernierHeight);
+  context.fillRect(upperPlateLeft, sliderTop, sliderRight - upperPlateLeft, upperPlateBottom - sliderTop);
   context.strokeStyle = ink;
   context.lineWidth = 1.5;
-  context.strokeRect(vernierX, vernierY, vernierWidth, vernierHeight);
+  context.strokeRect(upperPlateLeft, sliderTop, sliderRight - upperPlateLeft, upperPlateBottom - sliderTop);
+  context.fillStyle = "#d7d7d4";
+  context.fillRect(upperPlateLeft + 2, sliderTop + 3, Math.max(0, sliderRight - upperPlateLeft - 4), 5);
 
   const baseLabelEvery =
     scale.vernierDivisions <= 10
@@ -376,21 +326,27 @@ function drawInstrument(
       : scale.vernierDivisions === 20
         ? 2
         : 5;
-  const labelEvery = Math.ceil(
-    Math.max(baseLabelEvery, Math.ceil(12 / vernierStepPx)) / baseLabelEvery,
-  ) * baseLabelEvery;
+  const minimumLabelStep = Math.max(baseLabelEvery, Math.ceil(12 / vernierStepPx));
+  const labelEvery = Array.from(
+    { length: scale.vernierDivisions / baseLabelEvery },
+    (_, index) => (index + 1) * baseLabelEvery,
+  ).find(
+    (candidate) =>
+      candidate >= minimumLabelStep && scale.vernierDivisions % candidate === 0,
+  ) ?? scale.vernierDivisions;
   context.textAlign = "center";
   context.fillStyle = ink;
   context.font = `600 ${Math.max(8, Math.min(11, width / 100))}px Arial, sans-serif`;
+  const vernierTickTop = sliderTop + Math.max(31, (upperPlateBottom - sliderTop) * 0.46);
 
   for (let index = 0; index <= scale.vernierDivisions; index += 1) {
     const x = movingScaleZeroX + index * vernierStepPx;
-    if (x > vernierX + vernierWidth - 4) break;
+    if (x > sliderRight - 5) break;
     const major = index === 0 || index === scale.vernierDivisions || index % labelEvery === 0;
-    const tickHeight = major ? 25 : 15;
+    const tickHeight = major ? Math.min(31, beamHeight * 0.38) : Math.min(20, beamHeight * 0.25);
     context.beginPath();
-    context.moveTo(x, vernierY + 1);
-    context.lineTo(x, vernierY + 1 + tickHeight);
+    context.moveTo(x, vernierTickTop);
+    context.lineTo(x, vernierTickTop + tickHeight);
     context.stroke();
     if (major) {
       const labelValue =
@@ -399,20 +355,48 @@ function drawInstrument(
           : scale.vernierDivisions === 50
             ? index / 5
             : index;
-      context.fillText(String(labelValue), x, vernierY + 42);
+      context.fillText(String(labelValue), x, sliderTop + 24);
     }
   }
+
+  // Lock screw with a short neck and a cylindrical head.
+  const screwX = movingScaleZeroX + Math.min(
+    168,
+    Math.max(68, (sliderRight - movingScaleZeroX) * 0.52),
+  );
+  const screwTop = sliderTop - 27;
+  context.fillStyle = metalDark;
+  context.fillRect(screwX - 7, screwTop + 8, 14, 19);
+  context.strokeStyle = ink;
+  context.strokeRect(screwX - 7, screwTop + 8, 14, 19);
+  const screwGradient = context.createLinearGradient(screwX - 15, 0, screwX + 15, 0);
+  screwGradient.addColorStop(0, metalDark);
+  screwGradient.addColorStop(0.45, metalLight);
+  screwGradient.addColorStop(1, metalDark);
+  context.fillStyle = screwGradient;
+  context.fillRect(screwX - 16, screwTop, 32, 10);
+  context.strokeRect(screwX - 16, screwTop, 32, 10);
+
+  // Lower carriage plate: long and shallow, as on the reference instrument.
+  const carriageTop = beamBottom - 8;
+  const carriageBottom = carriageTop + Math.min(48, Math.max(38, height * 0.078));
+  context.fillStyle = metalLight;
+  context.fillRect(movingContactX, carriageTop, sliderRight - movingContactX, carriageBottom - carriageTop);
+  context.strokeStyle = ink;
+  context.strokeRect(movingContactX, carriageTop, sliderRight - movingContactX, carriageBottom - carriageTop);
+  context.fillStyle = metalMid;
+  context.fillRect(movingContactX + 2, carriageBottom - 8, Math.max(0, sliderRight - movingContactX - 4), 6);
 
   // Thumb roller.
   const rollerX = Math.min(
     beamEnd - 32,
-    vernierX + Math.max(78, vernierWidth * 0.78),
+    movingContactX + Math.max(82, (sliderRight - movingContactX) * 0.8),
   );
   context.beginPath();
   context.arc(
     rollerX,
-    vernierY + vernierHeight + 7,
-    Math.min(29, Math.max(22, vernierHeight * 0.48)),
+    carriageBottom + 4,
+    Math.min(29, Math.max(21, height * 0.05)),
     0,
     Math.PI,
     false,
@@ -515,7 +499,8 @@ export function CaliperWorkbench() {
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const stage = canvas?.parentElement;
+    if (!canvas || !stage) return;
 
     const render = () => {
       const rect = canvas.getBoundingClientRect();
@@ -544,7 +529,7 @@ export function CaliperWorkbench() {
       window.cancelAnimationFrame(resizeFrame);
       resizeFrame = window.requestAnimationFrame(render);
     });
-    observer.observe(canvas);
+    observer.observe(stage);
     return () => {
       observer.disconnect();
       window.cancelAnimationFrame(resizeFrame);
@@ -710,35 +695,36 @@ export function CaliperWorkbench() {
             <p className="eyebrow">Laboratório de metrologia</p>
             <h1 id="instrument-title">Paquímetro universal com nônio</h1>
           </div>
-          <p className="interaction-hint">
-            <span aria-hidden="true">↔</span>
-            Arraste o cursor ou use as setas do teclado
-          </p>
+          <div className="stage-aside">
+            <p className="interaction-hint">
+              <span aria-hidden="true">↔</span>
+              Arraste o cursor ou use as setas do teclado
+            </p>
+            <div className="readout" data-hidden={!answerVisible}>
+              <div className="readout-label">
+                <span>Medida atual</span>
+                <button
+                  className="eye-button"
+                  type="button"
+                  aria-label={answerVisible ? "Ocultar medida" : "Exibir medida"}
+                  aria-pressed={!answerVisible}
+                  title={answerVisible ? "Ocultar medida" : "Exibir medida"}
+                  onClick={toggleAnswer}
+                >
+                  <span className={`eye-symbol${answerVisible ? "" : " is-closed"}`} aria-hidden="true" />
+                </button>
+              </div>
+              <p className="reading-value" aria-hidden={!answerVisible}>
+                {answerVisible ? reading : "••••••"}
+              </p>
+              <p className="reading-breakdown">
+                {answerVisible ? breakdown : "Resposta oculta para a turma"}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="instrument-stage">
-          <div className="readout" data-hidden={!answerVisible}>
-            <div className="readout-label">
-              <span>Medida atual</span>
-              <button
-                className="eye-button"
-                type="button"
-                aria-label={answerVisible ? "Ocultar medida" : "Exibir medida"}
-                aria-pressed={!answerVisible}
-                title={answerVisible ? "Ocultar medida" : "Exibir medida"}
-                onClick={toggleAnswer}
-              >
-                <span className={`eye-symbol${answerVisible ? "" : " is-closed"}`} aria-hidden="true" />
-              </button>
-            </div>
-            <p className="reading-value" aria-hidden={!answerVisible}>
-              {answerVisible ? reading : "••••••"}
-            </p>
-            <p className="reading-breakdown">
-              {answerVisible ? breakdown : "Resposta oculta para a turma"}
-            </p>
-          </div>
-
           <canvas
             ref={canvasRef}
             className={`caliper-canvas${dragging ? " is-dragging" : ""}`}

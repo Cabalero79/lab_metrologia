@@ -24,12 +24,16 @@
 
 html {
   min-width: 320px;
+  max-width: 100%;
+  overflow-x: clip;
   color-scheme: light;
   scroll-behavior: smooth;
 }
 
 body {
+  width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   color: var(--ink-strong);
   background:
@@ -214,13 +218,21 @@ a[href] {
 }
 
 .stage-copy {
-  min-height: 94px;
-  padding: 1.1rem clamp(1rem, 2.3vw, 2.1rem);
+  position: relative;
+  min-height: 112px;
+  padding: 0.8rem clamp(1rem, 2.3vw, 2.1rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   border-bottom: 1px solid var(--line);
+}
+
+.stage-aside {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(0.8rem, 1.5vw, 1.35rem);
 }
 
 .eyebrow {
@@ -259,6 +271,7 @@ a[href] {
 
 .instrument-stage {
   position: relative;
+  height: 100%;
   min-height: 430px;
   overflow: hidden;
   background:
@@ -281,13 +294,10 @@ a[href] {
 }
 
 .readout {
-  position: absolute;
-  z-index: 2;
-  top: clamp(0.85rem, 2vw, 1.5rem);
-  right: clamp(0.85rem, 2vw, 1.7rem);
-  width: clamp(218px, 25vw, 330px);
-  min-height: 128px;
-  padding: 0.88rem 1rem 0.82rem;
+  position: relative;
+  width: clamp(238px, 22vw, 300px);
+  min-height: 92px;
+  padding: 0.68rem 0.85rem 0.62rem;
   color: oklch(1 0 0);
   background: var(--brand-strong);
   border: 1px solid oklch(1 0 0 / 0.16);
@@ -313,8 +323,8 @@ a[href] {
 }
 
 .eye-button {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   color: oklch(1 0 0);
@@ -361,9 +371,9 @@ a[href] {
 
 .reading-value {
   min-height: 1.1em;
-  margin: 0.26rem 0 0.12rem;
+  margin: 0.12rem 0 0.08rem;
   font-family: var(--font-geist-mono), monospace;
-  font-size: clamp(1.75rem, 4vw, 3.25rem);
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
   font-variant-numeric: tabular-nums;
   font-weight: 560;
   line-height: 1;
@@ -379,9 +389,12 @@ a[href] {
 }
 
 .caliper-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  min-height: 430px;
+  min-height: 0;
   display: block;
   touch-action: none;
   cursor: ew-resize;
@@ -397,8 +410,9 @@ a[href] {
 
 .stage-legend {
   position: absolute;
-  left: clamp(0.85rem, 2vw, 1.7rem);
-  bottom: 0.8rem;
+  z-index: 2;
+  top: 0.8rem;
+  right: clamp(0.85rem, 2vw, 1.7rem);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -636,6 +650,8 @@ a[href] {
   .workbench {
     height: auto;
     min-height: calc(100vh - 64px);
+    min-height: calc(100dvh - 64px);
+    grid-template-rows: auto auto auto;
     border-right: 0;
     border-left: 0;
     border-radius: 0;
@@ -643,26 +659,40 @@ a[href] {
   }
 
   .stage-copy {
-    min-height: 84px;
+    min-height: 0;
     padding: 0.85rem 1rem;
+    flex-wrap: wrap;
   }
 
   .interaction-hint {
+    position: absolute;
+    top: 1.55rem;
+    right: 1rem;
     width: 36px;
     overflow: hidden;
     white-space: nowrap;
+    font-size: 0;
   }
 
-  .instrument-stage,
+  .instrument-stage {
+    height: clamp(380px, 52svh, 470px);
+    height: clamp(380px, 52dvh, 470px);
+    min-height: 380px;
+  }
+
   .caliper-canvas {
-    min-height: 440px;
+    top: 0;
+    height: 100%;
   }
 
   .readout {
-    width: min(250px, calc(100% - 1.5rem));
-    min-height: 116px;
-    top: 0.75rem;
-    right: 0.75rem;
+    width: 100%;
+    min-height: 94px;
+  }
+
+  .stage-aside {
+    width: 100%;
+    margin-top: 0.75rem;
   }
 
   .stage-legend {
