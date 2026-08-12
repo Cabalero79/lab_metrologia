@@ -171,6 +171,8 @@ Uma faixa única contém marca, estado, detalhe e tela cheia. No telefone, o tex
 
 O instrumento é desenhado em canvas de alta densidade com três tons de metal e contornos de grafite. O mostrador é HTML, permanece legível em projeção, inclui decomposição e usa um botão de olho nativo. A ampliação transforma apenas a projeção visual; a medida interna não muda.
 
+A construção mecânica separa as faces de contato dos zeros das escalas por um deslocamento constante: a face externa fixa antecede o zero da escala principal, e a face externa móvel antecede o zero do nônio pela mesma distância. Garras inferiores estreitas e afuniladas, garras internas altas e uma ponte do cursor mais longa mantêm a silhueta de um paquímetro universal real sem reproduzir ativos da referência.
+
 ## Do's and Don'ts
 
 ### Do:
