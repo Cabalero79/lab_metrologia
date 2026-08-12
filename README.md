@@ -2,6 +2,8 @@
 
 Laboratório web de metrologia da **Cabalero_Automações**, com a direção de marca **Engenharia de Software aplicada à Indústria**.
 
+Versão privada publicada: <https://cabalero-paquimetro.cabalero.chatgpt.site>
+
 A primeira entrega é um paquímetro universal analógico, manipulável por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
 
 ## Funcionalidades

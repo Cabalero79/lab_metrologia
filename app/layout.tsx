@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cabalero-automacoes.example"),
+  metadataBase: new URL("https://cabalero-paquimetro.cabalero.chatgpt.site"),
   title: {
     default: "Cabalero_Automações — Laboratório de Metrologia",
     template: "%s | Cabalero_Automações",
