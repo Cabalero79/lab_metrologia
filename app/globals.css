@@ -205,11 +205,11 @@ a[href] {
 
 .workbench {
   width: min(100%, 1700px);
-  height: calc(100vh - 100px);
+  height: auto;
   min-height: calc(100vh - 100px);
   margin: 0 auto;
   display: grid;
-  grid-template-rows: auto minmax(430px, 1fr) auto;
+  grid-template-rows: auto clamp(500px, 45vw, 720px) auto;
   overflow: hidden;
   background: var(--surface-panel);
   border: 1px solid var(--line);
@@ -272,25 +272,14 @@ a[href] {
 .instrument-stage {
   position: relative;
   height: 100%;
-  min-height: 430px;
+  min-height: 500px;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 45%, oklch(1 0 0) 0, oklch(0.985 0.003 340) 58%, oklch(0.955 0.008 340) 100%);
+  background: var(--surface-panel);
   isolation: isolate;
 }
 
 .instrument-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.22;
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 79px,
-    var(--line) 80px
-  );
+  content: none;
 }
 
 .readout {
@@ -590,7 +579,7 @@ a[href] {
 
 @media (max-width: 1000px) {
   .workbench {
-    grid-template-rows: auto minmax(440px, 1fr) auto;
+    grid-template-rows: auto 500px auto;
   }
 
   .control-deck {
@@ -675,9 +664,9 @@ a[href] {
   }
 
   .instrument-stage {
-    height: clamp(380px, 52svh, 470px);
-    height: clamp(380px, 52dvh, 470px);
-    min-height: 380px;
+    height: clamp(430px, 58svh, 520px);
+    height: clamp(430px, 58dvh, 520px);
+    min-height: 430px;
   }
 
   .caliper-canvas {
@@ -728,7 +717,7 @@ a[href] {
 
   .workbench {
     min-height: calc(100vh - 74px);
-    grid-template-rows: auto minmax(390px, 1fr) auto;
+    grid-template-rows: auto 500px auto;
   }
 
   .stage-copy {
@@ -736,9 +725,8 @@ a[href] {
     padding-block: 0.75rem;
   }
 
-  .instrument-stage,
-  .caliper-canvas {
-    min-height: 390px;
+  .instrument-stage {
+    min-height: 500px;
   }
 
   .control-deck {

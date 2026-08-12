@@ -48,7 +48,7 @@ function getGeometry(width: number): Geometry {
   const side = Math.min(24, Math.max(8, width * 0.012));
   const fixedJawWidth = Math.min(78, Math.max(44, width * 0.061));
   const scaleToContactOffset = Math.min(68, Math.max(34, width * 0.052));
-  const endReserve = Math.min(188, Math.max(70, width * 0.14));
+  const endReserve = Math.min(78, Math.max(42, width * 0.052));
   const fixedContactX = side + fixedJawWidth;
   const mainZeroX = fixedContactX + scaleToContactOffset;
   const beamEnd = width - side;
@@ -91,16 +91,14 @@ function drawInstrument(
   const valueMm = ticksToMm(ticks);
   const movingScaleZeroX = mainZeroX + valueMm * pixelsPerMm;
   const movingContactX = movingScaleZeroX - scaleToContactOffset;
-  const beamY = width < 680
-    ? Math.min(height * 0.44, Math.max(166, height * 0.4))
-    : Math.min(196, Math.max(126, height * 0.305));
-  const beamHeight = Math.min(106, Math.max(72, height * 0.17));
+  const beamY = Math.min(192, Math.max(116, height * 0.27));
+  const beamHeight = Math.min(118, Math.max(78, height * 0.17));
   const beamBottom = beamY + beamHeight;
   const jawBottom = Math.min(
-    height - 42,
-    beamBottom + height * 0.43,
+    height - 54,
+    beamBottom + beamHeight * 2.65,
   );
-  const upperTipY = Math.max(18, beamY - height * 0.265);
+  const upperTipY = Math.max(18, beamY - beamHeight * 1.34);
   const metal = "#c8c8c6";
   const metalLight = "#eeeeec";
   const metalMid = "#aaa9a7";
@@ -166,16 +164,19 @@ function drawInstrument(
   context.fillRect(fixedContactX - 7, beamBottom + 35, 7, Math.max(22, jawBottom - beamBottom - 57));
 
   // Fixed internal jaw.
+  const fixedJawSpan = fixedContactX - side;
+  const fixedInternalFaceX = side + fixedJawSpan * 0.48;
+  const internalShelfY = beamY - beamHeight * 0.34;
   context.beginPath();
   context.moveTo(side, beamY + 1);
-  context.lineTo(side, beamY - 49);
-  context.lineTo(side + 10, beamY - 49);
-  context.lineTo(side + 10, upperTipY);
+  context.lineTo(side, internalShelfY);
+  context.lineTo(fixedInternalFaceX, internalShelfY);
+  context.lineTo(fixedInternalFaceX, upperTipY);
   context.quadraticCurveTo(
-    fixedContactX - 10,
-    upperTipY + 19,
     fixedContactX,
-    beamY - 48,
+    upperTipY + beamHeight * 0.58,
+    fixedContactX,
+    internalShelfY,
   );
   context.lineTo(fixedContactX, beamY + 1);
   context.closePath();
@@ -183,17 +184,18 @@ function drawInstrument(
   context.fill();
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(fixedContactX - 6, beamY - 49, 6, 50);
+  context.fillRect(fixedContactX - 7, internalShelfY, 7, beamY - internalShelfY);
 
   // Moving external jaw. Its long shoulder and tapered leg follow the
   // proportions of a universal caliper while preserving the exact contact.
-  const movingJawShoulder = movingContactX + Math.min(158, Math.max(88, width * 0.125));
-  const movingJawHeel = movingContactX + Math.min(108, Math.max(54, width * 0.084));
+  const movingJawShoulder = movingContactX + Math.min(142, Math.max(82, width * 0.09));
+  const movingJawHeel = movingContactX + Math.min(108, Math.max(58, width * 0.07));
+  const movingJawTop = beamBottom + beamHeight * 0.25;
   context.beginPath();
-  context.moveTo(movingContactX, beamBottom - 7);
-  context.lineTo(movingJawShoulder, beamBottom - 7);
-  context.lineTo(movingJawShoulder, beamBottom + 34);
-  context.lineTo(movingJawShoulder - 9, beamBottom + 38);
+  context.moveTo(movingContactX, movingJawTop);
+  context.lineTo(movingJawShoulder, movingJawTop);
+  context.lineTo(movingJawShoulder, movingJawTop + beamHeight * 0.23);
+  context.lineTo(movingJawShoulder - 9, movingJawTop + beamHeight * 0.27);
   context.lineTo(movingJawHeel, jawBottom - 28);
   context.quadraticCurveTo(
     movingJawHeel - 5,
@@ -208,41 +210,42 @@ function drawInstrument(
   context.strokeStyle = ink;
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(movingContactX, beamBottom + 35, 7, Math.max(22, jawBottom - beamBottom - 35));
+  context.fillRect(movingContactX, movingJawTop + 1, 7, Math.max(22, jawBottom - movingJawTop - 1));
 
   // Moving internal jaw.
+  const movingInternalRootX = movingContactX - fixedJawSpan;
+  const movingInternalFaceX = movingContactX - fixedJawSpan * 0.52;
   context.beginPath();
-  context.moveTo(movingContactX, beamY + 1);
-  context.lineTo(movingContactX, beamY - 50);
+  context.moveTo(movingInternalRootX, beamY + 1);
+  context.lineTo(movingInternalRootX, internalShelfY);
   context.quadraticCurveTo(
-    movingContactX + 8,
-    upperTipY + 17,
-    movingContactX + Math.max(44, scaleToContactOffset * 0.76),
+    movingInternalRootX,
+    upperTipY + beamHeight * 0.58,
+    movingInternalFaceX,
     upperTipY,
   );
-  context.lineTo(
-    movingContactX + Math.max(44, scaleToContactOffset * 0.76),
-    beamY - 50,
-  );
-  context.lineTo(movingScaleZeroX, beamY - 50);
+  context.lineTo(movingInternalFaceX, internalShelfY);
+  context.lineTo(movingScaleZeroX, internalShelfY);
   context.lineTo(movingScaleZeroX, beamY + 1);
   context.closePath();
   context.fillStyle = dragging ? "#b9b7b5" : metal;
   context.fill();
   context.stroke();
   context.fillStyle = metalDark;
-  context.fillRect(movingContactX, beamY - 50, 7, 51);
+  context.fillRect(movingInternalRootX, internalShelfY, 7, beamY - internalShelfY);
 
   // The reference cursor is a long bridge: an upper vernier plate and a
   // separate lower carriage. Their shared width is capped near the beam end.
-  const requestedSliderWidth = Math.min(372, Math.max(184, width * 0.3));
+  const requestedSliderWidth = Math.min(445, Math.max(178, width * 0.26));
   const sliderRight = Math.min(
     beamEnd - 8,
     movingScaleZeroX + requestedSliderWidth,
   );
-  const sliderTop = beamY - Math.min(36, beamHeight * 0.48);
+  const sliderTop = beamY - beamHeight * 0.42;
   const upperPlateLeft = movingContactX + Math.min(12, scaleToContactOffset * 0.18);
-  const upperPlateBottom = beamY + Math.min(48, beamHeight * 0.58);
+  const upperPlateBottom = beamY + beamHeight * 0.18;
+  const vernierTop = beamY + beamHeight * 0.82;
+  const vernierBottom = vernierTop + beamHeight * 0.43;
 
   // Main scale.
   const isMetric = scale.unit === "mm";
@@ -250,7 +253,8 @@ function drawInstrument(
     ? fractionToNumber(scale.mainScaleDivision)
     : fractionToNumber(scale.mainScaleDivision) * 25.4;
   const mainTickCount = Math.floor(150 / mainDivisionInMm);
-  const scaleBaseY = beamY + Math.max(12, beamHeight * 0.14);
+  const scaleBaseY = beamY + beamHeight * 0.62;
+  const mainLabelY = beamY + beamHeight * 0.48;
   context.strokeStyle = ink;
   context.fillStyle = ink;
   context.lineWidth = Math.max(0.8, Math.min(1.35, width / 980));
@@ -265,10 +269,12 @@ function drawInstrument(
     if (isMetric) {
       const millimetres = index * mainDivisionInMm;
       if (Math.abs(millimetres % 10) < 0.0001) {
-        tickHeight = beamHeight * 0.42;
-        label = String(Math.round(millimetres / 10));
+        tickHeight = beamHeight * 0.36;
+        label = millimetres <= 100
+          ? String(Math.round(millimetres / 10))
+          : null;
       } else if (Math.abs(millimetres % 5) < 0.0001) {
-        tickHeight = beamHeight * 0.31;
+        tickHeight = beamHeight * 0.28;
       }
     } else if (scale.id === "in-1/128") {
       if (index % 16 === 0) {
@@ -296,16 +302,16 @@ function drawInstrument(
     context.stroke();
 
     if (label !== null) {
-      context.font = `600 ${Math.max(10, Math.min(16, width / 78))}px Arial, sans-serif`;
+      context.font = `600 ${Math.max(11, Math.min(20, width / 68))}px Arial, sans-serif`;
       context.textAlign = "center";
-      context.fillText(label, x, scaleBaseY + tickHeight + Math.max(15, beamHeight * 0.2));
+      context.fillText(label, x, mainLabelY);
     }
   }
 
   context.font = `700 ${Math.max(9, Math.min(12, width / 96))}px Arial, sans-serif`;
   context.textAlign = "left";
   context.fillStyle = accent;
-  context.fillText(isMetric ? "mm" : "in", mainZeroX + 5, beamBottom - 8);
+  context.fillText(isMetric ? "mm" : "in", mainZeroX + 5, beamY + beamHeight * 0.95);
 
   // Upper slider plate and direct vernier. A vernier step is one resolution
   // shorter than a main-scale division, so the aligned mark remains physical.
@@ -319,6 +325,15 @@ function drawInstrument(
   context.strokeRect(upperPlateLeft, sliderTop, sliderRight - upperPlateLeft, upperPlateBottom - sliderTop);
   context.fillStyle = "#d7d7d4";
   context.fillRect(upperPlateLeft + 2, sliderTop + 3, Math.max(0, sliderRight - upperPlateLeft - 4), 5);
+
+  // The vernier is a second, lower plate. The exposed band between both
+  // plates preserves the complete main scale, as on the physical instrument.
+  context.fillStyle = metalLight;
+  context.fillRect(upperPlateLeft, vernierTop, sliderRight - upperPlateLeft, vernierBottom - vernierTop);
+  context.strokeStyle = ink;
+  context.strokeRect(upperPlateLeft, vernierTop, sliderRight - upperPlateLeft, vernierBottom - vernierTop);
+  context.fillStyle = metalMid;
+  context.fillRect(upperPlateLeft + 2, vernierBottom - 6, Math.max(0, sliderRight - upperPlateLeft - 4), 4);
 
   const baseLabelEvery =
     scale.vernierDivisions <= 10
@@ -337,25 +352,25 @@ function drawInstrument(
   context.textAlign = "center";
   context.fillStyle = ink;
   context.font = `600 ${Math.max(8, Math.min(11, width / 100))}px Arial, sans-serif`;
-  const vernierTickTop = sliderTop + Math.max(31, (upperPlateBottom - sliderTop) * 0.46);
+  const vernierTickTop = vernierTop + 1;
 
   for (let index = 0; index <= scale.vernierDivisions; index += 1) {
     const x = movingScaleZeroX + index * vernierStepPx;
     if (x > sliderRight - 5) break;
     const major = index === 0 || index === scale.vernierDivisions || index % labelEvery === 0;
-    const tickHeight = major ? Math.min(31, beamHeight * 0.38) : Math.min(20, beamHeight * 0.25);
+    const tickHeight = major ? beamHeight * 0.28 : beamHeight * 0.18;
     context.beginPath();
     context.moveTo(x, vernierTickTop);
     context.lineTo(x, vernierTickTop + tickHeight);
     context.stroke();
-    if (major) {
+    if (major && !(scale.vernierDivisions === 50 && index === 50)) {
       const labelValue =
         scale.vernierDivisions === 20
           ? index / 2
           : scale.vernierDivisions === 50
             ? index / 5
             : index;
-      context.fillText(String(labelValue), x, sliderTop + 24);
+      context.fillText(String(labelValue), x, vernierBottom - 6);
     }
   }
 
@@ -377,26 +392,16 @@ function drawInstrument(
   context.fillRect(screwX - 16, screwTop, 32, 10);
   context.strokeRect(screwX - 16, screwTop, 32, 10);
 
-  // Lower carriage plate: long and shallow, as on the reference instrument.
-  const carriageTop = beamBottom - 8;
-  const carriageBottom = carriageTop + Math.min(48, Math.max(38, height * 0.078));
-  context.fillStyle = metalLight;
-  context.fillRect(movingContactX, carriageTop, sliderRight - movingContactX, carriageBottom - carriageTop);
-  context.strokeStyle = ink;
-  context.strokeRect(movingContactX, carriageTop, sliderRight - movingContactX, carriageBottom - carriageTop);
-  context.fillStyle = metalMid;
-  context.fillRect(movingContactX + 2, carriageBottom - 8, Math.max(0, sliderRight - movingContactX - 4), 6);
-
   // Thumb roller.
   const rollerX = Math.min(
     beamEnd - 32,
-    movingContactX + Math.max(82, (sliderRight - movingContactX) * 0.8),
+    movingContactX + Math.max(82, (sliderRight - movingContactX) * 0.86),
   );
   context.beginPath();
   context.arc(
     rollerX,
-    carriageBottom + 4,
-    Math.min(29, Math.max(21, height * 0.05)),
+    vernierBottom + 3,
+    Math.min(36, Math.max(22, beamHeight * 0.36)),
     0,
     Math.PI,
     false,
@@ -406,11 +411,24 @@ function drawInstrument(
   context.strokeStyle = ink;
   context.stroke();
 
-  // Instrument branding.
+  // Compact maker's mark in the same neutral zone used by real instruments.
+  const markSize = Math.min(22, beamHeight * 0.27);
+  const markX = side + 11;
+  const markY = beamY + beamHeight * 0.34;
+  context.fillStyle = accent;
+  context.beginPath();
+  context.roundRect(markX, markY, markSize, markSize, Math.max(3, markSize * 0.22));
+  context.fill();
+  context.fillStyle = "#ffffff";
+  context.textAlign = "center";
+  context.font = `800 ${Math.max(6, markSize * 0.38)}px Arial, sans-serif`;
+  context.fillText("CA", markX + markSize / 2, markY + markSize * 0.66);
   context.textAlign = "left";
   context.fillStyle = fineInk;
-  context.font = `700 ${Math.max(8, Math.min(12, width / 90))}px Arial, sans-serif`;
-  context.fillText("Cabalero_Automações", side + 12, beamY + beamHeight * 0.46);
+  context.font = `700 ${Math.max(7, Math.min(10, width / 120))}px Arial, sans-serif`;
+  context.fillText("Cabalero", markX + markSize + 6, markY + markSize * 0.43);
+  context.font = `500 ${Math.max(6, Math.min(8, width / 150))}px Arial, sans-serif`;
+  context.fillText("Automações", markX + markSize + 6, markY + markSize * 0.86);
 
   // Contact arrows make the measured span explicit without revealing the value.
   const dimensionY = Math.min(height - 14, jawBottom + 27);
