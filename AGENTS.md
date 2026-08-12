@@ -29,3 +29,16 @@ Responsável por sequência didática, exemplos, exercícios, erros frequentes e
 ## Integração
 
 A raiz do projeto integra as frentes, resolve conflitos e só publica depois de lint, build, testes, revisão visual e segurança. Documentos de referência são informativos; `PRODUCT.md` governa estratégia e `DESIGN.md` governa decisões visuais quando existir.
+
+## Marco satisfatório aprovado
+
+O estado identificado pela tag Git `entrega-satisfatoria-layout-v1` é o ponto de retorno aprovado pelo responsável do produto. Nesta entrega:
+
+- o layout de saída foi considerado satisfatório;
+- a estrutura de desenho do paquímetro foi considerada correta;
+- as mandíbulas inferiores usam o mesmo perfil geométrico espelhado;
+- a leitura aparece junto à linha de cota e se reposiciona em aberturas pequenas;
+- toque, arraste, teclado, tela cheia, resoluções e demais comandos foram considerados funcionais;
+- o gate `npm run test:ci` passou integralmente.
+
+Próximos agentes devem fazer alterações incrementais e preservar esses comportamentos. Antes de publicar, devem comparar visualmente desktop e celular horizontal com esse marco, executar `npm run test:ci` e evitar reescrever a geometria completa quando o pedido exigir apenas um ajuste localizado. Se uma rodada introduzir regressão, a tag deve ser usada como referência de comparação, não como autorização para apagar trabalhos posteriores do usuário.

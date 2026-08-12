@@ -173,6 +173,10 @@ O instrumento é desenhado em canvas de alta densidade com três tons de metal e
 
 A construção mecânica separa as faces de contato dos zeros das escalas por um deslocamento constante: a face externa fixa antecede o zero da escala principal, e a face externa móvel antecede o zero do nônio pela mesma distância. Garras inferiores estreitas e afuniladas, garras internas altas e uma ponte do cursor mais longa mantêm a silhueta de um paquímetro universal real sem reproduzir ativos da referência.
 
+### Estado visual aprovado
+
+O marco `entrega-satisfatoria-layout-v1` registra a primeira saída considerada satisfatória pelo responsável do produto. A composição, a estrutura do desenho, a simetria espelhada das mandíbulas inferiores, a leitura integrada à linha de cota e o funcionamento dos comandos formam a base visual que deve permanecer estável. Ajustes posteriores devem ser localizados e comparados em navegador real com esse marco antes de substituir a versão publicada.
+
 ## Do's and Don'ts
 
 ### Do:
