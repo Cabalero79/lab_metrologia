@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-12T01:15:00-03:00",
+  "title": "Design System: Cabalero_Automações — Laboratório de Metrologia",
+  "extensions": {
+    "colorMeta": {
+      "brand-wine": {
+        "role": "primary",
+        "displayName": "Vinho de Calibração",
+        "canonical": "oklch(0.36 0.147 340)",
+        "tonalRamp": ["oklch(0.15 0.06 340)", "oklch(0.25 0.10 340)", "oklch(0.36 0.147 340)", "oklch(0.46 0.14 340)", "oklch(0.58 0.12 340)", "oklch(0.70 0.09 340)", "oklch(0.84 0.055 340)", "oklch(0.95 0.02 340)"]
+      },
+      "brand-wine-deep": {
+        "role": "primary",
+        "displayName": "Vinho de Oficina",
+        "canonical": "oklch(0.29 0.125 340)",
+        "tonalRamp": ["oklch(0.15 0.06 340)", "oklch(0.22 0.095 340)", "oklch(0.29 0.125 340)", "oklch(0.40 0.13 340)", "oklch(0.53 0.11 340)", "oklch(0.67 0.085 340)", "oklch(0.82 0.05 340)", "oklch(0.95 0.018 340)"]
+      },
+      "brand-blush": {
+        "role": "primary",
+        "displayName": "Papel Rosado",
+        "canonical": "oklch(0.92 0.042 340)",
+        "tonalRamp": ["oklch(0.15 0.03 340)", "oklch(0.28 0.04 340)", "oklch(0.42 0.045 340)", "oklch(0.56 0.045 340)", "oklch(0.70 0.044 340)", "oklch(0.82 0.043 340)", "oklch(0.92 0.042 340)", "oklch(0.97 0.018 340)"]
+      },
+      "drafting-paper": {
+        "role": "neutral",
+        "displayName": "Papel de Projeto",
+        "canonical": "oklch(0.975 0.006 340)",
+        "tonalRamp": ["oklch(0.15 0.006 340)", "oklch(0.28 0.006 340)", "oklch(0.42 0.006 340)", "oklch(0.56 0.006 340)", "oklch(0.70 0.006 340)", "oklch(0.82 0.006 340)", "oklch(0.91 0.006 340)", "oklch(0.975 0.006 340)"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Grafite de Traçado",
+        "canonical": "oklch(0.205 0.018 340)",
+        "tonalRamp": ["oklch(0.15 0.012 340)", "oklch(0.205 0.018 340)", "oklch(0.32 0.019 340)", "oklch(0.46 0.018 340)", "oklch(0.60 0.016 340)", "oklch(0.73 0.013 340)", "oklch(0.86 0.009 340)", "oklch(0.95 0.004 340)"]
+      },
+      "focus-amber": {
+        "role": "tertiary",
+        "displayName": "Âmbar de Segurança",
+        "canonical": "oklch(0.67 0.17 70)",
+        "tonalRamp": ["oklch(0.15 0.06 70)", "oklch(0.25 0.10 70)", "oklch(0.37 0.14 70)", "oklch(0.50 0.17 70)", "oklch(0.67 0.17 70)", "oklch(0.76 0.14 70)", "oklch(0.86 0.09 70)", "oklch(0.95 0.04 70)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Título do instrumento", "purpose": "Um título compacto por tela." },
+      "body": { "displayName": "Texto técnico", "purpose": "Instruções e conteúdo pedagógico." },
+      "label": { "displayName": "Etiqueta de bancada", "purpose": "Resolução, contexto e medidas." }
+    },
+    "shadows": [
+      { "name": "bench-ambient", "value": "0 24px 64px oklch(0.24 0.04 340 / 0.12)", "purpose": "Separar a bancada do papel de projeto em desktop." },
+      { "name": "readout-elevated", "value": "0 15px 34px oklch(0.25 0.11 340 / 0.23)", "purpose": "Fixar o mostrador acima do instrumento." }
+    ],
+    "motion": [
+      { "name": "state-immediate", "value": "0ms", "purpose": "Mudanças de escala e medida devem parecer instrumentais, sem coreografia." },
+      { "name": "reduced-motion", "value": "0.001ms", "purpose": "Neutralizar animação quando o sistema pede movimento reduzido." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "680px" },
+      { "name": "compact-desktop", "value": "1000px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação de prática que merece maior ênfase.",
+      "html": "<button class=\"ds-primary\">Sortear e ocultar</button>",
+      "css": ".ds-primary{min-height:52px;padding:.7rem .9rem;border:0;border-radius:var(--radius-sm,.6rem);background:var(--brand,oklch(.36 .147 340));color:white;font:760 .76rem Geist,Arial,sans-serif}.ds-primary:hover{background:var(--brand-strong,oklch(.29 .125 340))}.ds-primary:focus-visible{outline:3px solid var(--focus,oklch(.67 .17 70));outline-offset:3px}"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação reversível e discreta.",
+      "html": "<button class=\"ds-secondary\">Fechar</button>",
+      "css": ".ds-secondary{min-height:52px;padding:.7rem .9rem;border:1px solid var(--line,oklch(.84 .02 340));border-radius:var(--radius-sm,.6rem);background:transparent;color:var(--brand-strong,oklch(.29 .125 340));font:760 .76rem Geist,Arial,sans-serif}.ds-secondary:hover{background:white}.ds-secondary:focus-visible{outline:3px solid var(--focus,oklch(.67 .17 70));outline-offset:3px}"
+    },
+    {
+      "name": "Seletor de unidade",
+      "kind": "custom",
+      "description": "Segmento binário com estado pressionado explícito.",
+      "html": "<div class=\"ds-segment\"><button class=\"ds-segment-active\">Milímetro<small>mm</small></button><button>Polegada<small>in</small></button></div>",
+      "css": ".ds-segment{display:flex;gap:.3rem;padding:.3rem;border:1px solid var(--line,oklch(.84 .02 340));border-radius:var(--radius-md,.9rem);background:white}.ds-segment button{min-height:54px;padding:.62rem .85rem;border:0;border-radius:.62rem;background:transparent;color:var(--ink-muted,oklch(.47 .025 340));font:720 .76rem Geist,Arial,sans-serif}.ds-segment small{display:block;font-family:'Geist Mono',monospace}.ds-segment .ds-segment-active{background:var(--brand,oklch(.36 .147 340));color:white}.ds-segment button:focus-visible{outline:3px solid var(--focus,oklch(.67 .17 70));outline-offset:2px}"
+    },
+    {
+      "name": "Opção de resolução",
+      "kind": "card",
+      "description": "Perfil metrológico selecionável com valor e explicação.",
+      "html": "<button class=\"ds-resolution\"><strong>0,05 mm</strong><span>cinco centésimos · 20 divisões</span></button>",
+      "css": ".ds-resolution{min-width:150px;min-height:66px;padding:.65rem .75rem;display:grid;gap:.16rem;text-align:left;border:1px solid var(--brand,oklch(.36 .147 340));border-radius:var(--radius-sm,.6rem);background:var(--brand-soft,oklch(.92 .042 340));box-shadow:inset 0 -3px 0 var(--brand,oklch(.36 .147 340));color:var(--ink,oklch(.205 .018 340))}.ds-resolution strong{font:700 .94rem 'Geist Mono',monospace}.ds-resolution span{font:400 .62rem Geist,Arial,sans-serif;color:var(--ink-muted,oklch(.47 .025 340))}.ds-resolution:focus-visible{outline:3px solid var(--focus,oklch(.67 .17 70));outline-offset:3px}"
+    },
+    {
+      "name": "Mostrador de leitura",
+      "kind": "card",
+      "refersTo": "readout",
+      "description": "Resposta projetável com decomposição metrológica.",
+      "html": "<section class=\"ds-readout\"><small>MEDIDA ATUAL</small><strong>58,35 mm</strong><span>58,00 mm + 0,35 mm</span></section>",
+      "css": ".ds-readout{width:300px;padding:.88rem 1rem .82rem;display:grid;gap:.25rem;border-radius:var(--radius-md,.9rem);background:var(--brand-strong,oklch(.29 .125 340));color:white;box-shadow:0 15px 34px oklch(.25 .11 340/.23)}.ds-readout small,.ds-readout span{font-family:'Geist Mono',monospace}.ds-readout small{font-size:.68rem;letter-spacing:.1em}.ds-readout strong{font:560 2.6rem/1 'Geist Mono',monospace;letter-spacing:-.06em}.ds-readout span{font-size:.68rem;color:oklch(.88 .024 340)}"
+    },
+    {
+      "name": "Bancada principal",
+      "kind": "custom",
+      "refersTo": "workbench",
+      "description": "Contêiner único que prioriza o instrumento.",
+      "html": "<section class=\"ds-bench\"><span>LABORATÓRIO DE METROLOGIA</span><h2>Paquímetro universal com nônio</h2><div>Área do instrumento</div></section>",
+      "css": ".ds-bench{padding:1.25rem;border:1px solid var(--line,oklch(.84 .02 340));border-radius:var(--radius-lg,1.35rem);background:white;color:var(--ink,oklch(.205 .018 340));box-shadow:0 24px 64px oklch(.24 .04 340/.12);font-family:Geist,Arial,sans-serif}.ds-bench span{font:760 .66rem 'Geist Mono',monospace;letter-spacing:.09em;color:var(--brand,oklch(.36 .147 340))}.ds-bench h2{margin:.4rem 0 1rem;letter-spacing:-.045em}.ds-bench div{min-height:120px;display:grid;place-items:center;background:var(--surface,oklch(.975 .006 340));color:var(--ink-muted,oklch(.47 .025 340))}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Bancada de Precisão",
+    "overview": "A interface traduz uma bancada industrial bem iluminada para o navegador: papel de desenho ao fundo, metal técnico no instrumento e vinho profundo apenas onde uma decisão ou leitura exige atenção. A voz é precisa, industrial e didática; o paquímetro é sempre o maior elemento.",
+    "keyCharacteristics": ["instrumento analógico dominante sobre bancada clara", "contraste estrutural de grafite, aço e vinho", "controles compactos, táteis e semanticamente explícitos", "resposta e escala derivadas da mesma medida exata"],
+    "rules": [
+      { "name": "The One Gauge Rule", "body": "O vinho é reservado a leitura, seleção e ação.", "section": "colors" },
+      { "name": "The Numeric Truth Rule", "body": "Medidas usam Geist Mono com numerais tabulares.", "section": "typography" },
+      { "name": "The Structural Depth Rule", "body": "Corrija a superfície antes de aumentar a sombra.", "section": "elevation" }
+    ],
+    "dos": ["Do manter o instrumento como maior elemento da tela.", "Do derivar desenho, texto e cota da mesma medida inteira e determinística."],
+    "donts": ["Don't recriar o estilo de Flash.", "Don't introduzir anúncios, pop-ups, downloads, redirecionamentos ou telemetria.", "Don't organizar a experiência como dashboard de cartões genéricos.", "Don't copiar ativos, código ou textos extensos da referência."]
+  }
+}
