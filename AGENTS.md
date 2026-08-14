@@ -42,3 +42,16 @@ O estado identificado pela tag Git `entrega-satisfatoria-layout-v1` é o ponto d
 - o gate `npm run test:ci` passou integralmente.
 
 Próximos agentes devem fazer alterações incrementais e preservar esses comportamentos. Antes de publicar, devem comparar visualmente desktop e celular horizontal com esse marco, executar `npm run test:ci` e evitar reescrever a geometria completa quando o pedido exigir apenas um ajuste localizado. Se uma rodada introduzir regressão, a tag deve ser usada como referência de comparação, não como autorização para apagar trabalhos posteriores do usuário.
+
+## Marco satisfatório atual
+
+O estado identificado pela tag Git `entrega-satisfatoria-layout-v2` passa a ser o ponto de retorno mais recente aprovado pelo responsável do produto. Além de preservar o marco anterior, esta entrega registra:
+
+- projeções próprias para milímetros e polegadas, com escala principal e nônio encontrando a mesma costura;
+- ampliação localizada da escala com fechamento por X ou `Escape`, mantendo arraste, toque e teclado ativos;
+- leitura na linha de cota sem caixa opaca sobre a haste;
+- identidade Cabalero ampliada na página e marca empilhada no instrumento, sem invadir o zero da escala;
+- ativo local do Cavaleiro Samurai, sem dependência externa;
+- gate `npm run test:ci` aprovado integralmente.
+
+Para novas alterações visuais, comparar desktop, celular horizontal e 320 px com `entrega-satisfatoria-layout-v2`. A tag `entrega-satisfatoria-layout-v1` permanece como referência histórica da primeira composição aprovada.

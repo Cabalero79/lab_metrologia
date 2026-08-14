@@ -10,6 +10,7 @@ test("build produz worker, manifesto e ativos locais essenciais", async () => {
     "dist/server/wrangler.json",
     "dist/client/.vite/manifest.json",
     "dist/client/favicon.svg",
+    "dist/client/cavaleiro-samurai.png",
   ];
 
   await Promise.all(requiredFiles.map((file) => access(projectFile(file))));

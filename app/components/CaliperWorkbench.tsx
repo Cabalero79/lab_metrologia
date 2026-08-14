@@ -24,6 +24,10 @@ import {
   ticksToInches,
   ticksToMm,
 } from "../../lib/caliper";
+import {
+  getScalePresentation,
+  getVernierLabelInterval,
+} from "../../lib/caliper-presentation";
 
 const INITIAL_TICKS = mmToTicks(58.35);
 
@@ -166,6 +170,43 @@ function getInstrumentLayout(
   };
 }
 
+interface DetailViewport {
+  readonly zoom: number;
+  readonly focusX: number;
+  readonly focusY: number;
+  readonly targetX: number;
+  readonly targetY: number;
+}
+
+function getDetailViewport(
+  width: number,
+  height: number,
+  layout: InstrumentLayout,
+  scale: CaliperScale,
+): DetailViewport {
+  const mainDivisionInMm =
+    scale.unit === "mm"
+      ? fractionToNumber(scale.mainScaleDivision)
+      : fractionToNumber(scale.mainScaleDivision) * 25.4;
+  const mainDivisionPx = mainDivisionInMm * layout.pixelsPerMm;
+  const vernierEndX =
+    layout.movingScaleZeroX + scale.vernierDivisions * layout.vernierStepPx;
+  const sourceLeft = layout.movingScaleZeroX - mainDivisionPx * 1.5;
+  const sourceRight = vernierEndX + Math.max(18, mainDivisionPx);
+  const sourceWidth = Math.max(1, sourceRight - sourceLeft);
+  const horizontalZoom = (width * 0.82) / sourceWidth;
+  const zoom = Math.min(2.4, Math.max(1.55, horizontalZoom));
+  const presentation = getScalePresentation(scale.unit, layout);
+
+  return {
+    zoom,
+    focusX: (sourceLeft + sourceRight) / 2,
+    focusY: presentation.detailFocusY,
+    targetX: width * 0.5,
+    targetY: height * 0.5,
+  };
+}
+
 function getExternalJawPath(
   layout: InstrumentLayout,
   contactX: number,
@@ -232,10 +273,9 @@ function isPointInMovingAssembly(
   let y = clientY - rect.top;
 
   if (detailMode) {
-    const zoom = 1.55;
-    const detailY = layout.beamY + layout.beamHeight * 0.72;
-    x = (x - rect.width * 0.5) / zoom + layout.movingScaleZeroX;
-    y = (y - rect.height * 0.56) / zoom + detailY;
+    const viewport = getDetailViewport(rect.width, rect.height, layout, scale);
+    x = (x - viewport.targetX) / viewport.zoom + viewport.focusX;
+    y = (y - viewport.targetY) / viewport.zoom + viewport.focusY;
   }
 
   const within = (
@@ -316,6 +356,7 @@ function drawInstrument(
   detailMode: boolean,
   readingLabel: string,
   answerVisible: boolean,
+  brandingImage: HTMLImageElement | null,
 ) {
   const layout = getInstrumentLayout(width, height, ticks, scale);
   const {
@@ -357,11 +398,10 @@ function drawInstrument(
   context.clearRect(0, 0, width, height);
   context.save();
   if (detailMode) {
-    const zoom = 1.55;
-    const detailY = beamY + beamHeight * 0.72;
-    context.translate(width * 0.5, height * 0.56);
-    context.scale(zoom, zoom);
-    context.translate(-movingScaleZeroX, -detailY);
+    const viewport = getDetailViewport(width, height, layout, scale);
+    context.translate(viewport.targetX, viewport.targetY);
+    context.scale(viewport.zoom, viewport.zoom);
+    context.translate(-viewport.focusX, -viewport.focusY);
   }
   context.lineJoin = "round";
   context.lineCap = "square";
@@ -458,8 +498,9 @@ function drawInstrument(
     ? fractionToNumber(scale.mainScaleDivision)
     : fractionToNumber(scale.mainScaleDivision) * 25.4;
   const mainTickCount = Math.floor(150 / mainDivisionInMm);
-  const scaleBaseY = beamY + beamHeight * 0.62;
-  const mainLabelY = beamY + beamHeight * 0.48;
+  const scalePresentation = getScalePresentation(scale.unit, layout);
+  const scaleBaseY = scalePresentation.mainTickBaselineY;
+  const mainLabelY = scalePresentation.mainLabelY;
   context.strokeStyle = ink;
   context.fillStyle = ink;
   context.lineWidth = Math.max(0.8, Math.min(1.35, width / 980));
@@ -503,7 +544,10 @@ function drawInstrument(
 
     context.beginPath();
     context.moveTo(x, scaleBaseY);
-    context.lineTo(x, scaleBaseY + tickHeight);
+    context.lineTo(
+      x,
+      scaleBaseY + tickHeight * scalePresentation.mainTickDirection,
+    );
     context.stroke();
 
     if (label !== null) {
@@ -516,7 +560,11 @@ function drawInstrument(
   context.font = `700 ${Math.max(9, Math.min(12, width / 96))}px Arial, sans-serif`;
   context.textAlign = "left";
   context.fillStyle = accent;
-  context.fillText(isMetric ? "mm" : "in", mainZeroX + 5, beamY + beamHeight * 0.95);
+  context.fillText(
+    isMetric ? "mm" : "in",
+    mainZeroX + 5,
+    scalePresentation.unitLabelY,
+  );
 
   // Upper slider plate and direct vernier. A vernier step is one resolution
   // shorter than a main-scale division, so the aligned mark remains physical.
@@ -537,32 +585,26 @@ function drawInstrument(
   context.fillStyle = metalMid;
   context.fillRect(upperPlateLeft + 2, vernierBottom - 6, Math.max(0, sliderRight - upperPlateLeft - 4), 4);
 
-  const baseLabelEvery =
-    scale.vernierDivisions <= 10
-      ? 1
-      : scale.vernierDivisions === 20
-        ? 2
-        : 5;
-  const minimumLabelStep = Math.max(baseLabelEvery, Math.ceil(12 / vernierStepPx));
-  const labelEvery = Array.from(
-    { length: scale.vernierDivisions / baseLabelEvery },
-    (_, index) => (index + 1) * baseLabelEvery,
-  ).find(
-    (candidate) =>
-      candidate >= minimumLabelStep && scale.vernierDivisions % candidate === 0,
-  ) ?? scale.vernierDivisions;
+  const labelEvery = getVernierLabelInterval(
+    scale.id,
+    scale.vernierDivisions,
+    vernierStepPx,
+  );
   context.textAlign = "center";
   context.fillStyle = ink;
   context.font = `600 ${Math.max(8, Math.min(11, width / 100))}px Arial, sans-serif`;
-  const vernierTickTop = vernierTop + 1;
+  const vernierTickBaselineY = scalePresentation.vernierTickBaselineY;
 
   for (let index = 0; index <= scale.vernierDivisions; index += 1) {
     const x = movingScaleZeroX + index * vernierStepPx;
     const major = index === 0 || index === scale.vernierDivisions || index % labelEvery === 0;
     const tickHeight = major ? beamHeight * 0.28 : beamHeight * 0.18;
     context.beginPath();
-    context.moveTo(x, vernierTickTop);
-    context.lineTo(x, vernierTickTop + tickHeight);
+    context.moveTo(x, vernierTickBaselineY);
+    context.lineTo(
+      x,
+      vernierTickBaselineY + tickHeight * scalePresentation.vernierTickDirection,
+    );
     context.stroke();
     if (major) {
       const labelValue =
@@ -571,7 +613,7 @@ function drawInstrument(
           : scale.vernierDivisions === 50
             ? index / 5
             : index;
-      context.fillText(String(labelValue), x, vernierBottom - 6);
+      context.fillText(String(labelValue), x, scalePresentation.vernierLabelY);
     }
   }
 
@@ -603,24 +645,41 @@ function drawInstrument(
   context.strokeStyle = ink;
   context.stroke();
 
-  // Compact maker's mark in the same neutral zone used by real instruments.
-  const markSize = Math.min(22, beamHeight * 0.27);
-  const markX = side + 11;
-  const markY = beamY + beamHeight * 0.34;
-  context.fillStyle = accent;
-  context.beginPath();
-  context.roundRect(markX, markY, markSize, markSize, Math.max(3, markSize * 0.22));
-  context.fill();
-  context.fillStyle = "#ffffff";
-  context.textAlign = "center";
-  context.font = `800 ${Math.max(6, markSize * 0.38)}px Arial, sans-serif`;
-  context.fillText("CA", markX + markSize / 2, markY + markSize * 0.66);
-  context.textAlign = "left";
+  // Stack the maker's mark inside the neutral zone at every viewport size.
+  // Keeping the copy below the figure guarantees clearance from scale zero.
+  const brandZoneWidth = mainZeroX - side;
+  const largeBrandZone = brandZoneWidth >= 130;
+  const markSize = largeBrandZone
+    ? Math.min(60, Math.max(52, beamHeight * 0.58))
+    : Math.min(44, Math.max(42, beamHeight * 0.5));
+  const markX = side + (brandZoneWidth - markSize) / 2;
+  const markY = beamY + 4;
+  if (brandingImage) {
+    context.drawImage(brandingImage, markX, markY, markSize, markSize);
+  } else {
+    context.fillStyle = accent;
+    context.beginPath();
+    context.roundRect(markX, markY, markSize, markSize, Math.max(3, markSize * 0.22));
+    context.fill();
+    context.fillStyle = "#ffffff";
+    context.textAlign = "center";
+    context.font = `800 ${Math.max(6, markSize * 0.38)}px Arial, sans-serif`;
+    context.fillText("CA", markX + markSize / 2, markY + markSize * 0.66);
+  }
   context.fillStyle = fineInk;
-  context.font = `700 ${Math.max(7, Math.min(10, width / 120))}px Arial, sans-serif`;
-  context.fillText("Cabalero", markX + markSize + 6, markY + markSize * 0.43);
-  context.font = `500 ${Math.max(6, Math.min(8, width / 150))}px Arial, sans-serif`;
-  context.fillText("Automações", markX + markSize + 6, markY + markSize * 0.86);
+  const brandCenterX = side + brandZoneWidth / 2;
+  const brandNameSize = largeBrandZone ? 13 : 10;
+  const brandDescriptorSize = largeBrandZone ? 11 : 9;
+  context.textAlign = "center";
+  context.font = `750 ${brandNameSize}px Arial, sans-serif`;
+  context.fillText("Cabalero", brandCenterX, markY + markSize + brandNameSize);
+  context.font = `550 ${brandDescriptorSize}px Arial, sans-serif`;
+  context.fillText(
+    "Automações",
+    brandCenterX,
+    markY + markSize + brandNameSize + brandDescriptorSize + 2,
+  );
+  context.textAlign = "left";
 
   // Contact arrows and their label are tied to the same exact reading used by
   // the HTML readout. In practice mode the label becomes a neutral question
@@ -669,14 +728,12 @@ function drawInstrument(
     );
   }
   const labelCenterY = dimensionY - dimensionFontSize * 0.78;
-  const labelHeight = dimensionFontSize + 6;
-  context.fillStyle = "#ffffff";
-  context.fillRect(
-    labelCenterX - labelWidth / 2,
-    labelCenterY - labelHeight / 2,
-    labelWidth,
-    labelHeight,
-  );
+  // A rounded text halo keeps the reading legible over metal without the
+  // conspicuous white rectangle that crossed the lower jaw at small openings.
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = Math.max(4, dimensionFontSize * 0.18);
+  context.lineJoin = "round";
+  context.strokeText(dimensionLabel, labelCenterX, labelCenterY);
   context.fillStyle = ink;
   context.fillText(dimensionLabel, labelCenterX, labelCenterY);
   context.restore();
@@ -714,7 +771,9 @@ export function CaliperWorkbench() {
   const [detailMode, setDetailMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [brandingImage, setBrandingImage] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const detailButtonRef = useRef<HTMLButtonElement>(null);
   const labRef = useRef<HTMLElement>(null);
   const dragOriginRef = useRef<{ clientX: number; ticks: number } | null>(null);
   const activePointerRef = useRef<number | null>(null);
@@ -732,6 +791,36 @@ export function CaliperWorkbench() {
     [scale],
   );
 
+  const closeDetail = useCallback(() => {
+    setDetailMode(false);
+    setAnnouncement("Ampliação fechada. Visualização geral restaurada.");
+    window.requestAnimationFrame(() => detailButtonRef.current?.focus());
+  }, []);
+
+  const toggleDetail = () => {
+    if (detailMode) {
+      closeDetail();
+      return;
+    }
+
+    setDetailMode(true);
+    setAnnouncement(
+      "Escala e nônio ampliados. O paquímetro continua ajustável por arraste, toque ou teclado.",
+    );
+    window.requestAnimationFrame(() => canvasRef.current?.focus());
+  };
+
+  useEffect(() => {
+    const image = new window.Image();
+    image.decoding = "async";
+    image.onload = () => setBrandingImage(image);
+    image.src = "/cavaleiro-samurai.png";
+
+    return () => {
+      image.onload = null;
+    };
+  }, []);
+
   useEffect(() => {
     const onFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === labRef.current);
@@ -739,6 +828,19 @@ export function CaliperWorkbench() {
     document.addEventListener("fullscreenchange", onFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
   }, []);
+
+  useEffect(() => {
+    if (!detailMode) return;
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      closeDetail();
+    };
+
+    document.addEventListener("keydown", onEscape);
+    return () => document.removeEventListener("keydown", onEscape);
+  }, [closeDetail, detailMode]);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -765,6 +867,7 @@ export function CaliperWorkbench() {
         detailMode,
         reading,
         answerVisible,
+        brandingImage,
       );
       const lastMousePosition = lastMousePositionRef.current;
       if (lastMousePosition && !dragging) {
@@ -792,7 +895,7 @@ export function CaliperWorkbench() {
       observer.disconnect();
       window.cancelAnimationFrame(resizeFrame);
     };
-  }, [ticks, scale, dragging, detailMode, reading, answerVisible]);
+  }, [ticks, scale, dragging, detailMode, reading, answerVisible, brandingImage]);
 
   const pointerIsOnMovingAssembly = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -813,10 +916,12 @@ export function CaliperWorkbench() {
     const origin = dragOriginRef.current;
     if (!canvas || !origin) return;
     const rect = canvas.getBoundingClientRect();
-    const { pixelsPerMm } = getGeometry(rect.width);
-    const zoom = detailMode ? 1.55 : 1;
+    const layout = getInstrumentLayout(rect.width, rect.height, ticks, scale);
+    const zoom = detailMode
+      ? getDetailViewport(rect.width, rect.height, layout, scale).zoom
+      : 1;
     const deltaMillimetres =
-      (event.clientX - origin.clientX) / (pixelsPerMm * zoom);
+      (event.clientX - origin.clientX) / (layout.pixelsPerMm * zoom);
     setReading(origin.ticks + mmToTicks(deltaMillimetres));
   };
 
@@ -972,9 +1077,7 @@ export function CaliperWorkbench() {
     <main className="lab-shell" ref={labRef}>
       <header className="lab-header">
         <a className="brand" href="#simulador" aria-label="Cabalero Automações — início">
-          <span className="brand-mark" aria-hidden="true">
-            <span>CA</span>
-          </span>
+          <span className="brand-mark" aria-hidden="true" />
           <span className="brand-copy">
             <strong>Cabalero_Automações</strong>
             <small>Engenharia de Software aplicada à Indústria</small>
@@ -984,15 +1087,6 @@ export function CaliperWorkbench() {
           <span className="status-chip">
             <span aria-hidden="true" /> Paquímetro universal
           </span>
-          <button
-            className="icon-text-button detail-button"
-            type="button"
-            aria-pressed={detailMode}
-            onClick={() => setDetailMode((active) => !active)}
-          >
-            <span aria-hidden="true">⌕</span>
-            {detailMode ? "Visão geral" : "Ampliar escala"}
-          </button>
           <button className="icon-text-button" type="button" onClick={toggleFullscreen}>
             <span aria-hidden="true">⛶</span>
             {isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
@@ -1035,8 +1129,27 @@ export function CaliperWorkbench() {
           </div>
         </div>
 
-        <div className="instrument-stage">
+        <div className="instrument-stage" data-detail={detailMode}>
+          <button
+            ref={detailButtonRef}
+            className={`detail-control${detailMode ? " is-active" : ""}`}
+            type="button"
+            aria-controls="caliper-canvas"
+            aria-expanded={detailMode}
+            aria-pressed={detailMode}
+            aria-label={detailMode ? "Fechar ampliação" : "Ampliar escala e nônio"}
+            title={detailMode ? "Fechar ampliação (Esc)" : "Ampliar escala e nônio"}
+            onClick={toggleDetail}
+          >
+            {detailMode ? (
+              <span className="close-symbol" aria-hidden="true" />
+            ) : (
+              <span className="magnifier-symbol" aria-hidden="true" />
+            )}
+          </button>
+
           <canvas
+            id="caliper-canvas"
             ref={canvasRef}
             className={`caliper-canvas${movingAssemblyHovered ? " is-interactive" : ""}${dragging ? " is-dragging" : ""}`}
             role="slider"

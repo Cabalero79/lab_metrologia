@@ -33,6 +33,10 @@ test("entrega metadados sociais e controles acessíveis no HTML inicial", async 
   assert.match(html, /aria-valuetext="58,35 mm"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /aria-label="Ocultar medida"/);
+  assert.match(html, /aria-label="Ampliar escala e nônio"/);
+  assert.match(html, /aria-controls="caliper-canvas"/);
+  assert.match(html, /aria-expanded="false"/);
+  assert.match(html, /id="caliper-canvas"/);
 
   const headings = html.match(/<h1\b/g) ?? [];
   assert.equal(headings.length, 1, "a página deve ter exatamente um título principal");
@@ -63,4 +67,7 @@ test("mantém a implementação livre de conteúdo executável e HTML inseguro",
   assert.match(component, /onKeyDown/);
   assert.match(component, /requestFullscreen/);
   assert.match(component, /aria-live="polite"/);
+  assert.match(component, /aria-label=\{detailMode \? "Fechar ampliação"/);
+  assert.match(component, /event\.key !== "Escape"/);
+  assert.match(component, /getDetailViewport/);
 });

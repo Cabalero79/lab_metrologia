@@ -14,6 +14,20 @@ Resultado de `npm audit` neste estado:
 
 Este relatório é uma fotografia de um projeto ainda em construção, não uma garantia de ausência de vulnerabilidades nem uma homologação de produção.
 
+## Atualização da rodada — 2026-08-13
+
+Esta rodada adicionou a projeção específica das escalas em polegadas, a ampliação interativa e o ativo local do Cavaleiro Samurai. A revisão seguiu as orientações de segurança para frontend JavaScript/TypeScript, React e servidor Next/Vinext. **Nenhum novo achado crítico, alto ou médio foi introduzido.**
+
+- A ampliação reutiliza o mesmo canvas e os mesmos handlers de ponteiro/teclado; não interpreta HTML, URL ou código dinâmico. O fechamento por `Escape` usa listener com função e limpeza no ciclo de vida do React em `app/components/CaliperWorkbench.tsx:827`.
+- O mascote é um PNG local controlado, carregado do caminho constante `/cavaleiro-samurai.png` em `app/components/CaliperWorkbench.tsx:809`. Não há URL fornecida por usuário, `fetch` remoto, upload, redirecionamento ou novo domínio na CSP.
+- O ativo foi reduzido para 512×512, 203.027 bytes, transparência preservada e SHA-256 `E89F8BF3F8B1E54377BDC328F172C26215AA8D97137064FD4CBADC52078E3EF5`. O build e o teste de artefatos exigem sua presença local.
+- A varredura de sinks não encontrou `dangerouslySetInnerHTML`, `innerHTML`, `document.write`, `eval`, `new Function`, handlers em string, `javascript:`, `postMessage`, Web Storage, beacon, popup ou download no código da funcionalidade.
+- A CSP permaneceu inalterada em `worker/index.ts:52`; a funcionalidade não exigiu relaxamento de `script-src`, `connect-src` ou `img-src`. O risco residual de `unsafe-inline` continua registrado no SEC-002.
+- `npm audit --omit=dev` continua com **0** vulnerabilidades. A árvore completa continua com os mesmos **2** alertas altos consolidados no SEC-001 (`image-size` via Vinext); não foi aplicado o downgrade incompatível sugerido automaticamente.
+- A inspeção automatizada em navegador confirmou que a lupa preserva o slider por teclado e ponteiro, o X/`Escape` restauram estado e foco e nenhum fluxo abre janela, dispara download ou busca recurso externo.
+
+O risco do parser de imagens não se torna explorável pelo novo mascote: ele é um artefato estático produzido e revisado no repositório, não uma entrada não confiável processada em tempo de execução.
+
 ## Estado e escopo da revisão
 
 - Data/hora da coleta: **2026-08-11 22:11 BRT**.
