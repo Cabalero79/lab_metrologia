@@ -70,4 +70,6 @@ test("mantém a implementação livre de conteúdo executável e HTML inseguro",
   assert.match(component, /aria-label=\{detailMode \? "Fechar ampliação"/);
   assert.match(component, /event\.key !== "Escape"/);
   assert.match(component, /getDetailViewport/);
+  assert.match(component, /setDetailAnchorTicks\(ticks\)/);
+  assert.match(component, /detailAnchorTicks \?\? ticks/);
 });

@@ -267,13 +267,20 @@ function isPointInMovingAssembly(
   ticks: number,
   scale: CaliperScale,
   detailMode: boolean,
+  detailAnchorTicks: number | null,
 ): boolean {
   const layout = getInstrumentLayout(rect.width, rect.height, ticks, scale);
   let x = clientX - rect.left;
   let y = clientY - rect.top;
 
   if (detailMode) {
-    const viewport = getDetailViewport(rect.width, rect.height, layout, scale);
+    const viewportLayout = getInstrumentLayout(
+      rect.width,
+      rect.height,
+      detailAnchorTicks ?? ticks,
+      scale,
+    );
+    const viewport = getDetailViewport(rect.width, rect.height, viewportLayout, scale);
     x = (x - viewport.targetX) / viewport.zoom + viewport.focusX;
     y = (y - viewport.targetY) / viewport.zoom + viewport.focusY;
   }
@@ -354,6 +361,7 @@ function drawInstrument(
   scale: CaliperScale,
   dragging: boolean,
   detailMode: boolean,
+  detailAnchorTicks: number | null,
   readingLabel: string,
   answerVisible: boolean,
   brandingImage: HTMLImageElement | null,
@@ -398,7 +406,13 @@ function drawInstrument(
   context.clearRect(0, 0, width, height);
   context.save();
   if (detailMode) {
-    const viewport = getDetailViewport(width, height, layout, scale);
+    const viewportLayout = getInstrumentLayout(
+      width,
+      height,
+      detailAnchorTicks ?? ticks,
+      scale,
+    );
+    const viewport = getDetailViewport(width, height, viewportLayout, scale);
     context.translate(viewport.targetX, viewport.targetY);
     context.scale(viewport.zoom, viewport.zoom);
     context.translate(-viewport.focusX, -viewport.focusY);
@@ -769,6 +783,7 @@ export function CaliperWorkbench() {
   const [dragging, setDragging] = useState(false);
   const [movingAssemblyHovered, setMovingAssemblyHovered] = useState(false);
   const [detailMode, setDetailMode] = useState(false);
+  const [detailAnchorTicks, setDetailAnchorTicks] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [brandingImage, setBrandingImage] = useState<HTMLImageElement | null>(null);
@@ -793,6 +808,7 @@ export function CaliperWorkbench() {
 
   const closeDetail = useCallback(() => {
     setDetailMode(false);
+    setDetailAnchorTicks(null);
     setAnnouncement("Ampliação fechada. Visualização geral restaurada.");
     window.requestAnimationFrame(() => detailButtonRef.current?.focus());
   }, []);
@@ -803,6 +819,7 @@ export function CaliperWorkbench() {
       return;
     }
 
+    setDetailAnchorTicks(ticks);
     setDetailMode(true);
     setAnnouncement(
       "Escala e nônio ampliados. O paquímetro continua ajustável por arraste, toque ou teclado.",
@@ -865,6 +882,7 @@ export function CaliperWorkbench() {
         scale,
         dragging,
         detailMode,
+        detailAnchorTicks,
         reading,
         answerVisible,
         brandingImage,
@@ -879,6 +897,7 @@ export function CaliperWorkbench() {
             ticks,
             scale,
             detailMode,
+            detailAnchorTicks,
           ),
         );
       }
@@ -895,7 +914,16 @@ export function CaliperWorkbench() {
       observer.disconnect();
       window.cancelAnimationFrame(resizeFrame);
     };
-  }, [ticks, scale, dragging, detailMode, reading, answerVisible, brandingImage]);
+  }, [
+    ticks,
+    scale,
+    dragging,
+    detailMode,
+    detailAnchorTicks,
+    reading,
+    answerVisible,
+    brandingImage,
+  ]);
 
   const pointerIsOnMovingAssembly = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -908,6 +936,7 @@ export function CaliperWorkbench() {
       ticks,
       scale,
       detailMode,
+      detailAnchorTicks,
     );
   };
 
@@ -917,8 +946,16 @@ export function CaliperWorkbench() {
     if (!canvas || !origin) return;
     const rect = canvas.getBoundingClientRect();
     const layout = getInstrumentLayout(rect.width, rect.height, ticks, scale);
-    const zoom = detailMode
-      ? getDetailViewport(rect.width, rect.height, layout, scale).zoom
+    const viewportLayout = detailMode
+      ? getInstrumentLayout(
+          rect.width,
+          rect.height,
+          detailAnchorTicks ?? ticks,
+          scale,
+        )
+      : null;
+    const zoom = viewportLayout
+      ? getDetailViewport(rect.width, rect.height, viewportLayout, scale).zoom
       : 1;
     const deltaMillimetres =
       (event.clientX - origin.clientX) / (layout.pixelsPerMm * zoom);

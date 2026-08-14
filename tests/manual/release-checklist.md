@@ -13,6 +13,7 @@
 
 - [ ] Arrastar com mouse e toque da posição fechada ao limite sem perder captura do ponteiro.
 - [ ] Ligar a lupa e repetir arraste com mouse e toque; a leitura deve permanecer monotônica, quantizada e sem salto.
+- [ ] Com a lupa ligada, confirmar que a escala principal permanece fixa enquanto cursor e nônio se deslocam horizontalmente, como na visão geral.
 - [ ] Com a lupa ligada, operar Setas, Shift+Setas, Page Up/Down, Home e End.
 - [ ] Fechar a ampliação pelo botão X e por `Esc`; confirmar visão geral, anúncio e foco restaurados no botão da lupa.
 - [ ] Confirmar que a lupa enquadra a marca principal anterior, o zero e o nônio completo no zero, meia faixa e fim de curso.
