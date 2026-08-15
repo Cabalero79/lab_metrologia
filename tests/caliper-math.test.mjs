@@ -10,6 +10,7 @@ import {
   formatCaliperReading,
   formatDecimal,
   formatDecimalTicks,
+  formatOppositeUnitReading,
   formatFraction,
   formatFractionalInches,
   getCaliperScalesForUnit,
@@ -47,6 +48,12 @@ test("converts between millimetres and inches through integer ticks", () => {
   assert.equal(ticksToMm(oneInch), 25.4);
   assert.equal(convertMeasurement(50.8, "mm", "in"), 2);
   assert.equal(convertMeasurement(2, "in", "mm"), 50.8);
+});
+
+test("formats the automatic conversion in the unit opposite to the scale", () => {
+  assert.equal(formatOppositeUnitReading(mmToTicks(58.35), "mm"), "2,2972\u2033");
+  assert.equal(formatOppositeUnitReading(inchesToTicks(2.297), "in"), "58,344 mm");
+  assert.equal(formatOppositeUnitReading(mmToTicks(25.4), "mm"), "1,0000\u2033");
 });
 
 test("clamps values and rejects invalid ranges", () => {

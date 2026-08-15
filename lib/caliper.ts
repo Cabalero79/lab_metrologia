@@ -369,6 +369,22 @@ export function formatDecimalTicks(
   return formatScaledInteger(scaledValue, fractionDigits, options);
 }
 
+/**
+ * Format the exact current reading in the unit opposite to the active scale.
+ * The display uses conventional teaching precision without changing or
+ * re-quantizing the instrument state.
+ */
+export function formatOppositeUnitReading(
+  ticks: number,
+  sourceUnit: MeasurementUnit,
+): string {
+  assertSafeInteger(ticks, "ticks");
+
+  return sourceUnit === "mm"
+    ? `${formatDecimalTicks(ticks, "in", 4)}\u2033`
+    : `${formatDecimalTicks(ticks, "mm", 3)} mm`;
+}
+
 /** Format a signed improper fraction as a reduced whole/mixed fraction. */
 export function formatFraction(
   numerator: number,

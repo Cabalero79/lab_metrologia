@@ -18,6 +18,7 @@ import {
   type MeasurementUnit,
   formatCaliperReading,
   formatFractionalInches,
+  formatOppositeUnitReading,
   getCaliperScalesForUnit,
   mmToTicks,
   snapCaliperTicks,
@@ -249,6 +250,7 @@ function drawInstrument(
   detailAnchorTicks: number | null,
   readingLabel: string,
   answerVisible: boolean,
+  mainScaleNumbersVisible: boolean,
   brandingImage: HTMLImageElement | null,
 ) {
   const layout = getInstrumentLayout(width, height, ticks, scale);
@@ -493,7 +495,7 @@ function drawInstrument(
     );
     context.stroke();
 
-    if (label !== null) {
+    if (label !== null && mainScaleNumbersVisible) {
       context.font = `600 ${Math.max(11, Math.min(20, width / 68))}px Arial, sans-serif`;
       context.textAlign = "center";
       context.fillText(label, x, mainLabelY);
@@ -737,6 +739,7 @@ export function CaliperWorkbench() {
     snapCaliperTicks(INITIAL_TICKS, "mm-0.05"),
   );
   const [answerVisible, setAnswerVisible] = useState(true);
+  const [mainScaleNumbersVisible, setMainScaleNumbersVisible] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [movingAssemblyHovered, setMovingAssemblyHovered] = useState(false);
   const [detailMode, setDetailMode] = useState(false);
@@ -755,6 +758,7 @@ export function CaliperWorkbench() {
   const scalesForUnit = useMemo(() => getCaliperScalesForUnit(unit), [unit]);
   const reading = formatCaliperReading(ticks, scale);
   const breakdown = formatBreakdown(ticks, scale);
+  const convertedReading = formatOppositeUnitReading(ticks, unit);
 
   const setReading = useCallback(
     (candidateTicks: number) => {
@@ -842,6 +846,7 @@ export function CaliperWorkbench() {
         detailAnchorTicks,
         reading,
         answerVisible,
+        mainScaleNumbersVisible,
         brandingImage,
       );
       const lastMousePosition = lastMousePositionRef.current;
@@ -879,6 +884,7 @@ export function CaliperWorkbench() {
     detailAnchorTicks,
     reading,
     answerVisible,
+    mainScaleNumbersVisible,
     brandingImage,
   ]);
 
@@ -1044,6 +1050,17 @@ export function CaliperWorkbench() {
     });
   };
 
+  const toggleMainScaleNumbers = () => {
+    setMainScaleNumbersVisible((visible) => {
+      setAnnouncement(
+        visible
+          ? "Números da escala principal ocultados. Os traços permanecem visíveis."
+          : "Números da escala principal exibidos.",
+      );
+      return !visible;
+    });
+  };
+
   const toggleFullscreen = async () => {
     if (!labRef.current || !document.fullscreenEnabled) {
       setAnnouncement("A tela cheia não está disponível neste navegador.");
@@ -1124,6 +1141,27 @@ export function CaliperWorkbench() {
         </div>
 
         <div className="instrument-stage" data-detail={detailMode}>
+          <button
+            className="scale-numbers-control"
+            type="button"
+            data-hidden={!mainScaleNumbersVisible}
+            aria-controls="caliper-canvas"
+            aria-pressed={!mainScaleNumbersVisible}
+            aria-label={
+              mainScaleNumbersVisible
+                ? "Ocultar números da escala principal"
+                : "Mostrar números da escala principal"
+            }
+            title={
+              mainScaleNumbersVisible
+                ? "Ocultar números da escala principal"
+                : "Mostrar números da escala principal"
+            }
+            onClick={toggleMainScaleNumbers}
+          >
+            <span className="scale-numbers-symbol" aria-hidden="true">123</span>
+          </button>
+
           <button
             ref={detailButtonRef}
             className={`detail-control${detailMode ? " is-active" : ""}`}
@@ -1219,6 +1257,19 @@ export function CaliperWorkbench() {
               ))}
             </div>
           </fieldset>
+
+          <output
+            className="conversion-output"
+            data-hidden={!answerVisible}
+            aria-label={
+              answerVisible
+                ? `Conversão automática de ${unit === "mm" ? "milímetros para polegadas" : "polegadas para milímetros"}: ${convertedReading}`
+                : "Conversão automática oculta junto com a resposta"
+            }
+          >
+            <span>Conversão {unit === "mm" ? "mm → in" : "in → mm"}</span>
+            <strong>{answerVisible ? convertedReading : "••••"}</strong>
+          </output>
 
           <div className="practice-actions">
             <button className="secondary-button" type="button" onClick={() => setReading(0)}>
