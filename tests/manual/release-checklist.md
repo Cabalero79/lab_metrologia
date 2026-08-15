@@ -24,6 +24,13 @@
 
 ## Acessibilidade e responsividade
 
+- [ ] Em desktop e celular horizontal, confirmar que a haste inferior móvel encontra exatamente a borda inferior do nônio, sem vão branco, e que o bloco fixo equivalente permanece mais curto que a haste.
+- [ ] Confirmar que a unidade métrica e os dois pequenos datums bordô permanecem inteiramente dentro da viga, sem ultrapassar a borda superior, e que o bloco fixo inferior termina na face de contato sem sobra à direita.
+- [ ] Em 1280×720, confirmar `document.documentElement.scrollHeight === window.innerHeight`, canvas com pelo menos 455 CSS px de altura e logo alinhado à esquerda no cabeçalho compacto.
+- [ ] Em viewport curto com ponteiro fino (por exemplo, 844×390), confirmar canvas com pelo menos 380 CSS px, mandíbulas inferiores apontando para baixo e rolagem vertical natural até todos os controles.
+- [ ] Em 320 CSS px, confirmar `document.documentElement.scrollWidth === window.innerWidth`, canvas com pelo menos 380 CSS px e ausência de inversão, autointerseção ou recorte das mandíbulas inferiores em 0 mm, meia faixa e 150 mm.
+- [ ] Após girar o aparelho, repetir as verificações de altura, rolagem e mandíbulas; confirmar que cabeçalho, canvas e controles respeitam as quatro `safe-area-inset-*` em retrato e paisagem.
+
 - [ ] Abrir em 1920×1080, 1366×768 e 1024×768 e confirmar que cabeçalho, instrumento e todos os controles aparecem sem rolagem da página.
 - [ ] Em celular horizontal e 320 CSS px, confirmar que unidade, resolução, Fechar e Sortear permanecem acessíveis por rolagem vertical natural, com alvos de pelo menos 44 px e sem rolagem horizontal.
 - [ ] Girar um celular de retrato para paisagem e voltar; confirmar que o canvas mantém altura legível, todos os controles continuam acessíveis e a medida não muda.

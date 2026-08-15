@@ -94,7 +94,9 @@ export function getScalePresentation(
     mainTickBaselineY: scaleSeamY,
     mainTickDirection: -1,
     mainLabelY: beamY + beamHeight * 0.4,
-    unitLabelY: beamY + beamHeight * 0.16,
+    // Keep the unit baseline clear of the beam's upper edge even when the
+    // canvas is compressed in mobile landscape.
+    unitLabelY: beamY + beamHeight * 0.22,
     vernierPlate: "lower",
     vernierTickBaselineY: scaleSeamY,
     vernierTickDirection: 1,

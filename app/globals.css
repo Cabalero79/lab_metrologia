@@ -16,6 +16,8 @@
   --radius-sm: 0.6rem;
   --radius-md: 0.9rem;
   --radius-lg: 1.35rem;
+  --instrument-stage-safe-min: 380px;
+  --instrument-stage-desktop-target: 455px;
 }
 
 * {
@@ -178,7 +180,7 @@ a[href] {
 }
 
 .icon-text-button {
-  min-height: 42px;
+  min-height: 44px;
   gap: 0.45rem;
   padding: 0.6rem 0.85rem;
   color: var(--brand-strong);
@@ -387,8 +389,11 @@ a[href] {
 }
 
 .eye-button {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   color: oklch(1 0 0);
@@ -720,8 +725,8 @@ a[href] {
   }
 
   .icon-text-button {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     display: grid;
     place-items: center;
@@ -799,8 +804,8 @@ a[href] {
   }
 
   .eye-button {
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
   }
 
   .reading-value {
@@ -911,7 +916,8 @@ a[href] {
 
 @media (max-height: 820px) and (min-width: 681px) {
   .lab-shell {
-    grid-template-rows: 84px minmax(0, 1fr);
+    grid-template-rows: 64px minmax(0, 1fr);
+    padding-bottom: 0.4rem;
   }
 
   .lab-header {
@@ -919,16 +925,16 @@ a[href] {
   }
 
   .brand-mark {
-    width: 72px;
-    height: 72px;
+    width: 58px;
+    height: 58px;
   }
 
   .brand-copy strong {
-    font-size: 1.25rem;
+    font-size: 1.12rem;
   }
 
   .brand-copy small {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
   }
 
   .workbench {
@@ -936,31 +942,73 @@ a[href] {
   }
 
   .stage-copy {
-    min-height: 88px;
-    padding-block: 0.5rem;
+    min-height: 72px;
+    padding-block: 0.25rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.18rem;
+    font-size: 0.62rem;
+  }
+
+  .stage-copy h1 {
+    font-size: clamp(1.15rem, 2vw, 1.6rem);
+  }
+
+  .interaction-hint {
+    font-size: 0.75rem;
   }
 
   .readout {
-    min-height: 78px;
-    padding-block: 0.48rem;
+    width: clamp(225px, 22vw, 280px);
+    min-height: 64px;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .readout-label {
+    font-size: 0.62rem;
+  }
+
+  .eye-button,
+  .icon-text-button {
+    width: 44px;
+    height: 44px;
   }
 
   .reading-value {
-    font-size: 1.85rem;
+    margin-top: 0;
+    font-size: 1.5rem;
+  }
+
+  .reading-breakdown {
+    font-size: 0.62rem;
   }
 
   .control-deck {
-    padding-block: 0.55rem 0.65rem;
+    padding-block: 0.3rem 0.4rem;
+  }
+
+  .control-group legend {
+    margin-bottom: 0.25rem;
   }
 
   .segmented-control button,
   .secondary-button,
   .primary-button {
-    min-height: 48px;
+    min-height: 44px;
   }
 
   .resolution-options button {
-    min-height: 58px;
+    min-height: 48px;
+  }
+}
+
+@media (min-width: 1001px) and (min-height: 651px) and (max-height: 820px) {
+  .workbench {
+    grid-template-rows:
+      minmax(72px, auto)
+      minmax(var(--instrument-stage-desktop-target), 1fr)
+      auto;
   }
 }
 
@@ -1018,8 +1066,8 @@ a[href] {
   }
 
   .eye-button {
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
   }
 
   .reading-value {
@@ -1117,8 +1165,8 @@ a[href] {
   }
 }
 
-@media (hover: none) and (pointer: coarse) and (max-width: 680px),
-  (hover: none) and (pointer: coarse) and (max-height: 650px) and (orientation: landscape) {
+@media (max-width: 680px),
+  (max-height: 650px) and (orientation: landscape) {
   html {
     height: auto;
     overflow-x: hidden;
@@ -1136,19 +1184,26 @@ a[href] {
     height: auto;
     min-height: 100vh;
     min-height: 100dvh;
-    overflow: visible;
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .lab-shell:not(:fullscreen) .workbench {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: calc(100dvh - 64px);
+    min-height: calc(
+      100dvh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
 
   .lab-shell:not(:fullscreen) .instrument-stage {
-    height: clamp(380px, 60dvh, 520px);
-    min-height: 380px;
+    height: clamp(var(--instrument-stage-safe-min), 60dvh, 520px);
+    min-height: var(--instrument-stage-safe-min);
     flex: 0 0 auto;
   }
 
@@ -1158,9 +1213,11 @@ a[href] {
   }
 }
 
-@media (hover: none) and (pointer: coarse) and (max-height: 650px) and (orientation: landscape) {
+@media (max-height: 650px) and (orientation: landscape) {
   .lab-shell:not(:fullscreen) .workbench {
-    min-height: 100dvh;
+    min-height: calc(
+      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
 }
 
