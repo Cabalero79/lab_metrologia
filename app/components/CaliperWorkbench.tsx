@@ -1224,19 +1224,23 @@ export function CaliperWorkbench() {
             <div className="segmented-control">
               <button
                 type="button"
+                aria-label="Milímetro (mm)"
                 data-active={unit === "mm"}
                 aria-pressed={unit === "mm"}
                 onClick={() => changeUnit("mm")}
               >
-                Milímetro <span>mm</span>
+                <span className="unit-name">Milímetro</span>
+                <span className="unit-symbol">mm</span>
               </button>
               <button
                 type="button"
+                aria-label="Polegada (in)"
                 data-active={unit === "in"}
                 aria-pressed={unit === "in"}
                 onClick={() => changeUnit("in")}
               >
-                Polegada <span>in</span>
+                <span className="unit-name">Polegada</span>
+                <span className="unit-symbol">in</span>
               </button>
             </div>
           </fieldset>
@@ -1261,10 +1265,17 @@ export function CaliperWorkbench() {
 
           <div className="practice-actions">
             <button className="secondary-button" type="button" onClick={() => setReading(0)}>
-              <span aria-hidden="true">↺</span> Fechar
+              <span className="button-icon" aria-hidden="true">↺</span> Fechar
             </button>
-            <button className="primary-button" type="button" onClick={randomize}>
-              <span aria-hidden="true">⚄</span> Sortear e ocultar
+            <button
+              className="primary-button"
+              type="button"
+              aria-label="Sortear medida e ocultar resposta"
+              onClick={randomize}
+            >
+              <span className="button-icon" aria-hidden="true">⚄</span>
+              <span className="button-label-wide">Sortear e ocultar</span>
+              <span className="button-label-compact" aria-hidden="true">Sortear</span>
             </button>
           </div>
         </div>

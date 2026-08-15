@@ -23,18 +23,21 @@
 }
 
 html {
+  height: 100%;
   min-width: 320px;
   max-width: 100%;
-  overflow-x: clip;
+  overflow: hidden;
   color-scheme: light;
   scroll-behavior: smooth;
 }
 
 body {
   width: 100%;
+  height: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0;
+  overflow: hidden;
   color: var(--ink-strong);
   background:
     linear-gradient(oklch(0.93 0.014 340 / 0.42) 1px, transparent 1px),
@@ -82,17 +85,24 @@ a[href] {
 }
 
 .lab-shell {
-  min-height: 100vh;
-  padding: 0 clamp(0.75rem, 2.6vw, 2.5rem) clamp(1rem, 2.5vw, 2.4rem);
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0 clamp(0.75rem, 2.6vw, 2.5rem) clamp(0.5rem, 1.4vh, 1.25rem);
+  display: grid;
+  grid-template-rows: clamp(84px, 12vh, 132px) minmax(0, 1fr);
+  overflow: hidden;
   background: var(--surface-canvas);
 }
 
 .lab-shell:fullscreen {
-  overflow: auto;
+  overflow: hidden;
 }
 
 .lab-header {
-  min-height: 132px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   max-width: 1700px;
   margin: 0 auto;
   display: flex;
@@ -184,11 +194,11 @@ a[href] {
 
 .workbench {
   width: min(100%, 1700px);
-  height: auto;
-  min-height: calc(100vh - 100px);
+  height: 100%;
+  min-height: 0;
   margin: 0 auto;
   display: grid;
-  grid-template-rows: auto clamp(500px, 45vw, 720px) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   background: var(--surface-panel);
   border: 1px solid var(--line);
@@ -251,7 +261,7 @@ a[href] {
 .instrument-stage {
   position: relative;
   height: 100%;
-  min-height: 500px;
+  min-height: 0;
   overflow: hidden;
   background: var(--surface-panel);
   isolation: isolate;
@@ -502,7 +512,7 @@ a[href] {
 }
 
 .control-deck {
-  min-height: 152px;
+  min-height: 0;
   padding: 1rem clamp(1rem, 2.3vw, 2.1rem) 1.2rem;
   display: grid;
   grid-template-columns: auto minmax(340px, 1fr) auto;
@@ -559,6 +569,12 @@ a[href] {
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.63rem;
   font-weight: 600;
+}
+
+.segmented-control button .unit-name {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .segmented-control button[data-active="true"] {
@@ -647,11 +663,11 @@ a[href] {
   background: var(--brand-strong);
 }
 
-@media (max-width: 1000px) {
-  .workbench {
-    grid-template-rows: auto 500px auto;
-  }
+.button-label-compact {
+  display: none;
+}
 
+@media (max-width: 1000px) {
   .control-deck {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -672,12 +688,14 @@ a[href] {
 
 @media (max-width: 680px) {
   .lab-shell {
+    grid-template-rows: 64px minmax(0, 1fr);
     padding-inline: 0;
     padding-bottom: 0;
   }
 
   .lab-header {
-    min-height: 84px;
+    height: 64px;
+    min-height: 0;
     padding: 0 0.8rem;
   }
 
@@ -687,8 +705,8 @@ a[href] {
   }
 
   .brand-mark {
-    width: 68px;
-    height: 68px;
+    width: 54px;
+    height: 54px;
   }
 
   .brand-copy strong {
@@ -717,10 +735,9 @@ a[href] {
   }
 
   .workbench {
-    height: auto;
-    min-height: calc(100vh - 64px);
-    min-height: calc(100dvh - 64px);
-    grid-template-rows: auto auto auto;
+    height: 100%;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     border-right: 0;
     border-left: 0;
     border-radius: 0;
@@ -728,9 +745,22 @@ a[href] {
   }
 
   .stage-copy {
-    min-height: 0;
-    padding: 0.85rem 1rem;
-    flex-wrap: wrap;
+    min-height: 80px;
+    padding: 0.45rem 0.65rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(140px, 45vw, 172px);
+    gap: 0.55rem;
+  }
+
+  .eyebrow,
+  .interaction-hint {
+    display: none;
+  }
+
+  .stage-copy h1 {
+    font-size: 1rem;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
   }
 
   .interaction-hint {
@@ -744,9 +774,8 @@ a[href] {
   }
 
   .instrument-stage {
-    height: clamp(430px, 58svh, 520px);
-    height: clamp(430px, 58dvh, 520px);
-    min-height: 430px;
+    height: auto;
+    min-height: 0;
   }
 
   .caliper-canvas {
@@ -756,12 +785,33 @@ a[href] {
 
   .readout {
     width: 100%;
-    min-height: 94px;
+    min-height: 68px;
+    padding: 0.42rem 0.55rem;
   }
 
   .stage-aside {
     width: 100%;
-    margin-top: 0.75rem;
+    margin-top: 0;
+  }
+
+  .readout-label {
+    font-size: 0.56rem;
+  }
+
+  .eye-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .reading-value {
+    margin-top: 0;
+    font-size: 1.3rem;
+    letter-spacing: -0.04em;
+  }
+
+  .reading-breakdown {
+    font-size: 0.55rem;
+    white-space: nowrap;
   }
 
   .stage-legend {
@@ -774,35 +824,103 @@ a[href] {
   }
 
   .control-deck {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-    padding: 0.9rem 0.85rem 1.2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0.45rem 0.5rem 0.55rem;
   }
 
-  .resolution-control,
-  .unit-control,
-  .practice-actions {
+  .resolution-control {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .unit-control {
     grid-column: 1;
-    grid-row: auto;
+    grid-row: 2;
+  }
+
+  .practice-actions {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .control-group legend {
+    margin-bottom: 0.25rem;
+    font-size: 0.56rem;
+  }
+
+  .resolution-options {
+    gap: 0.3rem;
+  }
+
+  .resolution-options button {
+    min-width: 0;
+    min-height: 48px;
+    flex: 1;
+    padding: 0.35rem 0.4rem;
+  }
+
+  .resolution-options button strong {
+    font-size: 0.78rem;
+  }
+
+  .resolution-options button span {
+    display: none;
+  }
+
+  .segmented-control {
+    gap: 0.2rem;
+    padding: 0.2rem;
   }
 
   .segmented-control button {
+    min-height: 44px;
+    padding: 0.3rem;
     flex: 1;
+  }
+
+  .segmented-control button .unit-name {
+    display: none;
+  }
+
+  .segmented-control button .unit-symbol {
+    font-size: 0.75rem;
+    font-weight: 760;
   }
 
   .practice-actions > button {
+    min-width: 0;
+    min-height: 48px;
+    padding: 0.35rem;
     flex: 1;
+    font-size: 0.68rem;
+  }
+
+  .practice-actions .button-icon {
+    display: none;
+  }
+
+  .primary-button .button-label-wide {
+    display: none;
+  }
+
+  .primary-button .button-label-compact {
+    display: inline;
   }
 }
 
-@media (max-height: 760px) and (min-width: 1001px) {
+@media (max-height: 820px) and (min-width: 681px) {
+  .lab-shell {
+    grid-template-rows: 84px minmax(0, 1fr);
+  }
+
   .lab-header {
-    min-height: 96px;
+    min-height: 0;
   }
 
   .brand-mark {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
   }
 
   .brand-copy strong {
@@ -814,22 +932,235 @@ a[href] {
   }
 
   .workbench {
-    min-height: calc(100vh - 74px);
-    grid-template-rows: auto 500px auto;
+    min-height: 0;
   }
 
   .stage-copy {
-    min-height: 76px;
-    padding-block: 0.75rem;
+    min-height: 88px;
+    padding-block: 0.5rem;
   }
 
-  .instrument-stage {
-    min-height: 500px;
+  .readout {
+    min-height: 78px;
+    padding-block: 0.48rem;
+  }
+
+  .reading-value {
+    font-size: 1.85rem;
   }
 
   .control-deck {
-    min-height: 132px;
-    padding-block: 0.75rem;
+    padding-block: 0.55rem 0.65rem;
+  }
+
+  .segmented-control button,
+  .secondary-button,
+  .primary-button {
+    min-height: 48px;
+  }
+
+  .resolution-options button {
+    min-height: 58px;
+  }
+}
+
+@media (max-height: 650px) and (orientation: landscape) {
+  .lab-shell {
+    grid-template-rows: 0 minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .lab-header {
+    display: none;
+  }
+
+  .workbench {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .stage-copy {
+    min-height: 64px;
+    padding: 0.35rem 0.55rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 30vw);
+    gap: 0.55rem;
+  }
+
+  .eyebrow,
+  .interaction-hint {
+    display: none;
+  }
+
+  .stage-copy h1 {
+    font-size: 1rem;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  .stage-aside {
+    width: 100%;
+    margin: 0;
+  }
+
+  .readout {
+    width: 100%;
+    min-height: 58px;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .readout-label {
+    font-size: 0.56rem;
+  }
+
+  .eye-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .reading-value {
+    margin-top: 0;
+    font-size: 1.3rem;
+    letter-spacing: -0.04em;
+  }
+
+  .reading-breakdown {
+    display: none;
+  }
+
+  .instrument-stage {
+    height: auto;
+    min-height: 0;
+  }
+
+  .stage-legend {
+    display: none;
+  }
+
+  .detail-control {
+    top: 0.45rem;
+    right: 0.55rem;
+    width: 44px;
+    height: 44px;
+  }
+
+  .control-deck {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem 0.35rem;
+  }
+
+  .resolution-control,
+  .unit-control,
+  .practice-actions {
+    grid-column: auto;
+    grid-row: 1;
+  }
+
+  .control-group legend {
+    margin-bottom: 0.15rem;
+    font-size: 0.56rem;
+  }
+
+  .segmented-control,
+  .resolution-options {
+    gap: 0.25rem;
+  }
+
+  .segmented-control {
+    padding: 0.2rem;
+  }
+
+  .segmented-control button {
+    min-height: 44px;
+    padding: 0.3rem;
+    flex: 1;
+  }
+
+  .resolution-options button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.3rem 0.4rem;
+    flex: 1;
+  }
+
+  .resolution-options button span {
+    display: none;
+  }
+
+  .practice-actions {
+    gap: 0.25rem;
+  }
+
+  .practice-actions > button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.3rem;
+    flex: 1;
+    font-size: 0.68rem;
+  }
+
+  .practice-actions .button-icon {
+    display: none;
+  }
+
+  .primary-button .button-label-wide {
+    display: none;
+  }
+
+  .primary-button .button-label-compact {
+    display: inline;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (max-width: 680px),
+  (hover: none) and (pointer: coarse) and (max-height: 650px) and (orientation: landscape) {
+  html {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .lab-shell:not(:fullscreen) {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .lab-shell:not(:fullscreen) .workbench {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100dvh - 64px);
+  }
+
+  .lab-shell:not(:fullscreen) .instrument-stage {
+    height: clamp(380px, 60dvh, 520px);
+    min-height: 380px;
+    flex: 0 0 auto;
+  }
+
+  .lab-shell:not(:fullscreen) .stage-copy,
+  .lab-shell:not(:fullscreen) .control-deck {
+    flex: 0 0 auto;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (max-height: 650px) and (orientation: landscape) {
+  .lab-shell:not(:fullscreen) .workbench {
+    min-height: 100dvh;
   }
 }
 

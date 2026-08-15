@@ -24,6 +24,10 @@
 
 ## Acessibilidade e responsividade
 
+- [ ] Abrir em 1920×1080, 1366×768 e 1024×768 e confirmar que cabeçalho, instrumento e todos os controles aparecem sem rolagem da página.
+- [ ] Em celular horizontal e 320 CSS px, confirmar que unidade, resolução, Fechar e Sortear permanecem acessíveis por rolagem vertical natural, com alvos de pelo menos 44 px e sem rolagem horizontal.
+- [ ] Girar um celular de retrato para paisagem e voltar; confirmar que o canvas mantém altura legível, todos os controles continuam acessíveis e a medida não muda.
+- [ ] Em celular horizontal que exponha viewport largo (até 1280×650 CSS px), confirmar que o modo compacto é ativado mesmo acima de 1000 px de largura.
 - [ ] Testar reflow em 320 CSS px e zoom de 200% sem perda de controles.
 - [ ] Conferir áreas de toque e contraste em celular real.
 - [ ] Confirmar alvos de pelo menos 44×44 px para lupa e X em desktop, celular horizontal e zoom de 200%.
