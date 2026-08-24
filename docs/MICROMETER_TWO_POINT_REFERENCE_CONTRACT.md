@@ -119,5 +119,6 @@ Correção após validação cinemática: não existe uma segunda escala sobrepo
 - [x] Existe somente a escala física da bainha, sem duplicação sobre o tambor.
 - [x] Os números do trecho exposto permanecem centralizados e legíveis.
 - [x] A costura do tambor determina exatamente o limite visível da escala.
+- [x] Graduações e números circulares são recortados pelo envelope do tambor.
 - [x] Afastamento junto à orelha é invariável em toda a matriz responsiva.
 - [ ] Responsável do produto aprova a solução didática sem ressalvas.

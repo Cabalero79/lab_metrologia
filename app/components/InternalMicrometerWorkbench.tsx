@@ -382,7 +382,7 @@ function drawInternalMicrometer(
       context.fillText(
         String(markTicks / 100),
         labelX,
-        referenceY - B * 0.27,
+        referenceY - B * 0.23,
       );
     }
   }
@@ -401,20 +401,22 @@ function drawInternalMicrometer(
   thimbleGradient.addColorStop(0.5, metal);
   thimbleGradient.addColorStop(0.82, metalLight);
   thimbleGradient.addColorStop(1, metalDark);
+  const thimbleBody = new Path2D();
+  thimbleBody.moveTo(thimbleLeft, sleeveTop - B * 0.08);
+  thimbleBody.lineTo(thimbleLeft + B * 0.48, thimbleTop);
+  thimbleBody.lineTo(scaleCollarRight, thimbleTop);
+  thimbleBody.lineTo(scaleCollarRight, thimbleBottom);
+  thimbleBody.lineTo(thimbleLeft + B * 0.48, thimbleBottom);
+  thimbleBody.lineTo(thimbleLeft, sleeveBottom + B * 0.08);
+  thimbleBody.closePath();
   context.fillStyle = thimbleGradient;
-  context.beginPath();
-  context.moveTo(thimbleLeft, sleeveTop - B * 0.08);
-  context.lineTo(thimbleLeft + B * 0.48, thimbleTop);
-  context.lineTo(scaleCollarRight, thimbleTop);
-  context.lineTo(scaleCollarRight, thimbleBottom);
-  context.lineTo(thimbleLeft + B * 0.48, thimbleBottom);
-  context.lineTo(thimbleLeft, sleeveBottom + B * 0.08);
-  context.closePath();
-  context.fill();
+  context.fill(thimbleBody);
   context.strokeStyle = ink;
-  context.stroke();
+  context.stroke(thimbleBody);
 
   const thimbleTickStep = Math.max(B * 0.105, 5.5);
+  context.save();
+  context.clip(thimbleBody);
   context.strokeStyle = ink;
   context.fillStyle = ink;
   context.lineWidth = Math.max(0.75, B * 0.012);
@@ -440,6 +442,7 @@ function drawInternalMicrometer(
   context.moveTo(thimbleLeft - B * 0.1, referenceY);
   context.lineTo(thimbleLeft + B * 0.72, referenceY);
   context.stroke();
+  context.restore();
 
   const gripGradient = context.createLinearGradient(0, gripTop, 0, gripBottom);
   gripGradient.addColorStop(0, metalDark);
