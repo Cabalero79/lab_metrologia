@@ -306,7 +306,7 @@ Os contrastes finais precisam ser medidos no navegador antes de consolidar os to
 
 ### Tipografia
 
-- Uma família sans de produto: Geist já disponível no starter, com fallback `system-ui`.
+- Uma família sans de produto: Geist configurada no projeto, com fallback `system-ui`.
 - Escala fixa em `rem`, sem títulos fluidos exagerados.
 - Valor e números da graduação com `font-variant-numeric: tabular-nums`.
 - Valor da leitura: 2–3 rem no desktop, 2 rem no telefone; título de página: 1,25–1,5 rem.

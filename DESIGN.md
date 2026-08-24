@@ -10,8 +10,13 @@ colors:
   bench-soft: "oklch(0.945 0.011 340)"
   graphite: "oklch(0.205 0.018 340)"
   graphite-muted: "oklch(0.47 0.025 340)"
+  hidden-readout: "oklch(0.25 0.02 340)"
+  readout-label: "oklch(0.91 0.03 340)"
+  readout-breakdown: "oklch(0.88 0.024 340)"
   precision-line: "oklch(0.84 0.02 340)"
   focus-amber: "oklch(0.67 0.17 70)"
+  status-ready: "oklch(0.6 0.14 150)"
+  status-ready-halo: "oklch(0.6 0.14 150 / 0.14)"
 typography:
   display:
     fontFamily: "Geist, Arial, sans-serif"
@@ -32,9 +37,12 @@ typography:
     lineHeight: 1.2
     letterSpacing: "0.09em"
 rounded:
+  micro: "2px"
+  control: "0.42rem"
   sm: "0.6rem"
   md: "0.9rem"
   lg: "1.35rem"
+  pill: "999px"
 spacing:
   compact: "0.45rem"
   control: "0.75rem"

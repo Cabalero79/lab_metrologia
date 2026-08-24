@@ -779,7 +779,7 @@ export function CaliperWorkbench({
   const [brandingImage, setBrandingImage] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detailButtonRef = useRef<HTMLButtonElement>(null);
-  const labRef = useRef<HTMLElement>(null);
+  const labRef = useRef<HTMLDivElement>(null);
   const dragOriginRef = useRef<{ clientX: number; ticks: number } | null>(null);
   const activePointerRef = useRef<number | null>(null);
   const lastMousePositionRef = useRef<{ clientX: number; clientY: number } | null>(null);

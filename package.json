@@ -13,8 +13,9 @@
     "test:build": "node tests/build-with-retry.mjs",
     "test:unit": "node --experimental-strip-types --test tests/caliper-math.test.mjs tests/caliper-contract.test.mjs tests/caliper-presentation.test.mjs tests/caliper-geometry.test.mjs tests/internal-micrometer-math.test.mjs tests/internal-micrometer-geometry.test.mjs",
     "test:smoke": "node --test tests/rendered-html.test.mjs tests/security-headers.test.mjs tests/build-artifacts.test.mjs",
-    "test:ci": "npm run lint && npm test",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "test:ci": "npm run lint && npm run typecheck && npm test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "dependencies": {
     "react": "^19.2.8",

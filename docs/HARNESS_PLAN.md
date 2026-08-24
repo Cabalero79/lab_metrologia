@@ -4,15 +4,17 @@
 
 O harness deve transformar confiabilidade metrológica, interação e acessibilidade em verificações repetíveis. Ele precisa ser rápido no desenvolvimento local, determinístico no CI e extensível para novos instrumentos sem copiar toda a infraestrutura.
 
-Este documento descreve o estado-alvo. No starter atual, somente estes comandos já existem:
+O gate local vigente é `npm run test:ci`. Ele executa, nesta ordem:
 
 ```text
 npm run lint
-npm run build
-npm test
+npm run typecheck
+npm run test:build
+npm run test:unit
+npm run test:smoke
 ```
 
-O `npm test` atual compila o projeto e executa `tests/rendered-html.test.mjs`, que valida apenas o esqueleto temporário. Quando o produto substituir o starter, esse teste deverá ser substituído por um smoke test da página real.
+O harness atual cobre ESLint/React/jsx-a11y, TypeScript estrito, build Vinext/Cloudflare, 38 testes unitários e geométricos dos dois instrumentos e 10 testes de smoke, artefatos e cabeçalhos do Worker. Playwright multi-engine, axe e baselines visuais permanecem como evolução planejada; até sua automatização, a revisão em navegador real e o checklist manual continuam obrigatórios antes de publicar.
 
 ## 2. Princípios do harness
 
@@ -95,23 +97,23 @@ type InstrumentState = {
 
 Coordenadas visuais devem ser derivadas do mesmo estado, mas verificadas por fixtures independentes com leituras conhecidas.
 
-## 5. Comandos-alvo
+## 5. Comandos atuais e alvo
 
-Após a instalação das ferramentas e criação das configurações, padronizar scripts equivalentes a:
+Os comandos sem anotação já existem. Os marcados como planejados dependem da implantação das ferramentas indicadas na seção 3:
 
 ```text
 npm run lint             # ESLint, incluindo regras React e jsx-a11y
 npm run typecheck        # tsc --noEmit
 npm run test:unit        # unidade + propriedades + contratos
-npm run test:component   # componentes React em DOM de teste
-npm run test:e2e         # navegadores do Playwright
-npm run test:a11y        # axe + cenários manuais listados no relatório
-npm run test:visual      # comparação de screenshots sem atualizar baselines
-npm run test:visual:update # atualização explícita de baselines
+npm run test:component   # planejado: componentes React em DOM de teste
+npm run test:e2e         # planejado: navegadores do Playwright
+npm run test:a11y        # planejado: axe + cenários manuais listados no relatório
+npm run test:visual      # planejado: comparação sem atualizar baselines
+npm run test:visual:update # planejado: atualização explícita de baselines
 npm run build            # build vinext/Cloudflare
 npm run test:smoke       # worker compilado responde e renderiza o produto
-npm test                 # gate local: estática + unitário + componente + build + smoke
-npm run test:ci          # gate completo, incluindo E2E, a11y e visual
+npm test                 # build + unidade/contrato + smoke
+npm run test:ci          # gate local: lint + tipos + build + unidade/contrato + smoke
 ```
 
 `test:visual:update` nunca deve fazer parte do gate automático. Atualizar imagens é uma decisão de revisão, não uma forma de fazer o CI passar.
@@ -288,4 +290,3 @@ Fixtures de micrômetro ficam em arquivos próprios, mas obedecem à mesma unida
 6. Integrar axe e revisão manual acessível.
 7. Criar baselines visuais somente após a geometria do paquímetro ser aprovada.
 8. Publicar artefatos e gates no CI.
-

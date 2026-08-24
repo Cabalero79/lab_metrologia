@@ -45,3 +45,16 @@ test("artefato publicado não contém arquivos executáveis legados", async () =
     );
   }
 });
+
+test("artefato não publica ícones padrão sem uso", async () => {
+  const forbiddenUnusedAssets = new Set(["file.svg", "globe.svg", "window.svg"]);
+  const files = await listFiles(projectFile("dist/client/"));
+
+  for (const file of files) {
+    const filename = decodeURIComponent(file.pathname.split("/").at(-1) ?? "");
+    assert.ok(
+      !forbiddenUnusedAssets.has(filename),
+      `ativo padrão sem uso publicado: ${filename}`,
+    );
+  }
+});
