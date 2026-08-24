@@ -66,25 +66,10 @@ function getDetailViewport(
   };
 }
 
-function getCompactOverviewViewport(
-  width: number,
-  height: number,
-  layout: InternalMicrometerGeometry,
-): DetailViewport | null {
-  if (width >= 480) return null;
-  const zoom = Math.min(1.5, Math.max(1.32, 480 / Math.max(320, width)));
-  return {
-    zoom,
-    focusX: (layout.movingJawX + layout.thimbleLeft) / 2,
-    focusY: layout.axisY,
-    targetX: width * 0.49,
-    targetY: height * 0.52,
-  };
-}
-
 function pathReferenceJaw(
   layout: InternalMicrometerGeometry,
   centerX: number,
+  outward: -1 | 1,
 ): Path2D {
   const {
     B,
@@ -93,32 +78,35 @@ function pathReferenceJaw(
     jawShoulderY,
     jawStemWidth,
     jawTipBottom,
-    jawTipTop,
     jawTipWidth,
   } = layout;
   const path = new Path2D();
   const tipHalf = jawTipWidth / 2;
   const stemHalf = jawStemWidth / 2;
-  path.moveTo(centerX - tipHalf, jawTipTop);
-  path.lineTo(centerX + tipHalf, jawTipTop);
-  path.lineTo(centerX + tipHalf, jawTipBottom);
-  path.lineTo(centerX + stemHalf * 0.66, jawShoulderY);
-  path.quadraticCurveTo(
-    centerX + stemHalf * 1.12,
-    jawShoulderY + B * 0.26,
-    centerX + stemHalf,
-    jawBaseTop,
+  const inward = -outward;
+  const pinCenterX = outward < 0
+    ? layout.movingPinCenterX
+    : layout.fixedPinCenterX;
+  const outerNeckX = pinCenterX + outward * tipHalf;
+  const innerNeckX = pinCenterX + inward * tipHalf;
+  const outerBaseX = centerX + outward * stemHalf;
+  const innerFaceX = centerX + inward * stemHalf;
+
+  path.moveTo(outerNeckX, jawTipBottom);
+  path.lineTo(innerNeckX, jawTipBottom);
+  path.lineTo(innerFaceX, jawShoulderY);
+  path.lineTo(innerFaceX, jawBaseBottom);
+  path.lineTo(outerBaseX, jawBaseBottom);
+  path.lineTo(outerBaseX, jawBaseTop);
+  path.bezierCurveTo(
+    outerBaseX,
+    jawShoulderY + B * 0.34,
+    outerNeckX + outward * B * 0.08,
+    jawShoulderY - B * 0.18,
+    outerNeckX,
+    jawTipBottom,
   );
-  path.lineTo(centerX + stemHalf, jawBaseBottom);
-  path.lineTo(centerX - stemHalf, jawBaseBottom);
-  path.lineTo(centerX - stemHalf, jawBaseTop);
-  path.quadraticCurveTo(
-    centerX - stemHalf * 1.12,
-    jawShoulderY + B * 0.26,
-    centerX - stemHalf * 0.66,
-    jawShoulderY,
-  );
-  path.lineTo(centerX - tipHalf, jawTipBottom);
+  path.lineTo(outerNeckX, jawTipBottom);
   path.closePath();
   return path;
 }
@@ -135,7 +123,7 @@ function isPointOnMovingAssembly(
   let y = clientY - rect.top;
   const viewport = detailMode
     ? getDetailViewport(rect.width, rect.height, layout)
-    : getCompactOverviewViewport(rect.width, rect.height, layout);
+    : null;
   if (viewport) {
     x = (x - viewport.targetX) / viewport.zoom + viewport.focusX;
     y = (y - viewport.targetY) / viewport.zoom + viewport.focusY;
@@ -180,8 +168,11 @@ function drawInternalMicrometer(
     axisY,
     fixedJawX,
     movingJawX,
+    fixedPinCenterX,
+    movingPinCenterX,
     jawBaseBottom,
     jawBaseTop,
+    jawStemWidth,
     jawTipBottom,
     jawTipTop,
     jawTipWidth,
@@ -193,11 +184,19 @@ function drawInternalMicrometer(
     pixelsPerMm,
     scaleMaximumX,
     thimbleLeft,
-    thimbleRight,
     thimbleTop,
     thimbleBottom,
+    scaleCollarRight,
+    gripLeft,
+    gripRight,
+    gripTop,
+    gripBottom,
+    ratchetNeckLeft,
+    ratchetNeckRight,
     ratchetLeft,
     ratchetRight,
+    ratchetTop,
+    ratchetBottom,
     leftContactX,
     rightContactX,
     referenceY,
@@ -212,9 +211,7 @@ function drawInternalMicrometer(
 
   context.clearRect(0, 0, width, height);
   context.save();
-  const viewport = detailMode
-    ? getDetailViewport(width, height, layout)
-    : getCompactOverviewViewport(width, height, layout);
+  const viewport = detailMode ? getDetailViewport(width, height, layout) : null;
   if (viewport) {
     context.translate(viewport.targetX, viewport.targetY);
     context.scale(viewport.zoom, viewport.zoom);
@@ -233,77 +230,98 @@ function drawInternalMicrometer(
   bodyGradient.addColorStop(0.18, metalLight);
   bodyGradient.addColorStop(0.55, metal);
   bodyGradient.addColorStop(1, metalDark);
+
+  // Short left cylinder: it is part of the moving carriage, not a long fixed
+  // body. Its overlap with the left jaw is an important reference landmark.
+  const capLeft = movingJawX - B * 1.24;
+  const capRight = movingJawX - B * 0.28;
   context.fillStyle = bodyGradient;
-  context.fillRect(
-    layout.originX + B * 0.25,
-    axisY - B * 0.43,
-    Math.max(B * 0.4, movingJawX - layout.originX + B * 0.23),
-    B * 0.86,
+  context.beginPath();
+  context.roundRect(
+    capLeft,
+    axisY - B * 0.58,
+    capRight - capLeft,
+    B * 1.16,
+    B * 0.12,
   );
-  context.strokeRect(
-    layout.originX + B * 0.25,
-    axisY - B * 0.43,
-    Math.max(B * 0.4, movingJawX - layout.originX + B * 0.23),
-    B * 0.86,
-  );
+  context.fill();
+  context.stroke();
+  context.beginPath();
+  context.moveTo(capRight - B * 0.08, axisY - B * 0.58);
+  context.lineTo(capRight - B * 0.08, axisY + B * 0.58);
+  context.stroke();
+  context.beginPath();
+  context.arc(capLeft + B * 0.55, axisY - B * 0.18, B * 0.065, 0, Math.PI * 2);
+  context.fillStyle = ink;
+  context.fill();
+  context.beginPath();
+  context.arc(capLeft + B * 0.55, axisY - B * 0.18, B * 0.022, 0, Math.PI * 2);
+  context.fillStyle = metalLight;
+  context.fill();
+
+  // Two exposed spindle edges remain visible in the negative space.
+  const rodLeft = movingJawX + jawStemWidth / 2;
+  const rodRight = fixedJawX - jawStemWidth / 2;
   context.fillStyle = metalDark;
-  context.fillRect(
-    movingJawX,
-    axisY + B * 0.1,
-    fixedJawX - movingJawX,
-    B * 0.14,
-  );
+  context.fillRect(rodLeft, axisY - B * 0.2, Math.max(0, rodRight - rodLeft), B * 0.11);
+  context.fillRect(rodLeft, axisY + B * 0.12, Math.max(0, rodRight - rodLeft), B * 0.11);
+
+  // The right jaw overlaps the beginning of the fixed sleeve.
   context.fillStyle = metalMid;
   context.fillRect(
     fixedJawX,
-    jawBaseTop,
+    axisY - B * 0.5,
     sleeveStartX - fixedJawX + B * 0.08,
-    jawBaseBottom - jawBaseTop,
+    B,
   );
   context.strokeRect(
     fixedJawX,
-    jawBaseTop,
+    axisY - B * 0.5,
     sleeveStartX - fixedJawX + B * 0.08,
-    jawBaseBottom - jawBaseTop,
+    B,
   );
-  for (const jawX of [movingJawX, fixedJawX]) {
-    const jaw = pathReferenceJaw(layout, jawX);
+  const jaws = [
+    { centerX: movingJawX, pinCenterX: movingPinCenterX, outward: -1 as const },
+    { centerX: fixedJawX, pinCenterX: fixedPinCenterX, outward: 1 as const },
+  ];
+  for (const jawSpec of jaws) {
+    const jaw = pathReferenceJaw(layout, jawSpec.centerX, jawSpec.outward);
     context.fillStyle = metal;
     context.fill(jaw);
     context.strokeStyle = ink;
     context.stroke(jaw);
     const tipGradient = context.createLinearGradient(
-      jawX - jawTipWidth / 2,
+      jawSpec.pinCenterX - jawTipWidth / 2,
       0,
-      jawX + jawTipWidth / 2,
+      jawSpec.pinCenterX + jawTipWidth / 2,
       0,
     );
-    tipGradient.addColorStop(0, metalDark);
-    tipGradient.addColorStop(0.5, metalLight);
-    tipGradient.addColorStop(1, metalDark);
+    tipGradient.addColorStop(0, "#202124");
+    tipGradient.addColorStop(0.5, "#85878a");
+    tipGradient.addColorStop(1, "#202124");
     context.fillStyle = tipGradient;
     context.fillRect(
-      jawX - jawTipWidth / 2,
+      jawSpec.pinCenterX - jawTipWidth / 2,
       jawTipTop,
       jawTipWidth,
       jawTipBottom - jawTipTop,
     );
     context.strokeRect(
-      jawX - jawTipWidth / 2,
+      jawSpec.pinCenterX - jawTipWidth / 2,
       jawTipTop,
       jawTipWidth,
       jawTipBottom - jawTipTop,
     );
   }
   // Lock screw beneath the moving carriage, as on the analog reference.
-  const lockX = movingJawX - B * 0.48;
+  const lockX = movingJawX - B * 0.12;
   context.fillStyle = metalDark;
-  context.fillRect(lockX - B * 0.06, jawBaseBottom, B * 0.12, B * 0.28);
+  context.fillRect(lockX - B * 0.055, jawBaseBottom, B * 0.11, B * 0.46);
   context.fillStyle = metalMid;
   context.beginPath();
-  context.roundRect(lockX - B * 0.18, jawBaseBottom + B * 0.25, B * 0.36, B * 0.13, B * 0.04);
+  context.roundRect(lockX - B * 0.21, jawBaseBottom + B * 0.42, B * 0.42, B * 0.14, B * 0.04);
   context.fill();
-  context.strokeRect(lockX - B * 0.18, jawBaseBottom + B * 0.25, B * 0.36, B * 0.13);
+  context.strokeRect(lockX - B * 0.21, jawBaseBottom + B * 0.42, B * 0.42, B * 0.14);
 
   // Fixed graduated sleeve.
   context.fillStyle = metalLight;
@@ -355,7 +373,7 @@ function drawInternalMicrometer(
     context.moveTo(x, referenceY);
     context.lineTo(x, referenceY + direction * tickHeight);
     context.stroke();
-    if (whole && scaleNumbersVisible) {
+    if (whole && markTicks % 500 === 0 && scaleNumbersVisible) {
       context.font = `650 ${Math.max(9, B * 0.18)}px Arial, sans-serif`;
       const isAtSeam = Math.abs(x - sleeveEndX) <= B * 0.025;
       context.textAlign = isAtSeam ? "right" : "center";
@@ -368,7 +386,8 @@ function drawInternalMicrometer(
   }
   context.restore();
 
-  // Cone, rotating thimble and procedural knurling.
+  // The rotating assembly is split into the four volumes visible in the
+  // reference: graduated collar, main knurled grip, narrow neck, and ratchet.
   const thimbleGradient = context.createLinearGradient(
     0,
     thimbleTop,
@@ -384,8 +403,8 @@ function drawInternalMicrometer(
   context.beginPath();
   context.moveTo(thimbleLeft, sleeveTop - B * 0.08);
   context.lineTo(thimbleLeft + B * 0.48, thimbleTop);
-  context.lineTo(thimbleRight, thimbleTop);
-  context.lineTo(thimbleRight, thimbleBottom);
+  context.lineTo(scaleCollarRight, thimbleTop);
+  context.lineTo(scaleCollarRight, thimbleBottom);
   context.lineTo(thimbleLeft + B * 0.48, thimbleBottom);
   context.lineTo(thimbleLeft, sleeveBottom + B * 0.08);
   context.closePath();
@@ -420,23 +439,120 @@ function drawInternalMicrometer(
   context.lineTo(thimbleLeft + B * 0.72, referenceY);
   context.stroke();
 
+  const gripGradient = context.createLinearGradient(0, gripTop, 0, gripBottom);
+  gripGradient.addColorStop(0, metalDark);
+  gripGradient.addColorStop(0.12, metalLight);
+  gripGradient.addColorStop(0.5, metalMid);
+  gripGradient.addColorStop(0.88, metalLight);
+  gripGradient.addColorStop(1, metalDark);
+  context.fillStyle = gripGradient;
+  context.beginPath();
+  context.roundRect(
+    gripLeft,
+    gripTop,
+    gripRight - gripLeft,
+    gripBottom - gripTop,
+    B * 0.08,
+  );
+  context.fill();
+  context.strokeStyle = ink;
+  context.stroke();
+  context.fillStyle = metalDark;
+  context.fillRect(gripLeft, gripTop, B * 0.08, gripBottom - gripTop);
+
   context.strokeStyle = dragging ? accent : ink;
-  context.lineWidth = dragging ? Math.max(1.6, B * 0.025) : Math.max(1, B * 0.014);
-  for (let x = thimbleLeft + B * 0.9; x < thimbleRight - B * 0.15; x += B * 0.18) {
+  context.lineWidth = dragging ? Math.max(1.2, B * 0.018) : Math.max(0.5, B * 0.006);
+  context.save();
+  context.globalAlpha = dragging ? 0.9 : 0.62;
+  context.beginPath();
+  context.rect(gripLeft, gripTop, gripRight - gripLeft, gripBottom - gripTop);
+  context.clip();
+  for (let x = gripLeft - B * 0.35; x < gripRight; x += B * 0.065) {
     context.beginPath();
-    context.moveTo(x, thimbleTop + B * 0.08);
-    context.lineTo(x + B * 0.42, thimbleBottom - B * 0.08);
+    context.moveTo(x, gripTop);
+    context.lineTo(x + B * 0.45, gripBottom);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(x, gripBottom);
+    context.lineTo(x + B * 0.45, gripTop);
     context.stroke();
   }
+  context.restore();
+
   context.strokeStyle = ink;
   context.lineWidth = Math.max(1, B * 0.014);
+  const neckGradient = context.createLinearGradient(
+    ratchetNeckLeft,
+    0,
+    ratchetNeckRight,
+    0,
+  );
+  neckGradient.addColorStop(0, metalDark);
+  neckGradient.addColorStop(0.45, metalLight);
+  neckGradient.addColorStop(1, metalDark);
+  context.fillStyle = neckGradient;
+  context.fillRect(
+    ratchetNeckLeft,
+    axisY - B * 0.48,
+    ratchetNeckRight - ratchetNeckLeft,
+    B * 0.96,
+  );
+  context.strokeRect(
+    ratchetNeckLeft,
+    axisY - B * 0.48,
+    ratchetNeckRight - ratchetNeckLeft,
+    B * 0.96,
+  );
+  context.beginPath();
+  context.moveTo(ratchetNeckLeft + B * 0.12, axisY - B * 0.48);
+  context.lineTo(ratchetNeckLeft + B * 0.12, axisY + B * 0.48);
+  context.moveTo(ratchetNeckRight - B * 0.08, axisY - B * 0.48);
+  context.lineTo(ratchetNeckRight - B * 0.08, axisY + B * 0.48);
+  context.stroke();
+  context.beginPath();
+  context.arc(
+    (ratchetNeckLeft + ratchetNeckRight) / 2,
+    axisY - B * 0.2,
+    B * 0.055,
+    0,
+    Math.PI * 2,
+  );
+  context.fillStyle = ink;
+  context.fill();
+
   const ratchetGradient = context.createLinearGradient(ratchetLeft, 0, ratchetRight, 0);
   ratchetGradient.addColorStop(0, metalDark);
   ratchetGradient.addColorStop(0.5, metalLight);
   ratchetGradient.addColorStop(1, metalDark);
   context.fillStyle = ratchetGradient;
-  context.fillRect(ratchetLeft, axisY - B * 0.72, ratchetRight - ratchetLeft, B * 1.44);
-  context.strokeRect(ratchetLeft, axisY - B * 0.72, ratchetRight - ratchetLeft, B * 1.44);
+  context.beginPath();
+  context.roundRect(
+    ratchetLeft,
+    ratchetTop,
+    ratchetRight - ratchetLeft,
+    ratchetBottom - ratchetTop,
+    B * 0.12,
+  );
+  context.fill();
+  context.stroke();
+  context.save();
+  context.beginPath();
+  context.rect(ratchetLeft, ratchetTop, ratchetRight - ratchetLeft, ratchetBottom - ratchetTop);
+  context.clip();
+  context.strokeStyle = ink;
+  context.lineWidth = Math.max(0.7, B * 0.011);
+  context.globalAlpha = 0.62;
+  for (let x = ratchetLeft - B * 0.25; x < ratchetRight; x += B * 0.065) {
+    context.beginPath();
+    context.moveTo(x, ratchetTop);
+    context.lineTo(x + B * 0.32, ratchetBottom);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(x, ratchetBottom);
+    context.lineTo(x + B * 0.32, ratchetTop);
+    context.stroke();
+  }
+  context.restore();
 
   // Local identification engraved on the same surfaces used by the reference
   // family, without an added plate that would change the instrument silhouette.
@@ -455,7 +571,7 @@ function drawInternalMicrometer(
   context.font = `650 ${Math.max(7, B * 0.13)}px Arial, sans-serif`;
   context.fillText(
     "5–15",
-    layout.originX + B * 0.72,
+    (capLeft + capRight) / 2,
     axisY + B * 0.02,
   );
 
@@ -694,7 +810,7 @@ export function InternalMicrometerWorkbench({
     const layout = getInternalMicrometerGeometry(rect.width, rect.height, ticks);
     const viewport = detailMode
       ? getDetailViewport(rect.width, rect.height, layout)
-      : getCompactOverviewViewport(rect.width, rect.height, layout);
+      : null;
     const zoom = viewport?.zoom ?? 1;
     event.currentTarget.setPointerCapture(event.pointerId);
     activePointerRef.current = event.pointerId;

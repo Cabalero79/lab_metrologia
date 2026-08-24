@@ -8,24 +8,28 @@ import {
 } from "./internal-micrometer.ts";
 
 export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
-  sceneWidth: 13.8,
-  sceneHeight: 5.1,
+  sceneWidth: 11.9,
+  sceneHeight: 5.3,
   insetX: 0.2,
-  axisY: 3.05,
-  fixedJawX: 3.1,
-  sleeveStartX: 3.42,
-  sleeveEndAtMinimumX: 9.1,
-  sleeveTravel: 3.25,
-  sleeveRadius: 0.62,
-  thimbleLength: 3.45,
-  thimbleRadius: 0.92,
-  ratchetLength: 0.88,
-  contactBaseSpan: 0.58,
-  contactExpansion: 1.25,
-  jawStemWidth: 0.46,
-  jawTipWidth: 0.13,
-  jawTipTopOffset: 2.04,
-  jawTipHeight: 0.36,
+  axisY: 3.3,
+  fixedJawX: 3.45,
+  sleeveStartX: 3.85,
+  sleeveEndAtMinimumX: 6.2,
+  sleeveTravel: 1.2,
+  sleeveRadius: 0.5,
+  thimbleScaleLength: 2.15,
+  thimbleScaleRadius: 0.75,
+  gripLength: 1.85,
+  gripRadius: 0.86,
+  ratchetNeckLength: 0.38,
+  ratchetLength: 1.05,
+  ratchetRadius: 0.58,
+  contactPixelsPerMm: 0.12,
+  jawStemWidth: 0.94,
+  jawTipWidth: 0.2,
+  jawPinInwardOffset: 0.28,
+  jawTipTopOffset: 2.33,
+  jawTipHeight: 0.42,
 } as const;
 
 export interface InternalMicrometerGeometry {
@@ -37,6 +41,8 @@ export interface InternalMicrometerGeometry {
   readonly axisY: number;
   readonly fixedJawX: number;
   readonly movingJawX: number;
+  readonly fixedPinCenterX: number;
+  readonly movingPinCenterX: number;
   readonly jawTipTop: number;
   readonly jawTipBottom: number;
   readonly jawShoulderY: number;
@@ -58,8 +64,17 @@ export interface InternalMicrometerGeometry {
   readonly thimbleTop: number;
   readonly thimbleBottom: number;
   readonly thimbleRadius: number;
+  readonly scaleCollarRight: number;
+  readonly gripLeft: number;
+  readonly gripRight: number;
+  readonly gripTop: number;
+  readonly gripBottom: number;
+  readonly ratchetNeckLeft: number;
+  readonly ratchetNeckRight: number;
   readonly ratchetLeft: number;
   readonly ratchetRight: number;
+  readonly ratchetTop: number;
+  readonly ratchetBottom: number;
   readonly leftContactX: number;
   readonly rightContactX: number;
   readonly contactSpanPx: number;
@@ -93,11 +108,16 @@ export function getInternalMicrometerGeometry(
   const fixedJawX = originX + r.fixedJawX * B;
   const jawTipWidth = r.jawTipWidth * B;
   const jawStemWidth = r.jawStemWidth * B;
-  const contactCenterSpan =
-    (r.contactBaseSpan + progress * r.contactExpansion) * B;
-  const movingJawX = fixedJawX - contactCenterSpan;
-  const leftContactX = movingJawX - jawTipWidth / 2;
-  const rightContactX = fixedJawX + jawTipWidth / 2;
+  const contactSpanPx =
+    (snapped / INTERNAL_MICROMETER_TICKS_PER_MM) *
+    r.contactPixelsPerMm *
+    B;
+  const pinInwardOffset = r.jawPinInwardOffset * B;
+  const fixedPinCenterX = fixedJawX - pinInwardOffset;
+  const rightContactX = fixedPinCenterX + jawTipWidth / 2;
+  const leftContactX = rightContactX - contactSpanPx;
+  const movingPinCenterX = leftContactX + jawTipWidth / 2;
+  const movingJawX = movingPinCenterX - pinInwardOffset;
   const sleeveStartX = originX + r.sleeveStartX * B;
   const sleeveEndAtMinimumX = originX + r.sleeveEndAtMinimumX * B;
   const travelPx = progress * r.sleeveTravel * B;
@@ -115,10 +135,14 @@ export function getInternalMicrometerGeometry(
   const scaleMaximumX = sleeveEndX + travelPx - scaleSpanPx;
   const scaleMinimumX = scaleMaximumX + scaleSpanPx;
   const sleeveRadius = r.sleeveRadius * B;
-  const thimbleRadius = r.thimbleRadius * B;
+  const thimbleRadius = r.thimbleScaleRadius * B;
   const thimbleLeft = sleeveEndX - B * 0.08;
-  const thimbleRight = thimbleLeft + r.thimbleLength * B;
-  const ratchetLeft = thimbleRight;
+  const scaleCollarRight = thimbleLeft + r.thimbleScaleLength * B;
+  const gripLeft = scaleCollarRight;
+  const gripRight = gripLeft + r.gripLength * B;
+  const ratchetNeckLeft = gripRight;
+  const ratchetNeckRight = ratchetNeckLeft + r.ratchetNeckLength * B;
+  const ratchetLeft = ratchetNeckRight;
   const ratchetRight = ratchetLeft + r.ratchetLength * B;
   const reading = decomposeInternalMicrometerReading(snapped);
 
@@ -131,12 +155,14 @@ export function getInternalMicrometerGeometry(
     axisY,
     fixedJawX,
     movingJawX,
+    fixedPinCenterX,
+    movingPinCenterX,
     jawTipTop: axisY - r.jawTipTopOffset * B,
     jawTipBottom:
       axisY - (r.jawTipTopOffset - r.jawTipHeight) * B,
-    jawShoulderY: axisY - B * 1.24,
-    jawBaseTop: axisY - B * 0.5,
-    jawBaseBottom: axisY + B * 0.5,
+    jawShoulderY: axisY - B * 1.08,
+    jawBaseTop: axisY - B * 0.6,
+    jawBaseBottom: axisY + B * 1.05,
     jawStemWidth,
     jawTipWidth,
     sleeveStartX,
@@ -149,15 +175,24 @@ export function getInternalMicrometerGeometry(
     scaleMaximumX,
     scaleMinimumX,
     thimbleLeft,
-    thimbleRight,
+    thimbleRight: gripRight,
     thimbleTop: axisY - thimbleRadius,
     thimbleBottom: axisY + thimbleRadius,
     thimbleRadius,
+    scaleCollarRight,
+    gripLeft,
+    gripRight,
+    gripTop: axisY - r.gripRadius * B,
+    gripBottom: axisY + r.gripRadius * B,
+    ratchetNeckLeft,
+    ratchetNeckRight,
     ratchetLeft,
     ratchetRight,
+    ratchetTop: axisY - r.ratchetRadius * B,
+    ratchetBottom: axisY + r.ratchetRadius * B,
     leftContactX,
     rightContactX,
-    contactSpanPx: rightContactX - leftContactX,
+    contactSpanPx,
     referenceY: axisY,
     thimbleDivision: reading.phaseTicks,
     thimbleAngleDegrees:

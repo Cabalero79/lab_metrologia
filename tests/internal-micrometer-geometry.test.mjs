@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   INTERNAL_MICROMETER_MAX_TICKS,
   INTERNAL_MICROMETER_MIN_TICKS,
+  INTERNAL_MICROMETER_TICKS_PER_MM,
 } from "../lib/internal-micrometer.ts";
 import {
   INTERNAL_MICROMETER_GEOMETRY_RATIOS,
@@ -95,7 +96,10 @@ test("aumento da leitura separa as duas pontas e move o tambor à esquerda", () 
     );
     close(
       maximum.contactSpanPx - minimum.contactSpanPx,
-      INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactExpansion * minimum.B,
+      ((INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS) /
+        INTERNAL_MICROMETER_TICKS_PER_MM) *
+        INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactPixelsPerMm *
+        minimum.B,
       `${viewport.name}: abertura entre as duas pontas`,
     );
   }
