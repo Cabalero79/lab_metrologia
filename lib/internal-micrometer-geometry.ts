@@ -8,7 +8,7 @@ import {
 } from "./internal-micrometer.ts";
 
 export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
-  sceneWidth: 12,
+  sceneWidth: 12.1,
   sceneHeight: 5.3,
   insetX: 0.2,
   axisY: 3.3,
@@ -150,7 +150,9 @@ export function getInternalMicrometerGeometry(
   const sleeveEndX = scaleMinimumX - travelPx;
   const sleeveRadius = r.sleeveRadius * B;
   const thimbleRadius = r.thimbleScaleRadius * B;
-  const thimbleLeft = sleeveEndX - B * 0.08;
+  // The visible thimble seam is the same datum that limits the sleeve scale.
+  // Any overlap here hides the endpoint label before the mathematical reading.
+  const thimbleLeft = sleeveEndX;
   const scaleCollarRight = thimbleLeft + r.thimbleScaleLength * B;
   const gripLeft = scaleCollarRight;
   const gripRight = gripLeft + r.gripLength * B;

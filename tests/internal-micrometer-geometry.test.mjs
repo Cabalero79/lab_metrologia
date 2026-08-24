@@ -145,6 +145,16 @@ test("escala principal encontra a borda do tambor nos limites de 5 e 15 mm", () 
       `${viewport.name}: marca de 15 mm na borda`,
     );
     close(
+      minimum.thimbleLeft,
+      minimum.sleeveEndX,
+      `${viewport.name}: costura visual coincide com a escala em 5 mm`,
+    );
+    close(
+      maximum.thimbleLeft,
+      maximum.sleeveEndX,
+      `${viewport.name}: costura visual coincide com a escala em 15 mm`,
+    );
+    close(
       minimum.scaleMaximumX,
       maximum.scaleMaximumX,
       `${viewport.name}: escala absoluta permanece fixa`,
