@@ -4,7 +4,7 @@ Laboratório web de metrologia da **Cabalero_Automações**, com a direção de 
 
 Versão privada publicada: <https://cabalero-paquimetro.cabalero.chatgpt.site>
 
-A plataforma reúne um paquímetro universal e um micrômetro interno de três contatos, ambos manipuláveis por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
+A plataforma reúne um paquímetro universal e um micrômetro interno analógico de duas pontas, ambos manipuláveis por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
 
 ## Funcionalidades
 
@@ -18,7 +18,7 @@ A plataforma reúne um paquímetro universal e um micrômetro interno de três c
 - layout responsivo e requisitos WCAG 2.2 AA considerados desde o início;
 - cabeçalhos defensivos e política de conteúdo aplicados pelo Worker.
 - seletor de instrumento com estado de sessão independente;
-- micrômetro interno métrico de 5,00 a 15,00 mm, resolução de 0,01 mm e passo de fuso de 0,50 mm;
+- micrômetro interno tipo paquímetro, com duas pontas finas, faixa de 5,00 a 15,00 mm, resolução de 0,01 mm e passo de fuso de 0,50 mm;
 - leitura de bainha e tambor, ajuste fino, limites, lupa e prática com resposta oculta.
 
 ## Executar

@@ -4,7 +4,7 @@
 
 ## 1. Resumo da funcionalidade
 
-Adicionar ao laboratório um micrômetro interno de três contatos, métrico, com faixa nominal proposta de `5,00–15,00 mm` e resolução de `0,01 mm`. Professores e estudantes devem manipular o instrumento, ler bainha e tambor, ocultar/revelar a resposta e ampliar a escala usando o mesmo shell aprovado do paquímetro.
+Adicionar ao laboratório um micrômetro interno analógico tipo paquímetro, com duas pontas finas, faixa nominal proposta de `5,00–15,00 mm` e resolução de `0,01 mm`. Professores e estudantes devem manipular o instrumento, ler bainha e tambor, ocultar/revelar a resposta e ampliar a escala usando o mesmo shell aprovado do paquímetro.
 
 O simulador ensinará leitura e relação entre movimento e escala. Ele não certificará força de medição, alinhamento, temperatura, erro zero ou calibração real.
 
@@ -22,7 +22,7 @@ O professor pode preparar ou sortear uma posição, ocultar a resposta e revelá
 
 - Estratégia de cor: **Restrained**, preservando vinho apenas para leitura, seleção, cota e foco de ação.
 - Cena: uma bancada industrial bem iluminada, usada por uma turma concentrada, em que traços, datums e números precisam sobreviver a um projetor de contraste limitado.
-- Âncoras: layout atual do paquímetro no marco v2; leitura tradicional de bainha/tambor; silhueta de um imicro de três contatos.
+- Âncoras: layout atual do paquímetro no marco v2; leitura tradicional de bainha/tambor; silhueta da família analógica tipo paquímetro de duas pontas.
 - Anti-referência: não reproduzir o palco branco, o texto vermelho, a dupla composição fixa ou a malha da referência Flash.
 - Fidelidade: a implementação original em canvas segue este brief e o shell aprovado v2; ativos e código do Flash não foram incorporados.
 
@@ -30,7 +30,7 @@ Como o pedido é de esboço, e não de protótipo visual de média/alta fidelida
 
 ## 4. Decisões de produto propostas
 
-1. **Família:** imicro de três contatos; esta rodada substitui a decisão genérica pendente do roadmap.
+1. **Família:** micrômetro interno tipo paquímetro de duas pontas; para a capacidade iniciada em 5 mm, usar pontas cilíndricas finas, e não as bigornas curvas destinadas às faixas maiores.
 2. **Perfil inicial:** somente milímetro, `5–15 mm`, resolução `0,01 mm`.
 3. **Sem seletores falsos:** unidade e resolução únicas aparecem como especificação, não como botões desabilitados.
 4. **Uma superfície, duas projeções:** a tela normal mostra o instrumento completo; a lupa usa o modo de detalhe já aprovado, sem manter duas cópias simultâneas.
@@ -87,7 +87,7 @@ Como o pedido é de esboço, e não de protótipo visual de média/alta fidelida
 ├───────────────────────────────────────────────────────────────────┤
 │                                      [123] [lupa]                 │
 │                                                                   │
-│  contatos/cabeçote ─ bainha 15 10 5 ─ tambor ─ recartilha/catraca│
+│  duas pontas ─ corpo ─ bainha 15 10 5 ─ cone/escala ─ recartilha │
 │       ←──────────── cota do diâmetro interno ────────────→        │
 │                                                                   │
 ├───────────────────────────────────────────────────────────────────┤
@@ -153,12 +153,12 @@ Regras:
 
 ### Cabeçote de medição
 
-1. dois contatos visíveis em perfil, espelhados por transformação;
-2. indicação discreta do terceiro contato no corte/silhueta, sem inventar perspectiva ambígua;
-3. cone interno didático apenas se sua relação com a abertura puder ser explicada sem confundir a leitura;
-4. corpo do cabeçote com três tons de aço;
-5. faces técnicas usadas como landmarks da cota;
-6. plaqueta Cabalero com `5–15 mm` e `0,01 mm`, sem copiar tipografia ou posição da referência.
+1. duas pontas cilíndricas verticais, estreitas e paralelas;
+2. uma mandíbula fixa ligada à bainha e uma mandíbula móvel ligada ao carro esquerdo;
+3. ombros simétricos alargados abaixo das pontas, conforme a família para 5 mm;
+4. corpo cilíndrico esquerdo, haste aparente entre as mandíbulas e parafuso de trava inferior;
+5. faces externas das pontas usadas como landmarks da cota horizontal;
+6. identificação Cabalero gravada no corpo e no tambor, sem sobrepor uma plaqueta à silhueta.
 
 ### Bainha
 
@@ -351,11 +351,11 @@ O paquímetro deve ser comparado com `entrega-satisfatoria-layout-v2` nessas tr�
 
 O pedido de implementação confirmou para a rodada:
 
-- imicro de três contatos;
+- micrômetro interno tipo paquímetro de duas pontas;
 - faixa nominal estrita `5,00–15,00 mm`;
 - resolução única `0,01 mm`;
 - gesto horizontal único, com botões e teclado como alternativas;
 - uma vista geral com ampliação localizada, sem duas cópias permanentes;
 - ação “Ir ao mínimo” em vez de “Fechar até zero”.
 
-O código, as fixtures independentes e a revisão responsiva estão concluídos. A publicação ainda requer aceite humano da faixa, da escala descendente, da representação dos três contatos e das fixtures por um especialista em metrologia, além do gate `npm run test:ci`.
+O código, as fixtures independentes e a revisão responsiva estão concluídos. A publicação ainda requer aceite humano da faixa, da escala descendente, da representação das duas pontas e das fixtures por um especialista em metrologia, além do gate `npm run test:ci`.

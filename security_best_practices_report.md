@@ -16,7 +16,7 @@ Este relatório é uma fotografia de um projeto ainda em construção, não uma 
 
 ## Atualização da rodada — 2026-08-24
 
-Esta rodada adicionou o micrômetro interno de três contatos e o seletor local de instrumento. **Nenhum novo fluxo de rede, persistência, telemetria, upload, download ou execução de conteúdo foi introduzido.**
+Esta rodada adicionou o micrômetro interno analógico de duas pontas e o seletor local de instrumento. **Nenhum novo fluxo de rede, persistência, telemetria, upload, download ou execução de conteúdo foi introduzido.**
 
 - O novo estado é mantido apenas em memória React; a troca de instrumento não usa cookies, Web Storage, parâmetros de URL ou backend.
 - `lib/internal-micrometer.ts` e `lib/internal-micrometer-geometry.ts` recebem apenas números locais, validam finitude/limites e não interpretam HTML, arquivos, URLs ou código.

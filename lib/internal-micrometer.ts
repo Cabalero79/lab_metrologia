@@ -1,5 +1,5 @@
 /**
- * Deterministic domain model for the three-contact internal micrometer.
+ * Deterministic domain model for the two-point caliper-type internal micrometer.
  *
  * One tick is exactly 0.01 mm, matching the only profile in the first
  * micrometer release. Pixels, angles and accumulated floating-point deltas are
@@ -152,4 +152,3 @@ export function formatInternalMicrometerInches(ticks: number): string {
   const inches = internalMicrometerTicksToMm(snapped) / 25.4;
   return `${inches.toFixed(4).replace(".", ",")}″`;
 }
-

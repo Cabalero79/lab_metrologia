@@ -13,6 +13,10 @@ Não entram no produto nem no repositório:
 
 A referência é informativa. O modelo metrológico novo será governado por fixtures independentes, documentação técnica e aprovação humana de especialista.
 
+### Referência visual aprovada posteriormente
+
+Em 24/08/2026, o responsável do produto forneceu uma página de catálogo da família analógica Série 145 e pediu que a representação adotasse exatamente esse padrão mecânico. A capacidade iniciada em 5 mm corresponde ao modelo de duas pontas cilíndricas finas; as capacidades a partir de 25 mm usam mandíbulas com bigornas curvas. Essa decisão substitui a silhueta de três contatos inferida do Flash, mas preserva o modelo inteiro de leitura `5,00–15,00 mm`, passo de `0,50 mm` e resolução de `0,01 mm`.
+
 ## 2. Proveniência e método
 
 | Item | Evidência |
@@ -225,16 +229,17 @@ Esses valores ainda precisam de revisão humana de metrologia antes de serem ele
 
 - A página original do simulador descreve explicitamente o arraste horizontal na vista menor e o arraste vertical na maior: `https://www.stefanelli.eng.br/imicro-virtual-simulador-micrometro-interno/`.
 - A Mitutoyo descreve a leitura de micrômetros internos como soma da bainha com o tambor e alerta que ajuste de referência e ponto de contato influenciam a medição real: `https://www2.mitutoyo.co.jp/eng/about-metrology/knowledge/inside-measurements/`.
+- O catálogo oficial da Série 145 diferencia o modelo `145-185`, faixa `5–30 mm` e mandíbula tipo pino, dos modelos a partir de `25–50 mm`, com mandíbula tipo bigorna: `https://www2.mitutoyo.co.jp/eng/useful/catalog-2021/pdf/192.pdf`.
 
 Essas páginas ajudam a identificar o modelo mental e os limites didáticos; não autorizam copiar seus ativos ou substituem a aprovação do especialista.
 
 ## 10. Decisão clean-room
 
-O produto novo preservará somente ideias gerais:
+O produto novo preservará somente ideias gerais do Flash:
 
 - uma única medida exata projetada em vista geral e detalhe;
 - leitura combinada de bainha e tambor;
-- sentido de abertura interna coerente;
+- sentido de abertura interna coerente, agora projetado entre duas pontas horizontais;
 - ajuste por ponteiro, toque e teclado;
 - resposta ocultável para aula.
 

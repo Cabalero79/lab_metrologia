@@ -8,20 +8,24 @@ import {
 } from "./internal-micrometer.ts";
 
 export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
-  sceneWidth: 13.2,
+  sceneWidth: 13.8,
   sceneHeight: 5.1,
   insetX: 0.2,
-  headX: 1.05,
-  axisY: 2.55,
-  sleeveStartX: 3.15,
-  sleeveEndAtMinimumX: 8.4,
+  axisY: 3.05,
+  fixedJawX: 3.1,
+  sleeveStartX: 3.42,
+  sleeveEndAtMinimumX: 9.1,
   sleeveTravel: 3.25,
-  sleeveRadius: 0.72,
-  thimbleLength: 3.75,
-  thimbleRadius: 1.08,
-  ratchetLength: 0.82,
-  contactBaseGap: 0.66,
-  contactExpansion: 0.78,
+  sleeveRadius: 0.62,
+  thimbleLength: 3.45,
+  thimbleRadius: 0.92,
+  ratchetLength: 0.88,
+  contactBaseSpan: 0.58,
+  contactExpansion: 1.25,
+  jawStemWidth: 0.46,
+  jawTipWidth: 0.13,
+  jawTipTopOffset: 2.04,
+  jawTipHeight: 0.36,
 } as const;
 
 export interface InternalMicrometerGeometry {
@@ -31,7 +35,15 @@ export interface InternalMicrometerGeometry {
   readonly sceneRight: number;
   readonly sceneBottom: number;
   readonly axisY: number;
-  readonly headX: number;
+  readonly fixedJawX: number;
+  readonly movingJawX: number;
+  readonly jawTipTop: number;
+  readonly jawTipBottom: number;
+  readonly jawShoulderY: number;
+  readonly jawBaseTop: number;
+  readonly jawBaseBottom: number;
+  readonly jawStemWidth: number;
+  readonly jawTipWidth: number;
   readonly sleeveStartX: number;
   readonly sleeveEndX: number;
   readonly sleeveTop: number;
@@ -48,10 +60,9 @@ export interface InternalMicrometerGeometry {
   readonly thimbleRadius: number;
   readonly ratchetLeft: number;
   readonly ratchetRight: number;
-  readonly contactCenterX: number;
-  readonly upperContactY: number;
-  readonly lowerContactY: number;
-  readonly contactGapPx: number;
+  readonly leftContactX: number;
+  readonly rightContactX: number;
+  readonly contactSpanPx: number;
   readonly referenceY: number;
   readonly thimbleDivision: number;
   readonly thimbleAngleDegrees: number;
@@ -79,6 +90,14 @@ export function getInternalMicrometerGeometry(
     (snapped - INTERNAL_MICROMETER_MIN_TICKS) /
     (INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS);
   const axisY = originY + r.axisY * B;
+  const fixedJawX = originX + r.fixedJawX * B;
+  const jawTipWidth = r.jawTipWidth * B;
+  const jawStemWidth = r.jawStemWidth * B;
+  const contactCenterSpan =
+    (r.contactBaseSpan + progress * r.contactExpansion) * B;
+  const movingJawX = fixedJawX - contactCenterSpan;
+  const leftContactX = movingJawX - jawTipWidth / 2;
+  const rightContactX = fixedJawX + jawTipWidth / 2;
   const sleeveStartX = originX + r.sleeveStartX * B;
   const sleeveEndAtMinimumX = originX + r.sleeveEndAtMinimumX * B;
   const travelPx = progress * r.sleeveTravel * B;
@@ -101,9 +120,6 @@ export function getInternalMicrometerGeometry(
   const thimbleRight = thimbleLeft + r.thimbleLength * B;
   const ratchetLeft = thimbleRight;
   const ratchetRight = ratchetLeft + r.ratchetLength * B;
-  const contactGapPx =
-    (r.contactBaseGap + progress * r.contactExpansion) * B;
-  const contactCenterX = originX + r.headX * B;
   const reading = decomposeInternalMicrometerReading(snapped);
 
   return {
@@ -113,7 +129,16 @@ export function getInternalMicrometerGeometry(
     sceneRight: originX + sceneWidth,
     sceneBottom: originY + sceneHeight,
     axisY,
-    headX: originX + r.headX * B,
+    fixedJawX,
+    movingJawX,
+    jawTipTop: axisY - r.jawTipTopOffset * B,
+    jawTipBottom:
+      axisY - (r.jawTipTopOffset - r.jawTipHeight) * B,
+    jawShoulderY: axisY - B * 1.24,
+    jawBaseTop: axisY - B * 0.5,
+    jawBaseBottom: axisY + B * 0.5,
+    jawStemWidth,
+    jawTipWidth,
     sleeveStartX,
     sleeveEndX,
     sleeveTop: axisY - sleeveRadius,
@@ -130,10 +155,9 @@ export function getInternalMicrometerGeometry(
     thimbleRadius,
     ratchetLeft,
     ratchetRight,
-    contactCenterX,
-    upperContactY: axisY - contactGapPx / 2,
-    lowerContactY: axisY + contactGapPx / 2,
-    contactGapPx,
+    leftContactX,
+    rightContactX,
+    contactSpanPx: rightContactX - leftContactX,
     referenceY: axisY,
     thimbleDivision: reading.phaseTicks,
     thimbleAngleDegrees:

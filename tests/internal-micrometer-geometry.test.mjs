@@ -47,8 +47,12 @@ test("cena usa escala uniforme e permanece integral em toda a matriz", () => {
       assert.ok(layout.originY >= -EPSILON, `${label}: origem vertical`);
       assert.ok(layout.sceneRight <= viewport.width + EPSILON, `${label}: cena direita`);
       assert.ok(layout.sceneBottom <= viewport.height + EPSILON, `${label}: cena inferior`);
-      assert.ok(layout.upperContactY < layout.axisY, `${label}: contato superior`);
-      assert.ok(layout.lowerContactY > layout.axisY, `${label}: contato inferior`);
+      assert.ok(layout.jawTipTop < layout.jawTipBottom, `${label}: ponta positiva`);
+      assert.ok(layout.jawTipBottom < layout.jawShoulderY, `${label}: ponta acima do ombro`);
+      assert.ok(layout.jawShoulderY < layout.jawBaseTop, `${label}: ombro acima da base`);
+      assert.ok(layout.jawBaseTop < layout.jawBaseBottom, `${label}: base positiva`);
+      assert.ok(layout.movingJawX < layout.fixedJawX, `${label}: duas pontas separadas`);
+      assert.ok(layout.leftContactX < layout.rightContactX, `${label}: vão interno positivo`);
       assert.ok(layout.sleeveStartX < layout.sleeveEndX, `${label}: bainha positiva`);
       assert.ok(layout.thimbleLeft < layout.thimbleRight, `${label}: tambor positivo`);
       assert.ok(layout.thimbleRight <= layout.ratchetLeft + EPSILON, `${label}: catraca após tambor`);
@@ -59,7 +63,7 @@ test("cena usa escala uniforme e permanece integral em toda a matriz", () => {
   }
 });
 
-test("aumento da leitura abre contatos e move o tambor à esquerda", () => {
+test("aumento da leitura separa as duas pontas e move o tambor à esquerda", () => {
   for (const viewport of VIEWPORTS) {
     const minimum = getInternalMicrometerGeometry(
       viewport.width,
@@ -73,7 +77,9 @@ test("aumento da leitura abre contatos e move o tambor à esquerda", () => {
         viewport.height,
         ticks,
       );
-      assert.ok(current.contactGapPx >= previous.contactGapPx);
+      assert.ok(current.contactSpanPx >= previous.contactSpanPx);
+      assert.ok(current.movingJawX <= previous.movingJawX);
+      close(current.fixedJawX, previous.fixedJawX, `${viewport.name}: ponta fixa`);
       assert.ok(current.thimbleLeft <= previous.thimbleLeft);
       previous = current;
     }
@@ -86,6 +92,11 @@ test("aumento da leitura abre contatos e move o tambor à esquerda", () => {
       minimum.thimbleLeft - maximum.thimbleLeft,
       INTERNAL_MICROMETER_GEOMETRY_RATIOS.sleeveTravel * minimum.B,
       `${viewport.name}: curso axial`,
+    );
+    close(
+      maximum.contactSpanPx - minimum.contactSpanPx,
+      INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactExpansion * minimum.B,
+      `${viewport.name}: abertura entre as duas pontas`,
     );
   }
 });

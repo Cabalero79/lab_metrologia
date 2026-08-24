@@ -111,21 +111,21 @@ Para um perfil com nônio de 0,001 mm, acrescenta-se uma quarta parcela. O simul
 
 ### Recorte selecionado para a próxima rodada
 
-Por solicitação do responsável do produto, a referência em estudo passa a ser o **micrômetro interno de três contatos (imicro), métrico, centesimal**, com faixa nominal proposta de `5–15 mm` e resolução de `0,01 mm`. A análise clean-room e o esboço de integração estão registrados em:
+Por solicitação do responsável do produto e conforme a referência visual aprovada em 24/08/2026, o instrumento passa a ser o **micrômetro interno analógico tipo paquímetro, de duas pontas**, métrico e centesimal, com faixa nominal proposta de `5–15 mm` e resolução de `0,01 mm`. A análise clean-room e o esboço de integração estão registrados em:
 
 - `docs/MICROMETER_INTERNAL_REFERENCE_ANALYSIS.md`;
 - `docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md`.
 
 Essa seleção antecipou o imicro em relação à ordem anteriormente sugerida neste roteiro. O responsável do produto autorizou a implementação incremental em 24/08/2026; o modelo inteiro, as fixtures independentes e a interface foram adicionados, mas a publicação permanece condicionada à validação humana de metrologia. O modelo legado analisado contém uma divergência `4,5–15,5 mm` versus a plaqueta `5–15 mm`; o intervalo legado não foi usado como oráculo.
 
-### Decisão de produto pendente
+### Decisão de produto registrada
 
-“Micrômetro interno” descreve famílias distintas. A escolha desta rodada é o imicro de três contatos; a comparação abaixo permanece como registro histórico da decisão:
+“Micrômetro interno” descreve famílias distintas. A escolha vigente é o tipo paquímetro de duas pontas; a comparação abaixo permanece como registro histórico da decisão:
 
-1. **Tubular ou de duas pontas, com hastes/extensões:** favorece o ensino de alcance nominal e soma da constante da haste.
-2. **De três contatos para furos:** aproxima aplicações de inspeção de diâmetro, mas exige geometria e procedimento de centralização mais complexos.
+1. **Tipo paquímetro, de duas pontas:** corresponde à referência aprovada; a faixa iniciada em 5 mm usa pontas finas, enquanto capacidades maiores usam bigornas curvas.
+2. **De três contatos para furos:** permanece como instrumento futuro distinto e exige geometria e procedimento de centralização próprios.
 
-Embora o modelo tubular/de duas pontas reaproveite melhor a leitura do micrômetro externo, a referência selecionada exige modelar contato interno autocentrante e sentido de leitura próprios. A ficha metrológica definitiva continua dependente de professor e especialista, não apenas da conveniência de interface.
+O modelo selecionado reaproveita a leitura tradicional de bainha e tambor, mas exige representar o vão horizontal entre uma ponta fixa e outra móvel. A ficha metrológica definitiva continua dependente de professor e especialista, não apenas da conveniência de interface.
 
 ### Objetivo pedagógico
 

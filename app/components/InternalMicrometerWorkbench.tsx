@@ -75,37 +75,50 @@ function getCompactOverviewViewport(
   const zoom = Math.min(1.5, Math.max(1.32, 480 / Math.max(320, width)));
   return {
     zoom,
-    focusX: (layout.headX + layout.thimbleLeft) / 2,
+    focusX: (layout.movingJawX + layout.thimbleLeft) / 2,
     focusY: layout.axisY,
     targetX: width * 0.49,
     targetY: height * 0.52,
   };
 }
 
-function pathHeadNeck(
+function pathReferenceJaw(
   layout: InternalMicrometerGeometry,
-  direction: -1 | 1,
+  centerX: number,
 ): Path2D {
-  const { B, headX, axisY, sleeveStartX } = layout;
+  const {
+    B,
+    jawBaseBottom,
+    jawBaseTop,
+    jawShoulderY,
+    jawStemWidth,
+    jawTipBottom,
+    jawTipTop,
+    jawTipWidth,
+  } = layout;
   const path = new Path2D();
-  const contactY = direction < 0 ? layout.upperContactY : layout.lowerContactY;
-  const innerY = axisY + direction * B * 0.38;
-  path.moveTo(headX + B * 0.18, contactY);
+  const tipHalf = jawTipWidth / 2;
+  const stemHalf = jawStemWidth / 2;
+  path.moveTo(centerX - tipHalf, jawTipTop);
+  path.lineTo(centerX + tipHalf, jawTipTop);
+  path.lineTo(centerX + tipHalf, jawTipBottom);
+  path.lineTo(centerX + stemHalf * 0.66, jawShoulderY);
   path.quadraticCurveTo(
-    headX + B * 0.55,
-    contactY,
-    headX + B * 0.8,
-    innerY,
+    centerX + stemHalf * 1.12,
+    jawShoulderY + B * 0.26,
+    centerX + stemHalf,
+    jawBaseTop,
   );
-  path.lineTo(sleeveStartX, axisY + direction * B * 0.46);
-  path.lineTo(sleeveStartX, axisY + direction * B * 0.12);
-  path.lineTo(headX + B * 0.72, axisY + direction * B * 0.14);
+  path.lineTo(centerX + stemHalf, jawBaseBottom);
+  path.lineTo(centerX - stemHalf, jawBaseBottom);
+  path.lineTo(centerX - stemHalf, jawBaseTop);
   path.quadraticCurveTo(
-    headX + B * 0.48,
-    axisY + direction * B * 0.1,
-    headX + B * 0.18,
-    contactY - direction * B * 0.16,
+    centerX - stemHalf * 1.12,
+    jawShoulderY + B * 0.26,
+    centerX - stemHalf * 0.66,
+    jawShoulderY,
   );
+  path.lineTo(centerX - tipHalf, jawTipBottom);
   path.closePath();
   return path;
 }
@@ -135,7 +148,7 @@ function isPointOnMovingAssembly(
   );
 }
 
-function drawArrowHead(
+function drawHorizontalArrowHead(
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -144,8 +157,8 @@ function drawArrowHead(
 ) {
   context.beginPath();
   context.moveTo(x, y);
-  context.lineTo(x - size, y + direction * size);
-  context.lineTo(x + size, y + direction * size);
+  context.lineTo(x + direction * size, y - size);
+  context.lineTo(x + direction * size, y + size);
   context.closePath();
   context.fill();
 }
@@ -165,7 +178,13 @@ function drawInternalMicrometer(
   const {
     B,
     axisY,
-    headX,
+    fixedJawX,
+    movingJawX,
+    jawBaseBottom,
+    jawBaseTop,
+    jawTipBottom,
+    jawTipTop,
+    jawTipWidth,
     sleeveStartX,
     sleeveEndX,
     sleeveTop,
@@ -179,9 +198,8 @@ function drawInternalMicrometer(
     thimbleBottom,
     ratchetLeft,
     ratchetRight,
-    contactCenterX,
-    upperContactY,
-    lowerContactY,
+    leftContactX,
+    rightContactX,
     referenceY,
     thimbleDivision,
   } = layout;
@@ -207,56 +225,87 @@ function drawInternalMicrometer(
   context.strokeStyle = ink;
   context.lineWidth = Math.max(1.2, B * 0.018);
 
-  // Three-contact measuring head. Two contacts are visible in profile; the
-  // central circular datum explicitly identifies the third without inventing
-  // perspective or simulating the unvalidated internal cone mechanism.
-  for (const direction of [-1, 1] as const) {
-    const neck = pathHeadNeck(layout, direction);
-    context.fillStyle = metal;
-    context.fill(neck);
-    context.stroke(neck);
-  }
-  const contactWidth = B * 0.27;
-  const contactHeight = B * 0.34;
-  for (const contactY of [upperContactY, lowerContactY]) {
-    const y = contactY - contactHeight / 2;
-    const gradient = context.createLinearGradient(
-      contactCenterX - contactWidth / 2,
-      0,
-      contactCenterX + contactWidth / 2,
-      0,
-    );
-    gradient.addColorStop(0, metalDark);
-    gradient.addColorStop(0.52, metalLight);
-    gradient.addColorStop(1, metalDark);
-    context.fillStyle = gradient;
-    context.fillRect(contactCenterX - contactWidth / 2, y, contactWidth, contactHeight);
-    context.strokeRect(contactCenterX - contactWidth / 2, y, contactWidth, contactHeight);
-  }
-  context.beginPath();
-  context.arc(headX + B * 0.28, axisY, B * 0.16, 0, Math.PI * 2);
-  context.fillStyle = metalDark;
-  context.fill();
-  context.stroke();
-  context.beginPath();
-  context.arc(headX + B * 0.28, axisY, B * 0.055, 0, Math.PI * 2);
-  context.fillStyle = metalLight;
-  context.fill();
-
-  // Fixed body and sleeve.
-  context.fillStyle = metalMid;
+  // Caliper-type head with two upright pin contacts, matching the 5 mm
+  // reference family. The left jaw travels while the right jaw stays attached
+  // to the graduated sleeve.
+  const bodyGradient = context.createLinearGradient(0, jawBaseTop, 0, jawBaseBottom);
+  bodyGradient.addColorStop(0, metalDark);
+  bodyGradient.addColorStop(0.18, metalLight);
+  bodyGradient.addColorStop(0.55, metal);
+  bodyGradient.addColorStop(1, metalDark);
+  context.fillStyle = bodyGradient;
   context.fillRect(
-    headX + B * 0.62,
-    axisY - B * 0.47,
-    sleeveStartX - (headX + B * 0.62),
-    B * 0.94,
+    layout.originX + B * 0.25,
+    axisY - B * 0.43,
+    Math.max(B * 0.4, movingJawX - layout.originX + B * 0.23),
+    B * 0.86,
   );
   context.strokeRect(
-    headX + B * 0.62,
-    axisY - B * 0.47,
-    sleeveStartX - (headX + B * 0.62),
-    B * 0.94,
+    layout.originX + B * 0.25,
+    axisY - B * 0.43,
+    Math.max(B * 0.4, movingJawX - layout.originX + B * 0.23),
+    B * 0.86,
   );
+  context.fillStyle = metalDark;
+  context.fillRect(
+    movingJawX,
+    axisY + B * 0.1,
+    fixedJawX - movingJawX,
+    B * 0.14,
+  );
+  context.fillStyle = metalMid;
+  context.fillRect(
+    fixedJawX,
+    jawBaseTop,
+    sleeveStartX - fixedJawX + B * 0.08,
+    jawBaseBottom - jawBaseTop,
+  );
+  context.strokeRect(
+    fixedJawX,
+    jawBaseTop,
+    sleeveStartX - fixedJawX + B * 0.08,
+    jawBaseBottom - jawBaseTop,
+  );
+  for (const jawX of [movingJawX, fixedJawX]) {
+    const jaw = pathReferenceJaw(layout, jawX);
+    context.fillStyle = metal;
+    context.fill(jaw);
+    context.strokeStyle = ink;
+    context.stroke(jaw);
+    const tipGradient = context.createLinearGradient(
+      jawX - jawTipWidth / 2,
+      0,
+      jawX + jawTipWidth / 2,
+      0,
+    );
+    tipGradient.addColorStop(0, metalDark);
+    tipGradient.addColorStop(0.5, metalLight);
+    tipGradient.addColorStop(1, metalDark);
+    context.fillStyle = tipGradient;
+    context.fillRect(
+      jawX - jawTipWidth / 2,
+      jawTipTop,
+      jawTipWidth,
+      jawTipBottom - jawTipTop,
+    );
+    context.strokeRect(
+      jawX - jawTipWidth / 2,
+      jawTipTop,
+      jawTipWidth,
+      jawTipBottom - jawTipTop,
+    );
+  }
+  // Lock screw beneath the moving carriage, as on the analog reference.
+  const lockX = movingJawX - B * 0.48;
+  context.fillStyle = metalDark;
+  context.fillRect(lockX - B * 0.06, jawBaseBottom, B * 0.12, B * 0.28);
+  context.fillStyle = metalMid;
+  context.beginPath();
+  context.roundRect(lockX - B * 0.18, jawBaseBottom + B * 0.25, B * 0.36, B * 0.13, B * 0.04);
+  context.fill();
+  context.strokeRect(lockX - B * 0.18, jawBaseBottom + B * 0.25, B * 0.36, B * 0.13);
+
+  // Fixed graduated sleeve.
   context.fillStyle = metalLight;
   context.beginPath();
   context.roundRect(
@@ -308,8 +357,13 @@ function drawInternalMicrometer(
     context.stroke();
     if (whole && scaleNumbersVisible) {
       context.font = `650 ${Math.max(9, B * 0.18)}px Arial, sans-serif`;
-      context.textAlign = "center";
-      context.fillText(String(markTicks / 100), x, referenceY - B * 0.42);
+      const isAtSeam = Math.abs(x - sleeveEndX) <= B * 0.025;
+      context.textAlign = isAtSeam ? "right" : "center";
+      context.fillText(
+        String(markTicks / 100),
+        isAtSeam ? x - B * 0.1 : x,
+        referenceY - B * 0.42,
+      );
     }
   }
   context.restore();
@@ -384,54 +438,73 @@ function drawInternalMicrometer(
   context.fillRect(ratchetLeft, axisY - B * 0.72, ratchetRight - ratchetLeft, B * 1.44);
   context.strokeRect(ratchetLeft, axisY - B * 0.72, ratchetRight - ratchetLeft, B * 1.44);
 
-  // Original local identification plate.
-  const plateX = headX + B * 0.9;
-  const plateY = axisY + B * 0.62;
-  context.fillStyle = "#dededb";
-  context.fillRect(plateX, plateY, B * 2.0, B * 0.62);
-  context.strokeStyle = ink;
-  context.lineWidth = Math.max(0.8, B * 0.012);
-  context.strokeRect(plateX, plateY, B * 2.0, B * 0.62);
+  // Local identification engraved on the same surfaces used by the reference
+  // family, without an added plate that would change the instrument silhouette.
+  context.save();
+  context.translate(thimbleLeft + B * 0.82, axisY);
+  context.rotate(Math.PI / 2);
   context.fillStyle = accent;
   context.textAlign = "center";
-  context.textBaseline = "alphabetic";
-  context.font = `750 ${Math.max(8, B * 0.16)}px Arial, sans-serif`;
-  context.fillText("CABALERO", plateX + B, plateY + B * 0.25);
+  context.textBaseline = "middle";
+  context.font = `750 ${Math.max(7, B * 0.13)}px Arial, sans-serif`;
+  context.fillText("CABALERO", 0, 0);
+  context.restore();
   context.fillStyle = ink;
-  context.font = `620 ${Math.max(7, B * 0.13)}px Arial, sans-serif`;
-  context.fillText("5–15 mm  ·  0,01 mm", plateX + B, plateY + B * 0.48);
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.font = `650 ${Math.max(7, B * 0.13)}px Arial, sans-serif`;
+  context.fillText(
+    "5–15",
+    layout.originX + B * 0.72,
+    axisY + B * 0.02,
+  );
 
-  // Internal diameter dimension derived from the same integer reading.
-  const dimensionX = contactCenterX - B * 0.68;
+  // Horizontal inside dimension between the two carbide pin faces.
+  const dimensionY = jawTipTop - B * 0.38;
   context.strokeStyle = accent;
   context.fillStyle = accent;
   context.lineWidth = Math.max(1.2, B * 0.018);
   context.beginPath();
-  context.moveTo(contactCenterX - B * 0.18, upperContactY);
-  context.lineTo(dimensionX, upperContactY);
-  context.moveTo(contactCenterX - B * 0.18, lowerContactY);
-  context.lineTo(dimensionX, lowerContactY);
-  context.moveTo(dimensionX, upperContactY);
-  context.lineTo(dimensionX, lowerContactY);
+  context.moveTo(leftContactX, jawTipTop - B * 0.08);
+  context.lineTo(leftContactX, dimensionY);
+  context.moveTo(rightContactX, jawTipTop - B * 0.08);
+  context.lineTo(rightContactX, dimensionY);
+  context.moveTo(leftContactX, dimensionY);
+  context.lineTo(rightContactX, dimensionY);
   context.stroke();
-  drawArrowHead(context, dimensionX, upperContactY, 1, Math.max(4, B * 0.09));
-  drawArrowHead(context, dimensionX, lowerContactY, -1, Math.max(4, B * 0.09));
+  drawHorizontalArrowHead(
+    context,
+    leftContactX,
+    dimensionY,
+    1,
+    Math.max(3, B * 0.075),
+  );
+  drawHorizontalArrowHead(
+    context,
+    rightContactX,
+    dimensionY,
+    -1,
+    Math.max(3, B * 0.075),
+  );
   const dimensionLabel = answerVisible
     ? readingLabel.replace(/\s+mm$/u, "")
     : "?";
-  const labelX = Math.max(layout.originX + 10, dimensionX - B * 0.18);
-  context.font = `600 ${Math.max(14, B * 0.28)}px Arial, sans-serif`;
+  context.font = `650 ${Math.max(12, B * 0.23)}px Arial, sans-serif`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.save();
-  context.translate(labelX, axisY);
-  context.rotate(-Math.PI / 2);
   context.strokeStyle = "#ffffff";
   context.lineWidth = Math.max(3, B * 0.07);
-  context.strokeText(dimensionLabel, 0, 0);
+  context.strokeText(
+    dimensionLabel,
+    (leftContactX + rightContactX) / 2,
+    dimensionY - B * 0.23,
+  );
   context.fillStyle = ink;
-  context.fillText(dimensionLabel, 0, 0);
-  context.restore();
+  context.fillText(
+    dimensionLabel,
+    (leftContactX + rightContactX) / 2,
+    dimensionY - B * 0.23,
+  );
   context.restore();
 }
 
@@ -878,7 +951,7 @@ export function InternalMicrometerWorkbench({
             className={`caliper-canvas micrometer-canvas${movingAssemblyHovered ? " is-interactive" : ""}${dragging ? " is-dragging" : ""}`}
             role="slider"
             tabIndex={0}
-            aria-label={`Ajustar o micrômetro interno. Faixa de 5 a 15 milímetros. Resolução ${INTERNAL_MICROMETER_PROFILE.label}.${detailMode ? " Escala ampliada." : ""}`}
+            aria-label={`Ajustar o micrômetro interno de duas pontas. Faixa de 5 a 15 milímetros. Resolução ${INTERNAL_MICROMETER_PROFILE.label}.${detailMode ? " Escala ampliada." : ""}`}
             aria-valuemin={5}
             aria-valuemax={15}
             aria-valuenow={ariaValue}
@@ -899,8 +972,8 @@ export function InternalMicrometerWorkbench({
             Simulador de micrômetro interno. Use os controles para definir a medida.
           </canvas>
           <div className="stage-legend" aria-hidden="true">
-            <span><i className="legend-fixed" /> bainha fixa</span>
-            <span><i className="legend-moving" /> tambor móvel</span>
+            <span><i className="legend-fixed" /> ponta fixa</span>
+            <span><i className="legend-moving" /> ponta e tambor móveis</span>
           </div>
         </div>
 
@@ -910,7 +983,7 @@ export function InternalMicrometerWorkbench({
         >
           <div className="micrometer-specification">
             <span>Perfil do instrumento</span>
-            <strong>Milímetro · 0,01 mm</strong>
+            <strong>Duas pontas · 0,01 mm</strong>
             <small>Faixa nominal 5–15 mm</small>
           </div>
           <div className="micrometer-step-controls" aria-label="Ajuste fino">
