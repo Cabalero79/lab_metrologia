@@ -2,6 +2,16 @@
 
 Este arquivo registra as frentes usadas na primeira entrega e serve como contrato para futuras rodadas. Todo agente deve preservar `PRODUCT.md`, o modelo inteiro em `lib/caliper.ts`, a ausência de anúncios/downloads/telemetria e a meta WCAG 2.2 AA.
 
+## Contexto obrigatório de retomada
+
+Ao iniciar uma nova sessão neste repositório, leia antes de propor alterações:
+
+1. `docs/CODEX_HANDOFF.md`, que registra o estado funcional aprovado e as pendências reais;
+2. `PRODUCT.md` e `DESIGN.md`, que governam produto e interface;
+3. o contrato específico do instrumento que será alterado.
+
+Não trate documentos históricos como estado atual quando divergirem do handoff. Preserve os anexos do usuário em `.codex-remote-attachments/` fora dos commits, salvo pedido explícito em contrário.
+
 ## Interface
 
 Responsável por hierarquia, responsividade, projeção, toque, teclado, contraste e coerência visual. Valida a interface em navegador real e não altera fórmulas metrológicas sem revisão do agente de código.
@@ -55,3 +65,23 @@ O estado identificado pela tag Git `entrega-satisfatoria-layout-v2` passa a ser 
 - gate `npm run test:ci` aprovado integralmente.
 
 Para novas alterações visuais, comparar desktop, celular horizontal e 320 px com `entrega-satisfatoria-layout-v2`. A tag `entrega-satisfatoria-layout-v1` permanece como referência histórica da primeira composição aprovada.
+
+## Estado aprovado do micrômetro interno
+
+Em 24/08/2026, o responsável do produto aprovou visualmente o micrômetro interno analógico tipo paquímetro, Série 145, de duas pontas, após os refinamentos registrados até `a28c547`. O estado vigente inclui:
+
+- faixa estrita `5,00–15,00 mm`, resolução `0,01 mm` e passo de fuso `0,50 mm`;
+- pontas cilíndricas paralelas, uma fixa e outra móvel;
+- escala longitudinal única na bainha, centralizada e legível, com afastamento fixo junto à orelha;
+- costura da bainha e limite do tambor compartilhando o mesmo datum;
+- graduações circulares recortadas pelo envelope físico do tambor;
+- aumento da leitura movendo a ponta e o conjunto do tambor para a esquerda, sem escala duplicada;
+- arraste, toque, teclado, ajuste fino, sorteio, ocultação da resposta, lupa e tela cheia funcionais;
+- validação em `320 px`, celular horizontal e desktop, inclusive nos limites `5,00` e `15,00 mm`;
+- gate `npm run test:ci` com lint, TypeScript, build, 38 testes unitários/geométricos e 10 testes de smoke.
+
+Alterações futuras devem ser incrementais e usar `docs/MICROMETER_TWO_POINT_REFERENCE_CONTRACT.md` como contrato mecânico. Não redesenhar a topologia completa para corrigir um detalhe localizado. A aprovação do produto não equivale a calibração nem substitui validação de um especialista em metrologia.
+
+## Publicação
+
+A versão atual com o micrômetro não está autorizada para publicação definitiva. Túneis provisórios não são endereços persistentes e não devem ser registrados como implantação. Só publicar mediante novo pedido explícito do responsável do produto.

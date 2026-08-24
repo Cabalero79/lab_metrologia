@@ -268,9 +268,9 @@ Adicionar casos para:
 - zero, erro zero didático e calibração, se fizerem parte da experiência;
 - fechamento sobre medida externa conhecida.
 
-### 11.2 Futuro micrômetro interno
+### 11.2 Micrômetro interno implementado
 
-Reutilizar o contrato, acrescentando:
+O perfil atual já cobre abertura nominal `5–15 mm`, sentido de movimento, limite mínimo e contato de duas pontas. Extensões ou novos perfis deverão acrescentar:
 
 - abertura mínima nominal e extensões;
 - sentido visual correto do aumento de diâmetro;
@@ -280,13 +280,10 @@ Reutilizar o contrato, acrescentando:
 
 Fixtures de micrômetro ficam em arquivos próprios, mas obedecem à mesma unidade física canônica. A inclusão de um instrumento novo só é aceita quando ele passa na suíte compartilhada e em sua suíte geométrica específica.
 
-## 12. Sequência recomendada de implantação
+## 12. Próxima evolução do harness
 
-1. Extrair e testar o modelo matemático puro.
-2. Substituir o teste do skeleton por smoke test do produto.
-3. Instalar Vitest e criar testes unitários/contrato.
-4. Adicionar Testing Library para estados e teclado.
-5. Adicionar Playwright para ponteiro, toque, responsividade e tela cheia.
-6. Integrar axe e revisão manual acessível.
-7. Criar baselines visuais somente após a geometria do paquímetro ser aprovada.
-8. Publicar artefatos e gates no CI.
+1. Adicionar testes de componente para estados React e teclado.
+2. Versionar Playwright para ponteiro, toque, responsividade e tela cheia.
+3. Integrar axe e revisão manual acessível.
+4. Criar baselines visuais dos dois instrumentos aprovados.
+5. Publicar artefatos e gates no CI quando houver fluxo de integração definido.

@@ -2,7 +2,7 @@
 
 ## 1. Estado e limite deste documento
 
-O paquímetro universal é o primeiro instrumento do produto. Este roteiro prepara decisões técnicas e pedagógicas para **micrômetro externo** e **micrômetro interno**, mas não indica que eles já estejam implementados. A entrada de cada instrumento na aplicação depende de validação metrológica, protótipo visual, testes e aceite didático.
+O paquímetro universal foi o primeiro instrumento do produto. O micrômetro interno de duas pontas foi implementado e aprovado visualmente em 24/08/2026; permanece local enquanto aguarda validação metrológica especializada e autorização de publicação. O micrômetro externo e o interno de três contatos continuam futuros.
 
 ## 2. Base reaproveitável
 
@@ -109,12 +109,13 @@ Para um perfil com nônio de 0,001 mm, acrescenta-se uma quarta parcela. O simul
 
 ## 4. Micrômetro interno
 
-### Recorte selecionado para a próxima rodada
+### Recorte implementado
 
-Por solicitação do responsável do produto e conforme a referência visual aprovada em 24/08/2026, o instrumento passa a ser o **micrômetro interno analógico tipo paquímetro, de duas pontas**, métrico e centesimal, com faixa nominal proposta de `5–15 mm` e resolução de `0,01 mm`. A análise clean-room e o esboço de integração estão registrados em:
+Por solicitação do responsável do produto e conforme a referência visual aprovada em 24/08/2026, o instrumento implementado é o **micrômetro interno analógico tipo paquímetro, de duas pontas**, métrico e centesimal, com faixa nominal `5–15 mm` e resolução `0,01 mm`. A análise clean-room, o brief e o contrato final estão registrados em:
 
 - `docs/MICROMETER_INTERNAL_REFERENCE_ANALYSIS.md`;
-- `docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md`.
+- `docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md`;
+- `docs/MICROMETER_TWO_POINT_REFERENCE_CONTRACT.md`.
 
 Essa seleção antecipou o imicro em relação à ordem anteriormente sugerida neste roteiro. O responsável do produto autorizou a implementação incremental em 24/08/2026; o modelo inteiro, as fixtures independentes e a interface foram adicionados, mas a publicação permanece condicionada à validação humana de metrologia. O modelo legado analisado contém uma divergência `4,5–15,5 mm` versus a plaqueta `5–15 mm`; o intervalo legado não foi usado como oráculo.
 
@@ -241,12 +242,11 @@ Baselines visuais só devem ser aprovados depois das fixtures matemáticas. Uma 
 
 ## 8. Ordem recomendada
 
-1. Consolidar o paquímetro e obter retorno de uma aula real.
+1. Validar paquímetro e micrômetro interno em aula real e com especialista em metrologia.
 2. Implementar o micrômetro externo métrico de 0–25 mm e 0,01 mm.
 3. Avaliar o nônio de 0,001 mm como perfil avançado.
-4. Escolher a família de micrômetro interno com professores e especialistas.
-5. Implementar um único modelo interno e suas extensões/configurações aprovadas.
-6. Só então estudar variações em polegada e instrumentos internos de três contatos.
+4. Estudar extensões/configurações adicionais do micrômetro interno somente com ficha metrológica aprovada.
+5. Só então estudar variações em polegada e instrumentos internos de três contatos.
 
 ## 9. Papel do agente de aprendizado
 

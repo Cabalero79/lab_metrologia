@@ -2,7 +2,7 @@
 
 Laboratório web de metrologia da **Cabalero_Automações**, com a direção de marca **Engenharia de Software aplicada à Indústria**.
 
-Versão privada publicada: <https://cabalero-paquimetro.cabalero.chatgpt.site>
+Publicação privada histórica do paquímetro: <https://cabalero-paquimetro.cabalero.chatgpt.site>. A versão atual com o micrômetro permanece local e não deve ser publicada sem nova autorização explícita.
 
 A plataforma reúne um paquímetro universal e um micrômetro interno analógico de duas pontas, ambos manipuláveis por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
 
@@ -39,7 +39,7 @@ npm run test:ci
 npm audit --omit=dev
 ```
 
-O harness executa lint, build, contratos matemáticos, renderização SSR, cabeçalhos de segurança, resposta 404 e inspeção dos artefatos publicados.
+O harness executa lint, TypeScript estrito, build, 38 testes unitários/geométricos e 10 testes de smoke, incluindo SSR, cabeçalhos de segurança, resposta 404 e inspeção dos artefatos publicados.
 
 ## Documentação
 
@@ -52,6 +52,7 @@ O harness executa lint, build, contratos matemáticos, renderização SSR, cabe�
 - [Roadmap dos micrômetros](docs/ROADMAP_INSTRUMENTS.md)
 - [Análise clean-room do micrômetro interno](docs/MICROMETER_INTERNAL_REFERENCE_ANALYSIS.md)
 - [Brief e estado da implementação do micrômetro interno](docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md)
+- [Handoff para novas sessões do Codex](docs/CODEX_HANDOFF.md)
 - [Revisão de segurança](security_best_practices_report.md)
 
 O micrômetro interno já faz parte da interface local. A publicação definitiva continua condicionada ao aceite humano das fixtures e da representação por um especialista em metrologia. O micrômetro externo permanece no roadmap.

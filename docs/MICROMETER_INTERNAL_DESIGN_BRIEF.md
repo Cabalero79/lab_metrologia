@@ -1,6 +1,6 @@
 # Brief de design — micrômetro interno centesimal
 
-> Status: implementado localmente em 24/08/2026 para validação técnica, visual, didática e metrológica antes da publicação.
+> Status: implementado e aprovado visualmente pelo responsável do produto em 24/08/2026. Permanece local, aguardando validação metrológica especializada e autorização explícita antes da publicação definitiva.
 
 ## 1. Resumo da funcionalidade
 
@@ -287,24 +287,13 @@ Erros a diagnosticar:
 
 ## 12. Harness e critérios de aceite
 
-### Gate mínimo antes de publicar
+### Gate automatizado vigente
 
 ```text
-npm ci
-npm run lint
-npm run typecheck
-npm run test:unit
-npm run test:contract
-npm run test:component
-npm run build
-npm run test:smoke
-npm run test:security
-npm run test:e2e
-npm run test:a11y
-npm run test:visual
+npm run test:ci
 ```
 
-`npm run test:ci` deve agregar essas camadas. `test:visual:update` continua manual.
+O gate executa lint, TypeScript estrito, build, 38 testes unitários/geométricos e 10 testes de smoke, SSR, artefatos e cabeçalhos. Playwright multi-engine versionado, axe e baselines visuais continuam planejados em `docs/HARNESS_PLAN.md`; a validação atual em navegador real é manual e não deve ser descrita como automação já instalada.
 
 ### Matriz essencial
 
@@ -334,18 +323,16 @@ npm run test:visual
 
 O paquímetro deve ser comparado com `entrega-satisfatoria-layout-v2` nessas três vistas prioritárias: desktop, celular horizontal e `320 px`. A geometria existente não pode mudar como efeito colateral do seletor de instrumento.
 
-## 13. Sequência de implementação recomendada
+## 13. Sequência executada e pendências
 
-1. Aprovar faixa, resolução e nomenclatura com especialista.
-2. Criar o modelo inteiro e fixtures independentes.
-3. Criar landmarks geométricos e testes sem React/canvas.
-4. Integrar o seletor de instrumento ao shell sem alterar a geometria do paquímetro.
-5. Desenhar cabeçote, bainha e tambor a partir dos landmarks.
-6. Integrar ponteiro, toque, teclado e botões de passo.
-7. Reaproveitar readout, ocultação, lupa e fullscreen.
-8. Adicionar conteúdo didático e estados de limite.
-9. Executar gate completo e comparação visual v2.
-10. Submeter fixtures e screenshots a aceite humano de metrologia e produto.
+1. [x] Definir faixa, resolução e nomenclatura do produto.
+2. [x] Criar o modelo inteiro, fixtures e landmarks geométricos.
+3. [x] Integrar seletor, desenho, ponteiro, toque, teclado e botões.
+4. [x] Reaproveitar readout, ocultação, lupa e tela cheia.
+5. [x] Validar estados de limite, responsividade e comparação visual.
+6. [x] Obter aceite visual e didático do responsável do produto.
+7. [ ] Obter validação das fixtures e da representação por especialista em metrologia.
+8. [ ] Receber autorização explícita para publicação definitiva.
 
 ## 14. Decisões aplicadas e porta de publicação
 
@@ -358,4 +345,4 @@ O pedido de implementação confirmou para a rodada:
 - uma vista geral com ampliação localizada, sem duas cópias permanentes;
 - ação “Ir ao mínimo” em vez de “Fechar até zero”.
 
-O código, as fixtures independentes e a revisão responsiva estão concluídos. A publicação ainda requer aceite humano da faixa, da escala descendente, da representação das duas pontas e das fixtures por um especialista em metrologia, além do gate `npm run test:ci`.
+O código, as fixtures independentes, o gate atual, a revisão responsiva e o aceite visual do produto estão concluídos. A publicação ainda requer validação das fixtures e da representação por especialista em metrologia, nova execução de `npm run test:ci` e autorização explícita do responsável do produto.

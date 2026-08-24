@@ -92,7 +92,7 @@ O estado inteiro em centésimos deve dirigir simultaneamente o vão, o curso axi
 - [x] Limites `5,00` e `15,00 mm` preservam topologia e graduações.
 - [x] Arraste, toque, teclado e botões alteram o mesmo estado.
 - [x] Desktop, celular horizontal e 320 px preservam a mesma silhueta.
-- [ ] Responsável do produto recebe preview concreto para aceite visual.
+- [x] Responsável do produto recebe preview concreto para aceite visual.
 
 ## 7. Refinamento com a segunda referência
 
@@ -104,7 +104,7 @@ O estado inteiro em centésimos deve dirigir simultaneamente o vão, o curso axi
 - [x] Em `7,36 mm`, os rótulos `15`, `13`, `11` e `9` permanecem visíveis antes do tambor.
 - [x] Os estados `5,00`, `7,36` e `15,00 mm` foram inspecionados em navegador real.
 - [x] A silhueta foi verificada em desktop, `844 × 390` e `320 × 700` sem rolagem horizontal.
-- [ ] Responsável do produto aprova visualmente este refinamento.
+- [x] Responsável do produto aprova visualmente este refinamento.
 
 ## 8. Aprovação com ressalva — legibilidade da escala
 
@@ -121,4 +121,8 @@ Correção após validação cinemática: não existe uma segunda escala sobrepo
 - [x] A costura do tambor determina exatamente o limite visível da escala.
 - [x] Graduações e números circulares são recortados pelo envelope do tambor.
 - [x] Afastamento junto à orelha é invariável em toda a matriz responsiva.
-- [ ] Responsável do produto aprova a solução didática sem ressalvas.
+- [x] Responsável do produto aprova a solução didática sem ressalvas em 24/08/2026.
+
+## 9. Encerramento da rodada
+
+O responsável do produto aprovou a solução visual e didática após a integração da escala ao corpo, o recorte da graduação circular pelo tambor e o reposicionamento dos números da bainha. Essa aprovação encerra as ressalvas de interface desta rodada; não constitui certificado dimensional, calibração ou aprovação metrológica especializada.
