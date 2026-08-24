@@ -39,6 +39,8 @@ export interface InternalMicrometerGeometry {
   readonly sleeveRadius: number;
   readonly pixelsPerMm: number;
   readonly travelPx: number;
+  readonly scaleMaximumX: number;
+  readonly scaleMinimumX: number;
   readonly thimbleLeft: number;
   readonly thimbleRight: number;
   readonly thimbleTop: number;
@@ -87,6 +89,12 @@ export function getInternalMicrometerGeometry(
     (r.sleeveTravel * B) /
     ((INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS) /
       INTERNAL_MICROMETER_TICKS_PER_MM);
+  const scaleSpanPx =
+    ((INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS) /
+      INTERNAL_MICROMETER_TICKS_PER_MM) *
+    pixelsPerMm;
+  const scaleMaximumX = sleeveEndX + travelPx - scaleSpanPx;
+  const scaleMinimumX = scaleMaximumX + scaleSpanPx;
   const sleeveRadius = r.sleeveRadius * B;
   const thimbleRadius = r.thimbleRadius * B;
   const thimbleLeft = sleeveEndX - B * 0.08;
@@ -113,6 +121,8 @@ export function getInternalMicrometerGeometry(
     sleeveRadius,
     pixelsPerMm,
     travelPx,
+    scaleMaximumX,
+    scaleMinimumX,
     thimbleLeft,
     thimbleRight,
     thimbleTop: axisY - thimbleRadius,

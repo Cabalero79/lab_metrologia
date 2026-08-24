@@ -90,6 +90,37 @@ test("aumento da leitura abre contatos e move o tambor à esquerda", () => {
   }
 });
 
+test("escala principal encontra a borda do tambor nos limites de 5 e 15 mm", () => {
+  for (const viewport of VIEWPORTS) {
+    const minimum = getInternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      INTERNAL_MICROMETER_MIN_TICKS,
+    );
+    const maximum = getInternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      INTERNAL_MICROMETER_MAX_TICKS,
+    );
+
+    close(
+      minimum.scaleMinimumX,
+      minimum.sleeveEndX,
+      `${viewport.name}: marca de 5 mm na borda`,
+    );
+    close(
+      maximum.scaleMaximumX,
+      maximum.sleeveEndX,
+      `${viewport.name}: marca de 15 mm na borda`,
+    );
+    close(
+      minimum.scaleMaximumX,
+      maximum.scaleMaximumX,
+      `${viewport.name}: escala absoluta permanece fixa`,
+    );
+  }
+});
+
 test("fase do tambor dá a volta exata nos limites de meia marca", () => {
   const viewport = VIEWPORTS[0];
   const beforeWrap = getInternalMicrometerGeometry(
@@ -107,4 +138,3 @@ test("fase do tambor dá a volta exata nos limites de meia marca", () => {
   assert.equal(afterWrap.thimbleDivision, 0);
   close(afterWrap.thimbleAngleDegrees, 0, "ângulo após o wrap");
 });
-

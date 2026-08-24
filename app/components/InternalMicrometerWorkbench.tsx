@@ -172,7 +172,7 @@ function drawInternalMicrometer(
     sleeveBottom,
     sleeveRadius,
     pixelsPerMm,
-    travelPx,
+    scaleMaximumX,
     thimbleLeft,
     thimbleRight,
     thimbleTop,
@@ -279,7 +279,6 @@ function drawInternalMicrometer(
   // Absolute internal scale, descending from 15 to 5 toward the thimble as
   // on the selected reference family. Half-millimetre marks alternate around
   // the datum and are clipped by the moving seam.
-  const scaleAtFifteenX = sleeveEndX + travelPx - B * 3.5;
   context.save();
   context.beginPath();
   context.rect(
@@ -298,7 +297,7 @@ function drawInternalMicrometer(
   context.stroke();
   for (let markTicks = 1_500; markTicks >= 500; markTicks -= 50) {
     const x =
-      scaleAtFifteenX + ((1_500 - markTicks) / 100) * pixelsPerMm;
+      scaleMaximumX + ((1_500 - markTicks) / 100) * pixelsPerMm;
     if (x > sleeveEndX + 1) continue;
     const whole = markTicks % 100 === 0;
     const tickHeight = whole ? B * 0.34 : B * 0.24;
