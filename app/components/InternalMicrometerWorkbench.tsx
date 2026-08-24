@@ -13,7 +13,6 @@ import {
   INTERNAL_MICROMETER_MIN_TICKS,
   INTERNAL_MICROMETER_PROFILE,
   INTERNAL_MICROMETER_SPINDLE_PITCH_TICKS,
-  INTERNAL_MICROMETER_TICKS_PER_MM,
   decomposeInternalMicrometerReading,
   formatInternalMicrometerBreakdown,
   formatInternalMicrometerInches,
@@ -26,6 +25,7 @@ import {
   getInternalMicrometerScaleMarkX,
   type InternalMicrometerGeometry,
 } from "../../lib/internal-micrometer-geometry";
+import { getInternalMicrometerDragTicks } from "../../lib/internal-micrometer-interaction";
 import type {
   InstrumentId,
   InstrumentNavigationProps,
@@ -680,7 +680,6 @@ export function InternalMicrometerWorkbench({
   const dragOriginRef = useRef<{
     clientX: number;
     ticks: number;
-    ticksPerCssPixel: number;
   } | null>(null);
   const lastMousePositionRef = useRef<{
     clientX: number;
@@ -811,19 +810,11 @@ export function InternalMicrometerWorkbench({
       return;
     }
     event.preventDefault();
-    const rect = event.currentTarget.getBoundingClientRect();
-    const layout = getInternalMicrometerGeometry(rect.width, rect.height, ticks);
-    const viewport = detailMode
-      ? getDetailViewport(rect.width, rect.height, layout)
-      : null;
-    const zoom = viewport?.zoom ?? 1;
     event.currentTarget.setPointerCapture(event.pointerId);
     activePointerRef.current = event.pointerId;
     dragOriginRef.current = {
       clientX: event.clientX,
       ticks,
-      ticksPerCssPixel:
-        INTERNAL_MICROMETER_TICKS_PER_MM / (layout.pixelsPerMm * zoom),
     };
     setDragging(true);
     setMovingAssemblyHovered(true);
@@ -834,7 +825,7 @@ export function InternalMicrometerWorkbench({
       const origin = dragOriginRef.current;
       if (!origin) return;
       const delta = event.clientX - origin.clientX;
-      setReading(origin.ticks - delta * origin.ticksPerCssPixel);
+      setReading(getInternalMicrometerDragTicks(origin.ticks, delta));
       return;
     }
     if (event.pointerType !== "touch") {
@@ -999,7 +990,7 @@ export function InternalMicrometerWorkbench({
           <div className="stage-aside">
             <p className="interaction-hint micrometer-hint">
               <span aria-hidden="true">←</span>
-              Arraste o tambor à esquerda para aumentar
+              Arraste o tambor com precisão de 0,01 mm
             </p>
             <div className="readout" data-hidden={!answerVisible}>
               <div className="readout-label">
