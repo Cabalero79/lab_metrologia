@@ -8,10 +8,10 @@ A aplicação é um frontend React/TypeScript servido por Vinext e empacotado pa
 interação (ponteiro / toque / teclado)
             │
             ▼
-estado exato em ticks inteiros ──► formatação da leitura
+modelo exato do instrumento ─────► formatação da leitura
             │                              │
             ▼                              ▼
-geometria do paquímetro no canvas    mostrador HTML acessível
+geometria específica no canvas       mostrador HTML acessível
             │                              │
             └──────── mesma fonte ─────────┘
 ```
@@ -33,6 +33,22 @@ Não usar pixels ou ponto flutuante acumulado como estado do instrumento.
 ### `app/components/CaliperWorkbench.tsx`
 
 Orquestra estado, controles e desenho. O canvas é uma projeção descartável do valor em ticks. `ResizeObserver` redesenha em mudança de viewport, e o `devicePixelRatio` mantém linhas nítidas. O canvas expõe semântica de slider; controles críticos permanecem como HTML real.
+
+### `lib/internal-micrometer.ts`
+
+Modelo puro do micrômetro interno centesimal. Um tick equivale exatamente a `0,01 mm`; a faixa estrita é `5,00–15,00 mm`, o passo do fuso é `0,50 mm` e o tambor possui 50 divisões. O módulo controla snap, limites, decomposição bainha/tambor e formatação, sem pixels ou ângulos como estado.
+
+### `lib/internal-micrometer-geometry.ts`
+
+Projeta os landmarks do imicro a partir do tick inteiro: contatos, bainha, costura, tambor, catraca, área de gesto e fase angular. A representação ensina leitura e abertura nominal; não simula força, alinhamento nem a cinemática interna não validada do cone.
+
+### `app/components/InternalMicrometerWorkbench.tsx`
+
+Implementa o canvas, o arraste axial, toque, teclado, ajuste fino, lupa, resposta ocultável e tela cheia do micrômetro. O gesto é calculado desde a origem do ponteiro e cancelado também em perda de foco ou visibilidade.
+
+### `app/components/MetrologyLab.tsx`
+
+Seleciona o instrumento ativo e preserva, separadamente durante a sessão, a medida e os estados pedagógicos de cada ferramenta. Apenas a ferramenta ativa é renderizada, mantendo um único `h1` e um único landmark principal no HTML.
 
 ### `worker/index.ts`
 
@@ -64,4 +80,4 @@ Trocar perfil preserva a abertura física e faz snap para a leitura representáv
 
 ## Evolução para micrômetros
 
-Compartilhar shell, leitura ocultável, tela cheia, acessibilidade e estratégia de testes. Não compartilhar à força a geometria ou o gesto: o micrômetro requer modelo de bainha/tambor, rotação e contato. Antes do perfil de 0,0001″, a unidade canônica deve ser revista, pois 80.000 ticks/mm não o representa exatamente.
+O micrômetro interno compartilha a linguagem visual, a leitura ocultável, a tela cheia, a acessibilidade e a estratégia de testes, mas mantém modelo, geometria e gesto próprios. Antes de adicionar perfis em polegadas ou o micrômetro externo, a unidade canônica deve ser escolhida por perfil; os `100 ticks/mm` desta primeira entrega não representam `0,001″` exatamente.

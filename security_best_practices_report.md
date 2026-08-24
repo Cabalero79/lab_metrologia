@@ -14,6 +14,20 @@ Resultado de `npm audit` neste estado:
 
 Este relatório é uma fotografia de um projeto ainda em construção, não uma garantia de ausência de vulnerabilidades nem uma homologação de produção.
 
+## Atualização da rodada — 2026-08-24
+
+Esta rodada adicionou o micrômetro interno de três contatos e o seletor local de instrumento. **Nenhum novo fluxo de rede, persistência, telemetria, upload, download ou execução de conteúdo foi introduzido.**
+
+- O novo estado é mantido apenas em memória React; a troca de instrumento não usa cookies, Web Storage, parâmetros de URL ou backend.
+- `lib/internal-micrometer.ts` e `lib/internal-micrometer-geometry.ts` recebem apenas números locais, validam finitude/limites e não interpretam HTML, arquivos, URLs ou código.
+- `InternalMicrometerWorkbench.tsx` usa canvas, eventos de ponteiro, teclado, `ResizeObserver` e Fullscreen API com caminhos constantes. Não há `dangerouslySetInnerHTML`, `eval`, `new Function`, navegação externa ou entrada textual livre.
+- O cancelamento do gesto cobre `pointercancel`, perda de captura, `blur` e `visibilitychange`, reduzindo estados transitórios presos sem ampliar permissões do navegador.
+- O teste de artefatos agora percorre `dist/` recursivamente e rejeita `.swf`, `.fla`, `.as`, `.jar`, `.zip` e executáveis, além de preservar a proibição do domínio legado.
+- A política do modo “resposta oculta” permanece igual à do paquímetro: o texto e `aria-valuetext` são neutralizados, mas `aria-valuenow` é mantido por ser obrigatório ao `role="slider"`. Continua sendo privacidade pedagógica, não confidencialidade.
+- A revisão em navegador local confirmou ausência de erros no console e nenhuma requisição ou ativo remoto foi necessário para manipulação, lupa, troca de instrumento ou responsividade.
+
+Risco residual específico: a representação didática não certifica força, alinhamento ou cinemática real do cone do imicro. Isso é risco de exatidão pedagógica/metrológica, não uma vulnerabilidade de segurança, e bloqueia publicação até o aceite de especialista.
+
 ## Atualização da rodada — 2026-08-13
 
 Esta rodada adicionou a projeção específica das escalas em polegadas, a ampliação interativa e o ativo local do Cavaleiro Samurai. A revisão seguiu as orientações de segurança para frontend JavaScript/TypeScript, React e servidor Next/Vinext. **Nenhum novo achado crítico, alto ou médio foi introduzido.**

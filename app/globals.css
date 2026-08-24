@@ -97,6 +97,11 @@ a[href] {
   background: var(--surface-canvas);
 }
 
+.metrology-lab {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .lab-shell:fullscreen {
   overflow: hidden;
 }
@@ -149,7 +154,7 @@ a[href] {
 }
 
 .header-actions,
-.status-chip,
+.instrument-picker,
 .icon-text-button {
   display: flex;
   align-items: center;
@@ -157,6 +162,41 @@ a[href] {
 
 .header-actions {
   gap: 0.7rem;
+}
+
+.instrument-picker {
+  min-height: 44px;
+  gap: 0.55rem;
+  padding: 0.3rem 0.35rem 0.3rem 0.72rem;
+  color: var(--ink-muted);
+  background: oklch(1 0 0 / 0.8);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  font-weight: 720;
+}
+
+.instrument-picker > span,
+.stage-instrument-picker > span {
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.instrument-picker select,
+.stage-instrument-picker select {
+  min-height: 36px;
+  max-width: 210px;
+  padding: 0.35rem 1.8rem 0.35rem 0.55rem;
+  color: var(--ink-strong);
+  background: var(--surface-panel);
+  border: 1px solid var(--line);
+  border-radius: 0.42rem;
+  font: 680 0.78rem/1.2 var(--font-geist), Arial, sans-serif;
+}
+
+.stage-instrument-picker {
+  display: none;
 }
 
 .status-chip {
@@ -519,6 +559,10 @@ a[href] {
   outline-offset: -5px;
 }
 
+.micrometer-stage {
+  background: var(--surface-panel);
+}
+
 .stage-legend {
   position: absolute;
   z-index: 2;
@@ -562,6 +606,65 @@ a[href] {
   gap: clamp(1rem, 2.4vw, 2.2rem);
   background: var(--surface-soft);
   border-top: 1px solid var(--line);
+}
+
+.micrometer-control-deck {
+  grid-template-columns: minmax(190px, 0.9fr) auto minmax(150px, 190px) auto;
+}
+
+.micrometer-specification {
+  min-height: 66px;
+  padding: 0.62rem 0.75rem;
+  display: grid;
+  align-content: center;
+  gap: 0.12rem;
+  color: var(--ink-strong);
+  background: var(--surface-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.micrometer-specification > span {
+  color: var(--ink-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.micrometer-specification strong {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.micrometer-specification small {
+  color: var(--ink-muted);
+  font-size: 0.66rem;
+}
+
+.micrometer-step-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.micrometer-step-controls .secondary-button {
+  min-width: 84px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1rem;
+}
+
+.micrometer-step-controls .secondary-button span {
+  font-size: 0.68rem;
+}
+
+.secondary-button:disabled {
+  color: var(--ink-muted);
+  background: var(--surface-soft);
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .control-group {
@@ -771,6 +874,31 @@ a[href] {
     grid-column: 3;
     grid-row: 2;
   }
+
+  .micrometer-control-deck {
+    grid-template-columns: minmax(190px, 1fr) auto minmax(150px, 0.7fr);
+  }
+
+  .micrometer-control-deck .micrometer-specification {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .micrometer-control-deck .micrometer-step-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .micrometer-control-deck .conversion-output {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .micrometer-control-deck .practice-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 680px) {
@@ -801,9 +929,29 @@ a[href] {
     white-space: nowrap;
   }
 
-  .brand-copy small,
-  .status-chip {
+  .brand-copy small {
     display: none;
+  }
+
+  .header-actions {
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .instrument-picker {
+    min-width: 0;
+    padding: 0.2rem;
+  }
+
+  .instrument-picker > span {
+    display: none;
+  }
+
+  .instrument-picker select {
+    width: clamp(126px, 38vw, 168px);
+    min-height: 40px;
+    padding-left: 0.4rem;
+    font-size: 0.7rem;
   }
 
   .icon-text-button {
@@ -921,6 +1069,41 @@ a[href] {
     padding: 0.45rem 0.5rem 0.55rem;
   }
 
+  .micrometer-control-deck {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .micrometer-control-deck .micrometer-specification,
+  .micrometer-control-deck .micrometer-step-controls,
+  .micrometer-control-deck .conversion-output,
+  .micrometer-control-deck .practice-actions {
+    grid-column: 1 / -1;
+  }
+
+  .micrometer-control-deck .micrometer-specification {
+    grid-row: 1;
+    min-height: 54px;
+  }
+
+  .micrometer-control-deck .micrometer-step-controls {
+    grid-row: 2;
+  }
+
+  .micrometer-control-deck .conversion-output {
+    grid-row: 3;
+  }
+
+  .micrometer-control-deck .practice-actions {
+    grid-row: 4;
+    justify-content: stretch;
+  }
+
+  .micrometer-step-controls .secondary-button {
+    min-width: 0;
+    min-height: 48px;
+    flex: 1;
+  }
+
   .resolution-control {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -1013,6 +1196,21 @@ a[href] {
 
   .primary-button .button-label-compact {
     display: inline;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-copy {
+    display: none;
+  }
+
+  .brand-mark {
+    width: 50px;
+    height: 50px;
+  }
+
+  .instrument-picker select {
+    width: clamp(122px, 42vw, 142px);
   }
 }
 
@@ -1156,6 +1354,33 @@ a[href] {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(180px, 30vw);
     gap: 0.55rem;
+  }
+
+  .stage-copy > div:first-child {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .stage-copy h1 {
+    min-width: 0;
+  }
+
+  .stage-instrument-picker {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .stage-instrument-picker > span {
+    display: none;
+  }
+
+  .stage-instrument-picker select {
+    width: clamp(132px, 18vw, 190px);
+    min-height: 40px;
+    font-size: 0.7rem;
   }
 
   .eyebrow,
@@ -1306,6 +1531,42 @@ a[href] {
 
   .primary-button .button-label-compact {
     display: inline;
+  }
+
+  .micrometer-control-deck {
+    grid-template-columns:
+      minmax(170px, 0.9fr)
+      minmax(150px, 0.8fr)
+      minmax(118px, 0.65fr)
+      minmax(0, 0.85fr);
+  }
+
+  .micrometer-control-deck .micrometer-specification,
+  .micrometer-control-deck .micrometer-step-controls,
+  .micrometer-control-deck .conversion-output,
+  .micrometer-control-deck .practice-actions {
+    grid-column: auto;
+    grid-row: 1;
+  }
+
+  .micrometer-control-deck .micrometer-specification {
+    min-height: 44px;
+    padding: 0.25rem 0.4rem;
+  }
+
+  .micrometer-control-deck .micrometer-specification small {
+    display: none;
+  }
+
+  .micrometer-control-deck .micrometer-step-controls {
+    gap: 0.25rem;
+  }
+
+  .micrometer-step-controls .secondary-button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.3rem;
+    flex: 1;
   }
 }
 

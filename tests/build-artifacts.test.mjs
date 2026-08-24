@@ -1,8 +1,19 @@
 import assert from "node:assert/strict";
-import { access, readFile, stat } from "node:fs/promises";
+import { access, readdir, readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 const projectFile = (relativePath) => new URL(`../${relativePath}`, import.meta.url);
+
+async function listFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const nested = await Promise.all(
+    entries.map((entry) => {
+      const child = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directory);
+      return entry.isDirectory() ? listFiles(child) : [child];
+    }),
+  );
+  return nested.flat();
+}
 
 test("build produz worker, manifesto e ativos locais essenciais", async () => {
   const requiredFiles = [
@@ -24,4 +35,13 @@ test("artefato publicado não contém arquivos executáveis legados", async () =
   const manifest = await readFile(projectFile("dist/client/.vite/manifest.json"), "utf8");
   assert.doesNotMatch(manifest, /\.(?:exe|msi|bat|cmd|com)(?:["?#]|$)/i);
   assert.doesNotMatch(manifest, /stefanelli\.eng\.br/i);
+
+  const files = await listFiles(projectFile("dist/"));
+  for (const file of files) {
+    assert.doesNotMatch(
+      file.pathname,
+      /\.(?:exe|msi|bat|cmd|com|swf|fla|as|jar|zip)$/i,
+      `artefato legado proibido: ${file.pathname}`,
+    );
+  }
 });

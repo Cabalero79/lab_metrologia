@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { CaliperWorkbench } from "./components/CaliperWorkbench";
+import { MetrologyLab } from "./components/MetrologyLab";
 
 export const metadata: Metadata = {
-  title: "Paquímetro Universal Virtual",
+  title: "Paquímetro Universal Virtual | Micrômetro Interno",
   description:
-    "Simulador didático de paquímetro universal com nônio em milímetros e polegadas.",
+    "Laboratório didático de paquímetro universal e micrômetro interno para estudos de metrologia.",
 };
 
 export default function Home() {
-  return <CaliperWorkbench />;
+  return <MetrologyLab />;
 }

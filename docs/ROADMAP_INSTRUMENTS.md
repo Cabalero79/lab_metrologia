@@ -109,14 +109,23 @@ Para um perfil com nônio de 0,001 mm, acrescenta-se uma quarta parcela. O simul
 
 ## 4. Micrômetro interno
 
+### Recorte selecionado para a próxima rodada
+
+Por solicitação do responsável do produto, a referência em estudo passa a ser o **micrômetro interno de três contatos (imicro), métrico, centesimal**, com faixa nominal proposta de `5–15 mm` e resolução de `0,01 mm`. A análise clean-room e o esboço de integração estão registrados em:
+
+- `docs/MICROMETER_INTERNAL_REFERENCE_ANALYSIS.md`;
+- `docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md`.
+
+Essa seleção antecipou o imicro em relação à ordem anteriormente sugerida neste roteiro. O responsável do produto autorizou a implementação incremental em 24/08/2026; o modelo inteiro, as fixtures independentes e a interface foram adicionados, mas a publicação permanece condicionada à validação humana de metrologia. O modelo legado analisado contém uma divergência `4,5–15,5 mm` versus a plaqueta `5–15 mm`; o intervalo legado não foi usado como oráculo.
+
 ### Decisão de produto pendente
 
-“Micrômetro interno” descreve famílias distintas. Antes do protótipo, o curso deve escolher qual delas atende ao objetivo:
+“Micrômetro interno” descreve famílias distintas. A escolha desta rodada é o imicro de três contatos; a comparação abaixo permanece como registro histórico da decisão:
 
 1. **Tubular ou de duas pontas, com hastes/extensões:** favorece o ensino de alcance nominal e soma da constante da haste.
 2. **De três contatos para furos:** aproxima aplicações de inspeção de diâmetro, mas exige geometria e procedimento de centralização mais complexos.
 
-Para uma sequência didática logo após o micrômetro externo, o modelo tubular/de duas pontas tende a reaproveitar melhor a leitura de bainha e tambor. A escolha definitiva deve ser feita com professor e especialista, não apenas por conveniência de interface.
+Embora o modelo tubular/de duas pontas reaproveite melhor a leitura do micrômetro externo, a referência selecionada exige modelar contato interno autocentrante e sentido de leitura próprios. A ficha metrológica definitiva continua dependente de professor e especialista, não apenas da conveniência de interface.
 
 ### Objetivo pedagógico
 

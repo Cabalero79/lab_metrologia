@@ -1,10 +1,10 @@
-# Paquímetro para Estudos
+# Laboratório de Metrologia para Estudos
 
 Laboratório web de metrologia da **Cabalero_Automações**, com a direção de marca **Engenharia de Software aplicada à Indústria**.
 
 Versão privada publicada: <https://cabalero-paquimetro.cabalero.chatgpt.site>
 
-A primeira entrega é um paquímetro universal analógico, manipulável por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
+A plataforma reúne um paquímetro universal e um micrômetro interno de três contatos, ambos manipuláveis por mouse, toque e teclado. A mesma tela serve para projeção em sala e estudo individual, sem anúncios, rastreadores, pop-ups ou downloads automáticos.
 
 ## Funcionalidades
 
@@ -17,6 +17,9 @@ A primeira entrega é um paquímetro universal analógico, manipulável por mous
 - teclado: setas, `Shift` + setas, `Page Up/Down`, `Home` e `End`;
 - layout responsivo e requisitos WCAG 2.2 AA considerados desde o início;
 - cabeçalhos defensivos e política de conteúdo aplicados pelo Worker.
+- seletor de instrumento com estado de sessão independente;
+- micrômetro interno métrico de 5,00 a 15,00 mm, resolução de 0,01 mm e passo de fuso de 0,50 mm;
+- leitura de bainha e tambor, ajuste fino, limites, lupa e prática com resposta oculta.
 
 ## Executar
 
@@ -47,6 +50,8 @@ O harness executa lint, build, contratos matemáticos, renderização SSR, cabe�
 - [Guia de aprendizagem](docs/LEARNING_GUIDE.md)
 - [Plano e harness de testes](docs/TEST_PLAN.md)
 - [Roadmap dos micrômetros](docs/ROADMAP_INSTRUMENTS.md)
+- [Análise clean-room do micrômetro interno](docs/MICROMETER_INTERNAL_REFERENCE_ANALYSIS.md)
+- [Brief e estado da implementação do micrômetro interno](docs/MICROMETER_INTERNAL_DESIGN_BRIEF.md)
 - [Revisão de segurança](security_best_practices_report.md)
 
-O micrômetro externo e o interno estão estudados e planejados, mas ainda não fazem parte da interface publicada.
+O micrômetro interno já faz parte da interface local. A publicação definitiva continua condicionada ao aceite humano das fixtures e da representação por um especialista em metrologia. O micrômetro externo permanece no roadmap.

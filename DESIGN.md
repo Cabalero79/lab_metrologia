@@ -76,7 +76,7 @@ A voz é precisa, industrial e didática. O sistema rejeita a aparência de Flas
 
 **Key Characteristics:**
 
-- instrumento analógico dominante sobre bancada clara;
+- instrumento analógico ativo dominante sobre bancada clara;
 - contraste estrutural de grafite, aço e vinho;
 - controles compactos, táteis e semanticamente explícitos;
 - números tabulares e rótulos técnicos em mono;
@@ -167,9 +167,11 @@ O sistema é plano por padrão. Bordas e mudanças tonais separam áreas; sombra
 
 Uma faixa única contém marca, estado, detalhe e tela cheia. No telefone, o texto secundário e o chip cedem espaço, mas os dois comandos continuam como alvos reais de 42 px.
 
-### Paquímetro e mostrador
+### Instrumentos e mostrador
 
 O instrumento é desenhado em canvas de alta densidade com três tons de metal e contornos de grafite. O mostrador é HTML, permanece legível em projeção, inclui decomposição e usa um botão de olho nativo. A ampliação transforma apenas a projeção visual; a medida interna não muda.
+
+O seletor de instrumento preserva uma sessão independente para o paquímetro e para o micrômetro interno. No imicro, a vista geral apresenta cabeçote de três contatos, bainha descendente, tambor centesimal e catraca visual; a lupa centra a costura bainha/tambor. A geometria comunica leitura e abertura nominal sem afirmar que simula força, alinhamento ou a cinemática interna real.
 
 A construção mecânica separa as faces de contato dos zeros das escalas por um deslocamento constante: a face externa fixa antecede o zero da escala principal, e a face externa móvel antecede o zero do nônio pela mesma distância. Garras inferiores estreitas e afuniladas, garras internas altas e uma ponte do cursor mais longa mantêm a silhueta de um paquímetro universal real sem reproduzir ativos da referência.
 

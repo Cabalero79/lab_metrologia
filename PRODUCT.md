@@ -10,7 +10,7 @@ Professores, instrutores e estudantes de metrologia, mecânica, manufatura e ár
 
 ## Product Purpose
 
-Criar uma plataforma web de estudos de metrologia que reproduza instrumentos analógicos de forma interativa, começando pelo paquímetro universal. A primeira versão deve permitir abrir e fechar o instrumento por mouse, toque ou teclado, alternar entre milímetros e polegadas, selecionar resoluções de leitura e ocultar a resposta para exercícios em sala. O sucesso significa oferecer uma experiência confiável, sem publicidade, downloads inesperados ou dependência de tecnologias descontinuadas.
+Criar uma plataforma web de estudos de metrologia que reproduza instrumentos analógicos de forma interativa, começando pelo paquímetro universal e avançando para o micrômetro interno centesimal. Cada ferramenta deve permitir ajuste por mouse, toque ou teclado, respeitar seus próprios perfis e limites e ocultar a resposta para exercícios em sala. O sucesso significa oferecer uma experiência confiável, sem publicidade, downloads inesperados ou dependência de tecnologias descontinuadas.
 
 ## Brand Personality
 
@@ -26,7 +26,7 @@ Engenharia de Software aplicada à Indústria: precisa, industrial e didática. 
 
 ## Design Principles
 
-1. O instrumento é o protagonista e ocupa a maior área útil da tela.
+1. O instrumento ativo é o protagonista e ocupa a maior área útil da tela.
 2. Toda leitura exibida deve ser derivada de um modelo matemático determinístico e testável.
 3. O modo professor deve permitir preparar uma medida e ocultar ou revelar a resposta imediatamente.
 4. Controles essenciais devem permanecer legíveis durante projeção e utilizáveis em telas menores.

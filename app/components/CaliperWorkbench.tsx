@@ -33,8 +33,24 @@ import {
   getCaliperGeometry,
   type CaliperGeometry,
 } from "../../lib/caliper-geometry";
+import type {
+  InstrumentId,
+  InstrumentNavigationProps,
+} from "./instrument-types";
 
 const INITIAL_TICKS = mmToTicks(58.35);
+
+export interface CaliperSessionState {
+  readonly scaleId: CaliperScaleId;
+  readonly ticks: number;
+  readonly answerVisible: boolean;
+  readonly mainScaleNumbersVisible: boolean;
+}
+
+interface CaliperWorkbenchProps extends InstrumentNavigationProps {
+  readonly initialSession?: CaliperSessionState;
+  readonly onSessionChange?: (session: CaliperSessionState) => void;
+}
 
 const SCALE_NOTES: Record<CaliperScaleId, string> = {
   "mm-0.1": "nônio decimal · 10 divisões",
@@ -733,13 +749,27 @@ function formatBreakdown(ticks: number, scale: CaliperScale): string {
   return `${formatCaliperReading(mainTicks, scale, { quantize: false })} + ${formatCaliperReading(vernierTicks, scale, { quantize: false })}`;
 }
 
-export function CaliperWorkbench() {
-  const [scaleId, setScaleId] = useState<CaliperScaleId>("mm-0.05");
-  const [ticks, setTicks] = useState(() =>
-    snapCaliperTicks(INITIAL_TICKS, "mm-0.05"),
+export function CaliperWorkbench({
+  activeInstrument,
+  onInstrumentChange,
+  initialSession,
+  onSessionChange,
+}: CaliperWorkbenchProps) {
+  const [scaleId, setScaleId] = useState<CaliperScaleId>(
+    initialSession?.scaleId ?? "mm-0.05",
   );
-  const [answerVisible, setAnswerVisible] = useState(true);
-  const [mainScaleNumbersVisible, setMainScaleNumbersVisible] = useState(true);
+  const [ticks, setTicks] = useState(() =>
+    snapCaliperTicks(
+      initialSession?.ticks ?? INITIAL_TICKS,
+      initialSession?.scaleId ?? "mm-0.05",
+    ),
+  );
+  const [answerVisible, setAnswerVisible] = useState(
+    initialSession?.answerVisible ?? true,
+  );
+  const [mainScaleNumbersVisible, setMainScaleNumbersVisible] = useState(
+    initialSession?.mainScaleNumbersVisible ?? true,
+  );
   const [dragging, setDragging] = useState(false);
   const [movingAssemblyHovered, setMovingAssemblyHovered] = useState(false);
   const [detailMode, setDetailMode] = useState(false);
@@ -759,6 +789,21 @@ export function CaliperWorkbench() {
   const reading = formatCaliperReading(ticks, scale);
   const breakdown = formatBreakdown(ticks, scale);
   const convertedReading = formatOppositeUnitReading(ticks, unit);
+
+  useEffect(() => {
+    onSessionChange?.({
+      scaleId,
+      ticks,
+      answerVisible,
+      mainScaleNumbersVisible,
+    });
+  }, [
+    answerVisible,
+    mainScaleNumbersVisible,
+    onSessionChange,
+    scaleId,
+    ticks,
+  ]);
 
   const setReading = useCallback(
     (candidateTicks: number) => {
@@ -1085,7 +1130,7 @@ export function CaliperWorkbench() {
       : ticksToInches(DEFAULT_CALIPER_MAX_TICKS);
 
   return (
-    <main className="lab-shell" ref={labRef}>
+    <div className="lab-shell" ref={labRef}>
       <header className="lab-header">
         <a className="brand" href="#simulador" aria-label="Cabalero Automações — início">
           <span className="brand-mark" aria-hidden="true" />
@@ -1095,9 +1140,19 @@ export function CaliperWorkbench() {
           </span>
         </a>
         <div className="header-actions">
-          <span className="status-chip">
-            <span aria-hidden="true" /> Paquímetro universal
-          </span>
+          <label className="instrument-picker">
+            <span>Instrumento</span>
+            <select
+              aria-label="Instrumento de medição"
+              value={activeInstrument}
+              onChange={(event) =>
+                onInstrumentChange(event.target.value as InstrumentId)
+              }
+            >
+              <option value="caliper">Paquímetro universal</option>
+              <option value="internal-micrometer">Micrômetro interno</option>
+            </select>
+          </label>
           <button className="icon-text-button" type="button" onClick={toggleFullscreen}>
             <span aria-hidden="true">⛶</span>
             {isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
@@ -1110,6 +1165,19 @@ export function CaliperWorkbench() {
           <div>
             <p className="eyebrow">Laboratório de metrologia</p>
             <h1 id="instrument-title">Paquímetro universal com nônio</h1>
+            <label className="stage-instrument-picker">
+              <span>Instrumento</span>
+              <select
+                aria-label="Instrumento de medição na bancada"
+                value={activeInstrument}
+                onChange={(event) =>
+                  onInstrumentChange(event.target.value as InstrumentId)
+                }
+              >
+                <option value="caliper">Paquímetro universal</option>
+                <option value="internal-micrometer">Micrômetro interno</option>
+              </select>
+            </label>
           </div>
           <div className="stage-aside">
             <p className="interaction-hint">
@@ -1292,6 +1360,6 @@ export function CaliperWorkbench() {
           {announcement}
         </p>
       </section>
-    </main>
+    </div>
   );
 }

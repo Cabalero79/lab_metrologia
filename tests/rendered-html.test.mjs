@@ -15,6 +15,8 @@ test("renderiza o laboratório de metrologia em português", async () => {
   assert.match(html, /Cabalero_Automações/);
   assert.match(html, /Engenharia de Software aplicada à Indústria/);
   assert.match(html, /Laboratório de metrologia/);
+  assert.match(html, /Micrômetro interno/);
+  assert.match(html, /Instrumento de medição/);
   assert.match(html, /role="slider"/);
   assert.match(html, /Ocultar medida/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Building your site/i);
@@ -56,14 +58,16 @@ test("não incorpora navegação, downloads ou conteúdo ativo de terceiros", as
 });
 
 test("mantém a implementação livre de conteúdo executável e HTML inseguro", async () => {
-  const [component, page, layout, packageJson] = await Promise.all([
+  const [component, micrometer, platform, page, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/components/CaliperWorkbench.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/InternalMicrometerWorkbench.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/MetrologyLab.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  const source = `${component}\n${page}\n${layout}`;
+  const source = `${component}\n${micrometer}\n${platform}\n${page}\n${layout}`;
   assert.doesNotMatch(source, /dangerouslySetInnerHTML|eval\(|javascript:|\.exe\b/i);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(component, /onPointerDown/);
@@ -77,4 +81,9 @@ test("mantém a implementação livre de conteúdo executável e HTML inseguro",
   assert.match(component, /formatOppositeUnitReading/);
   assert.match(component, /setDetailAnchorTicks\(ticks\)/);
   assert.match(component, /detailAnchorTicks \?\? ticks/);
+  assert.match(micrometer, /INTERNAL_MICROMETER_MIN_TICKS/);
+  assert.match(micrometer, /onPointerCancel/);
+  assert.match(micrometer, /visibilitychange/);
+  assert.match(micrometer, /aria-valuemin=\{5\}/);
+  assert.match(platform, /activeInstrument/);
 });
