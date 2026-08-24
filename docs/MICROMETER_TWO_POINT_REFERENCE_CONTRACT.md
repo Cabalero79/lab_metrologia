@@ -114,7 +114,7 @@ O responsável do produto aprovou a estrutura mecânica em 24/08/2026, com duas 
 - o afastamento entre a orelha fixa e o extremo `15` da escala, que fica próximo
   à orelha, deve ser preservado.
 
-Decisão de projeção: a escala física continua sofrendo a oclusão real do tambor. Uma escala didática fixa, derivada dos mesmos datums e do mesmo estado inteiro, repete `15, 13, 11, 9, 7, 5` acima do corpo e mantém um cursor vinho coincidente com a costura do tambor. O afastamento entre a orelha e o extremo `15` passa a ser um datum explícito de `0,18 × B`.
+Decisão de projeção: a escala física continua sofrendo a oclusão real do tambor. Uma escala didática fixa, derivada dos mesmos datums e do mesmo estado inteiro, repete `15, 13, 11, 9, 7, 5` na faixa superior-central do corpo cilíndrico e mantém um cursor vinho coincidente com a costura do tambor. O traçado usa uma chave clara para permanecer legível sobre as superfícies metálicas sem criar uma régua destacada fora do instrumento. O afastamento entre a orelha e o extremo `15` permanece como datum explícito de `0,18 × B`.
 
 - [x] Escala física e escala didática usam os mesmos pontos axiais.
 - [x] Todos os números permanecem visíveis de `5,00` a `15,00 mm`.

@@ -155,7 +155,7 @@ function drawHorizontalArrowHead(
   context.fill();
 }
 
-function drawPersistentTeachingScale(
+function drawIntegratedTeachingScale(
   context: CanvasRenderingContext2D,
   layout: InternalMicrometerGeometry,
   ticks: number,
@@ -169,46 +169,66 @@ function drawPersistentTeachingScale(
     scaleMaximumX,
     scaleMinimumX,
   } = layout;
-  // Keep the didactic rail above both the sleeve and the highest visible
-  // thimble numeral, including the narrow-screen detail projection.
-  const railY = axisY - B * 1.3;
+  // The complete teaching scale is engraved across the upper-centre of the
+  // cylindrical body. A light keyline keeps it readable over smooth and
+  // knurled metal without introducing a detached scale outside the tool.
+  const railY = axisY - B * 0.27;
 
   context.save();
   context.lineCap = "butt";
-  context.strokeStyle = ink;
-  context.fillStyle = ink;
-  context.lineWidth = Math.max(0.8, B * 0.012);
+  context.fillStyle = "rgba(238, 238, 236, 0.94)";
   context.beginPath();
-  context.moveTo(scaleMaximumX, railY);
-  context.lineTo(scaleMinimumX, railY);
-  context.stroke();
-
-  for (let markTicks = 1_500; markTicks >= 500; markTicks -= 100) {
-    const x = getInternalMicrometerScaleMarkX(layout, markTicks);
-    const labelled = INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS.includes(
-      markTicks as (typeof INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS)[number],
-    );
-    const tickHeight = labelled ? B * 0.14 : B * 0.09;
+  context.roundRect(
+    scaleMaximumX - B * 0.06,
+    railY - B * 0.22,
+    scaleMinimumX - scaleMaximumX + B * 0.12,
+    B * 0.2,
+    B * 0.025,
+  );
+  context.fill();
+  context.fillStyle = ink;
+  const drawRailAndTicks = (strokeStyle: string, lineWidth: number) => {
+    context.strokeStyle = strokeStyle;
+    context.lineWidth = lineWidth;
     context.beginPath();
-    context.moveTo(x, railY);
-    context.lineTo(x, railY + tickHeight);
+    context.moveTo(scaleMaximumX, railY);
+    context.lineTo(scaleMinimumX, railY);
     context.stroke();
-    if (labelled && scaleNumbersVisible) {
-      context.font = `700 ${Math.max(9, B * 0.14)}px Arial, sans-serif`;
+
+    for (let markTicks = 1_500; markTicks >= 500; markTicks -= 100) {
+      const x = getInternalMicrometerScaleMarkX(layout, markTicks);
+      const labelled = INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS.includes(
+        markTicks as (typeof INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS)[number],
+      );
+      const tickHeight = labelled ? B * 0.14 : B * 0.09;
+      context.beginPath();
+      context.moveTo(x, railY);
+      context.lineTo(x, railY + tickHeight);
+      context.stroke();
+    }
+  };
+
+  drawRailAndTicks("rgba(255, 255, 255, 0.92)", Math.max(2.4, B * 0.055));
+  drawRailAndTicks(ink, Math.max(0.8, B * 0.012));
+
+  for (const markTicks of INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS) {
+    const x = getInternalMicrometerScaleMarkX(layout, markTicks);
+    if (scaleNumbersVisible) {
+      context.font = `700 ${Math.max(9, B * 0.13)}px Arial, sans-serif`;
       context.textAlign = "center";
       context.textBaseline = "bottom";
-      context.fillText(String(markTicks / 100), x, railY - B * 0.08);
+      context.fillStyle = ink;
+      context.fillText(String(markTicks / 100), x, railY - B * 0.11);
     }
   }
 
-  if (scaleNumbersVisible) {
-    context.font = `700 ${Math.max(7, B * 0.1)}px Arial, sans-serif`;
-    context.textAlign = "left";
-    context.textBaseline = "top";
-    context.fillText("ESCALA DIDÁTICA", scaleMaximumX, railY + B * 0.2);
-  }
-
   const currentX = getInternalMicrometerScaleMarkX(layout, ticks);
+  context.strokeStyle = "rgba(255, 255, 255, 0.96)";
+  context.lineWidth = Math.max(3.4, B * 0.065);
+  context.beginPath();
+  context.moveTo(currentX, railY - B * 0.05);
+  context.lineTo(currentX, railY + B * 0.2);
+  context.stroke();
   context.strokeStyle = accent;
   context.fillStyle = accent;
   context.lineWidth = Math.max(1.2, B * 0.02);
@@ -643,7 +663,7 @@ function drawInternalMicrometer(
     axisY + B * 0.02,
   );
 
-  drawPersistentTeachingScale(
+  drawIntegratedTeachingScale(
     context,
     layout,
     ticks,
