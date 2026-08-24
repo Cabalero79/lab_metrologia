@@ -14,8 +14,8 @@ export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
   axisY: 3.3,
   fixedJawX: 3.45,
   sleeveStartX: 3.85,
-  sleeveEndAtMinimumX: 6.2,
-  sleeveTravel: 1.2,
+  sleeveEndAtMinimumX: 6.52,
+  sleeveTravel: 2.55,
   sleeveRadius: 0.5,
   thimbleScaleLength: 2.15,
   thimbleScaleRadius: 0.75,
@@ -24,7 +24,7 @@ export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
   ratchetNeckLength: 0.38,
   ratchetLength: 1.05,
   ratchetRadius: 0.58,
-  contactPixelsPerMm: 0.12,
+  contactPixelsPerMm: 0.1,
   jawStemWidth: 0.94,
   jawTipWidth: 0.2,
   jawPinInwardOffset: 0.28,
@@ -43,6 +43,8 @@ export interface InternalMicrometerGeometry {
   readonly movingJawX: number;
   readonly fixedPinCenterX: number;
   readonly movingPinCenterX: number;
+  readonly fixedInnerFaceX: number;
+  readonly movingInnerFaceX: number;
   readonly jawTipTop: number;
   readonly jawTipBottom: number;
   readonly jawShoulderY: number;
@@ -118,6 +120,8 @@ export function getInternalMicrometerGeometry(
   const leftContactX = rightContactX - contactSpanPx;
   const movingPinCenterX = leftContactX + jawTipWidth / 2;
   const movingJawX = movingPinCenterX - pinInwardOffset;
+  const fixedInnerFaceX = fixedPinCenterX - jawTipWidth / 2;
+  const movingInnerFaceX = movingPinCenterX + jawTipWidth / 2;
   const sleeveStartX = originX + r.sleeveStartX * B;
   const sleeveEndAtMinimumX = originX + r.sleeveEndAtMinimumX * B;
   const travelPx = progress * r.sleeveTravel * B;
@@ -157,12 +161,14 @@ export function getInternalMicrometerGeometry(
     movingJawX,
     fixedPinCenterX,
     movingPinCenterX,
+    fixedInnerFaceX,
+    movingInnerFaceX,
     jawTipTop: axisY - r.jawTipTopOffset * B,
     jawTipBottom:
       axisY - (r.jawTipTopOffset - r.jawTipHeight) * B,
     jawShoulderY: axisY - B * 1.08,
     jawBaseTop: axisY - B * 0.6,
-    jawBaseBottom: axisY + B * 1.05,
+    jawBaseBottom: axisY + B * 0.56,
     jawStemWidth,
     jawTipWidth,
     sleeveStartX,

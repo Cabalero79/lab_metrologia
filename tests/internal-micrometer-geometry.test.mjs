@@ -54,6 +54,20 @@ test("cena usa escala uniforme e permanece integral em toda a matriz", () => {
       assert.ok(layout.jawBaseTop < layout.jawBaseBottom, `${label}: base positiva`);
       assert.ok(layout.movingJawX < layout.fixedJawX, `${label}: duas pontas separadas`);
       assert.ok(layout.leftContactX < layout.rightContactX, `${label}: vão interno positivo`);
+      close(
+        layout.movingInnerFaceX,
+        layout.movingPinCenterX + layout.jawTipWidth / 2,
+        `${label}: haste móvel encontra a face interna em paralelo`,
+      );
+      close(
+        layout.fixedInnerFaceX,
+        layout.fixedPinCenterX - layout.jawTipWidth / 2,
+        `${label}: haste fixa encontra a face interna em paralelo`,
+      );
+      assert.ok(
+        layout.movingInnerFaceX < layout.fixedInnerFaceX,
+        `${label}: folga paralela positiva`,
+      );
       assert.ok(layout.sleeveStartX < layout.sleeveEndX, `${label}: bainha positiva`);
       assert.ok(layout.thimbleLeft < layout.thimbleRight, `${label}: tambor positivo`);
       assert.ok(layout.thimbleRight <= layout.ratchetLeft + EPSILON, `${label}: catraca após tambor`);
@@ -133,7 +147,34 @@ test("escala principal encontra a borda do tambor nos limites de 5 e 15 mm", () 
       maximum.scaleMaximumX,
       `${viewport.name}: escala absoluta permanece fixa`,
     );
+    assert.ok(
+      minimum.scaleMaximumX - minimum.sleeveStartX <= minimum.B * 0.16,
+      `${viewport.name}: números começam junto ao início da bainha`,
+    );
   }
+});
+
+test("diâmetro das pontas e abertura nominal compartilham a mesma escala física", () => {
+  const layout = getInternalMicrometerGeometry(
+    VIEWPORTS[0].width,
+    VIEWPORTS[0].height,
+    INTERNAL_MICROMETER_MIN_TICKS,
+  );
+  close(
+    layout.jawTipWidth,
+    2 * INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactPixelsPerMm * layout.B,
+    "ponta de 2 mm",
+  );
+  close(
+    layout.contactSpanPx,
+    5 * INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactPixelsPerMm * layout.B,
+    "abertura mínima de 5 mm",
+  );
+  close(
+    layout.fixedInnerFaceX - layout.movingInnerFaceX,
+    (5 - 2 * 2) * INTERNAL_MICROMETER_GEOMETRY_RATIOS.contactPixelsPerMm * layout.B,
+    "folga de 1 mm entre duas pontas de 2 mm",
+  );
 });
 
 test("fase do tambor dá a volta exata nos limites de meia marca", () => {

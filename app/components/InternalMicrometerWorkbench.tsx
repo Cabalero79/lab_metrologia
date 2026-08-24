@@ -90,7 +90,9 @@ function pathReferenceJaw(
   const outerNeckX = pinCenterX + outward * tipHalf;
   const innerNeckX = pinCenterX + inward * tipHalf;
   const outerBaseX = centerX + outward * stemHalf;
-  const innerFaceX = centerX + inward * stemHalf;
+  const innerFaceX = outward < 0
+    ? layout.movingInnerFaceX
+    : layout.fixedInnerFaceX;
 
   path.moveTo(outerNeckX, jawTipBottom);
   path.lineTo(innerNeckX, jawTipBottom);
@@ -172,7 +174,6 @@ function drawInternalMicrometer(
     movingPinCenterX,
     jawBaseBottom,
     jawBaseTop,
-    jawStemWidth,
     jawTipBottom,
     jawTipTop,
     jawTipWidth,
@@ -260,8 +261,8 @@ function drawInternalMicrometer(
   context.fill();
 
   // Two exposed spindle edges remain visible in the negative space.
-  const rodLeft = movingJawX + jawStemWidth / 2;
-  const rodRight = fixedJawX - jawStemWidth / 2;
+  const rodLeft = layout.movingInnerFaceX;
+  const rodRight = layout.fixedInnerFaceX;
   context.fillStyle = metalDark;
   context.fillRect(rodLeft, axisY - B * 0.2, Math.max(0, rodRight - rodLeft), B * 0.11);
   context.fillRect(rodLeft, axisY + B * 0.12, Math.max(0, rodRight - rodLeft), B * 0.11);
@@ -300,18 +301,16 @@ function drawInternalMicrometer(
     tipGradient.addColorStop(0.5, "#85878a");
     tipGradient.addColorStop(1, "#202124");
     context.fillStyle = tipGradient;
-    context.fillRect(
+    context.beginPath();
+    context.roundRect(
       jawSpec.pinCenterX - jawTipWidth / 2,
       jawTipTop,
       jawTipWidth,
       jawTipBottom - jawTipTop,
+      B * 0.035,
     );
-    context.strokeRect(
-      jawSpec.pinCenterX - jawTipWidth / 2,
-      jawTipTop,
-      jawTipWidth,
-      jawTipBottom - jawTipTop,
-    );
+    context.fill();
+    context.stroke();
   }
   // Lock screw beneath the moving carriage, as on the analog reference.
   const lockX = movingJawX - B * 0.12;
@@ -373,8 +372,8 @@ function drawInternalMicrometer(
     context.moveTo(x, referenceY);
     context.lineTo(x, referenceY + direction * tickHeight);
     context.stroke();
-    if (whole && markTicks % 500 === 0 && scaleNumbersVisible) {
-      context.font = `650 ${Math.max(9, B * 0.18)}px Arial, sans-serif`;
+    if (whole && markTicks % 200 === 100 && scaleNumbersVisible) {
+      context.font = `650 ${Math.max(9, B * 0.16)}px Arial, sans-serif`;
       const isAtSeam = Math.abs(x - sleeveEndX) <= B * 0.025;
       context.textAlign = isAtSeam ? "right" : "center";
       context.fillText(

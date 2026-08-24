@@ -16,6 +16,8 @@ Este documento aplica a skill `mechanical-reference-reconstruction` à referênc
 
 Fonte visual primária: `Photo 1.jpg` fornecida pelo usuário. Recorte analisado no arquivo de `576 × 1280 px`: `x=10`, `y=330`, `w=560`, `h=220`.
 
+Fonte visual secundária: `Photo 2.jpg` fornecida pelo usuário em 24/08/2026. A vista é perspectiva, com sombra e instrumento apoiado sobre papel, portanto não substitui a vista quase ortográfica do catálogo. Ela confirma com maior nitidez três relações: as hastes cilíndricas são paralelas, as faces internas sob as hastes seguem verticais e a numeração ocupa a bainha desde o cabeçote até a costura do tambor.
+
 Fonte dimensional auxiliar oficial: desenho externo `145-185`, que estabelece ponta `Ø2 mm`, trecho exposto de `4,5 mm`, altura do cabeçote de `27,5 mm` e capacidade mínima de `5 mm`.
 
 ## 2. Inventário e topologia observável
@@ -52,6 +54,9 @@ Partes que não podem ser fundidas: colar graduado e empunhadura; empunhadura e 
 | Ponta | `Ø2 mm`; altura exposta `4,5 mm` |
 | Cabeçote | altura total `27,5 mm` no desenho oficial |
 | Vão mínimo nominal | `5 mm` entre faces externas de medição |
+| Paralelismo no cabeçote | bordas internas das hastes e faces internas das mandíbulas compartilham a mesma vertical |
+| Início útil da escala | primeira numeração fica junto ao cabeçote; não reservar trecho cilíndrico vazio antes das marcas |
+| Base das mandíbulas | termina aproximadamente no envelope vertical do corpo cilíndrico; a trava é o único volume que desce além dele |
 
 A forma das mandíbulas é assimétrica: a face interna junto ao vão é quase vertical, o pino fica deslocado em direção ao vão e o ombro externo se alarga em direção ao corpo. Uma forma de “vaso” simétrica não satisfaz a referência.
 
@@ -71,6 +76,7 @@ O estado inteiro em centésimos deve dirigir simultaneamente o vão, o curso axi
 
 - A foto não revela a leitura exata da pose; `7,36 mm` é a pose canônica do produto, não uma afirmação sobre a fotografia.
 - O desenho oficial fornece cotas do cabeçote, mas não todas as dimensões axiais do conjunto completo.
+- A segunda foto sofre perspectiva e sombras; dela são adotados paralelismo e ordem de oclusão, não razões axiais absolutas.
 - Reflexos, recartilha e marca do fabricante são aparência, não datums geométricos.
 - A marca Cabalero substitui identificação proprietária; isso é uma divergência intencional.
 - O produto continua didático e não afirma força constante, calibração, exatidão certificada ou mecanismo interno invisível.
@@ -87,3 +93,15 @@ O estado inteiro em centésimos deve dirigir simultaneamente o vão, o curso axi
 - [x] Arraste, toque, teclado e botões alteram o mesmo estado.
 - [x] Desktop, celular horizontal e 320 px preservam a mesma silhueta.
 - [ ] Responsável do produto recebe preview concreto para aceite visual.
+
+## 7. Refinamento com a segunda referência
+
+- [x] Abertura nominal de `5 mm` e pontas de `Ø2 mm` usam a mesma escala geométrica.
+- [x] As duas hastes e as faces internas das mandíbulas permanecem paralelas em todo o curso.
+- [x] As duas barras expostas ocupam todo o vão negativo entre as mandíbulas.
+- [x] A base das mandíbulas termina junto ao envelope do corpo cilíndrico.
+- [x] A numeração começa junto ao cabeçote e ocupa a extensão útil da bainha.
+- [x] Em `7,36 mm`, os rótulos `15`, `13`, `11` e `9` permanecem visíveis antes do tambor.
+- [x] Os estados `5,00`, `7,36` e `15,00 mm` foram inspecionados em navegador real.
+- [x] A silhueta foi verificada em desktop, `844 × 390` e `320 × 700` sem rolagem horizontal.
+- [ ] Responsável do produto aprova visualmente este refinamento.
