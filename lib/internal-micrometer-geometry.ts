@@ -8,14 +8,14 @@ import {
 } from "./internal-micrometer.ts";
 
 export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
-  sceneWidth: 11.9,
+  sceneWidth: 12,
   sceneHeight: 5.3,
   insetX: 0.2,
   axisY: 3.3,
   fixedJawX: 3.45,
   sleeveStartX: 3.85,
-  sleeveEndAtMinimumX: 6.52,
   sleeveTravel: 2.55,
+  scaleHeadClearance: 0.18,
   sleeveRadius: 0.5,
   thimbleScaleLength: 2.15,
   thimbleScaleRadius: 0.75,
@@ -31,6 +31,15 @@ export const INTERNAL_MICROMETER_GEOMETRY_RATIOS = {
   jawTipTopOffset: 2.33,
   jawTipHeight: 0.42,
 } as const;
+
+export const INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS = [
+  1_500,
+  1_300,
+  1_100,
+  900,
+  700,
+  500,
+] as const;
 
 export interface InternalMicrometerGeometry {
   readonly B: number;
@@ -61,6 +70,7 @@ export interface InternalMicrometerGeometry {
   readonly travelPx: number;
   readonly scaleMaximumX: number;
   readonly scaleMinimumX: number;
+  readonly scaleHeadClearancePx: number;
   readonly thimbleLeft: number;
   readonly thimbleRight: number;
   readonly thimbleTop: number;
@@ -123,11 +133,6 @@ export function getInternalMicrometerGeometry(
   const fixedInnerFaceX = fixedPinCenterX - jawTipWidth / 2;
   const movingInnerFaceX = movingPinCenterX + jawTipWidth / 2;
   const sleeveStartX = originX + r.sleeveStartX * B;
-  const sleeveEndAtMinimumX = originX + r.sleeveEndAtMinimumX * B;
-  const travelPx = progress * r.sleeveTravel * B;
-  // The internal micrometer reference advances toward the measuring head:
-  // dragging the thimble left increases the indicated internal diameter.
-  const sleeveEndX = sleeveEndAtMinimumX - travelPx;
   const pixelsPerMm =
     (r.sleeveTravel * B) /
     ((INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS) /
@@ -136,8 +141,13 @@ export function getInternalMicrometerGeometry(
     ((INTERNAL_MICROMETER_MAX_TICKS - INTERNAL_MICROMETER_MIN_TICKS) /
       INTERNAL_MICROMETER_TICKS_PER_MM) *
     pixelsPerMm;
-  const scaleMaximumX = sleeveEndX + travelPx - scaleSpanPx;
+  const scaleHeadClearancePx = r.scaleHeadClearance * B;
+  const scaleMaximumX = sleeveStartX + scaleHeadClearancePx;
   const scaleMinimumX = scaleMaximumX + scaleSpanPx;
+  const travelPx = progress * r.sleeveTravel * B;
+  // The internal micrometer reference advances toward the measuring head:
+  // dragging the thimble left increases the indicated internal diameter.
+  const sleeveEndX = scaleMinimumX - travelPx;
   const sleeveRadius = r.sleeveRadius * B;
   const thimbleRadius = r.thimbleScaleRadius * B;
   const thimbleLeft = sleeveEndX - B * 0.08;
@@ -180,6 +190,7 @@ export function getInternalMicrometerGeometry(
     travelPx,
     scaleMaximumX,
     scaleMinimumX,
+    scaleHeadClearancePx,
     thimbleLeft,
     thimbleRight: gripRight,
     thimbleTop: axisY - thimbleRadius,
@@ -208,4 +219,19 @@ export function getInternalMicrometerGeometry(
     hitRight: ratchetRight + B * 0.1,
     hitBottom: axisY + thimbleRadius + B * 0.18,
   };
+}
+
+export function getInternalMicrometerScaleMarkX(
+  layout: Pick<
+    InternalMicrometerGeometry,
+    "scaleMaximumX" | "pixelsPerMm"
+  >,
+  markTicks: number,
+): number {
+  return (
+    layout.scaleMaximumX +
+    ((INTERNAL_MICROMETER_MAX_TICKS - markTicks) /
+      INTERNAL_MICROMETER_TICKS_PER_MM) *
+      layout.pixelsPerMm
+  );
 }

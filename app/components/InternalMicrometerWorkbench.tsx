@@ -22,7 +22,9 @@ import {
   snapInternalMicrometerTicks,
 } from "../../lib/internal-micrometer";
 import {
+  INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS,
   getInternalMicrometerGeometry,
+  getInternalMicrometerScaleMarkX,
   type InternalMicrometerGeometry,
 } from "../../lib/internal-micrometer-geometry";
 import type {
@@ -153,6 +155,76 @@ function drawHorizontalArrowHead(
   context.fill();
 }
 
+function drawPersistentTeachingScale(
+  context: CanvasRenderingContext2D,
+  layout: InternalMicrometerGeometry,
+  ticks: number,
+  scaleNumbersVisible: boolean,
+  ink: string,
+  accent: string,
+) {
+  const {
+    B,
+    axisY,
+    scaleMaximumX,
+    scaleMinimumX,
+  } = layout;
+  // Keep the didactic rail above both the sleeve and the highest visible
+  // thimble numeral, including the narrow-screen detail projection.
+  const railY = axisY - B * 1.3;
+
+  context.save();
+  context.lineCap = "butt";
+  context.strokeStyle = ink;
+  context.fillStyle = ink;
+  context.lineWidth = Math.max(0.8, B * 0.012);
+  context.beginPath();
+  context.moveTo(scaleMaximumX, railY);
+  context.lineTo(scaleMinimumX, railY);
+  context.stroke();
+
+  for (let markTicks = 1_500; markTicks >= 500; markTicks -= 100) {
+    const x = getInternalMicrometerScaleMarkX(layout, markTicks);
+    const labelled = INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS.includes(
+      markTicks as (typeof INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS)[number],
+    );
+    const tickHeight = labelled ? B * 0.14 : B * 0.09;
+    context.beginPath();
+    context.moveTo(x, railY);
+    context.lineTo(x, railY + tickHeight);
+    context.stroke();
+    if (labelled && scaleNumbersVisible) {
+      context.font = `700 ${Math.max(9, B * 0.14)}px Arial, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "bottom";
+      context.fillText(String(markTicks / 100), x, railY - B * 0.08);
+    }
+  }
+
+  if (scaleNumbersVisible) {
+    context.font = `700 ${Math.max(7, B * 0.1)}px Arial, sans-serif`;
+    context.textAlign = "left";
+    context.textBaseline = "top";
+    context.fillText("ESCALA DIDÁTICA", scaleMaximumX, railY + B * 0.2);
+  }
+
+  const currentX = getInternalMicrometerScaleMarkX(layout, ticks);
+  context.strokeStyle = accent;
+  context.fillStyle = accent;
+  context.lineWidth = Math.max(1.2, B * 0.02);
+  context.beginPath();
+  context.moveTo(currentX, railY - B * 0.05);
+  context.lineTo(currentX, railY + B * 0.2);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(currentX, railY + B * 0.22);
+  context.lineTo(currentX - B * 0.065, railY + B * 0.32);
+  context.lineTo(currentX + B * 0.065, railY + B * 0.32);
+  context.closePath();
+  context.fill();
+  context.restore();
+}
+
 function drawInternalMicrometer(
   context: CanvasRenderingContext2D,
   width: number,
@@ -182,8 +254,6 @@ function drawInternalMicrometer(
     sleeveTop,
     sleeveBottom,
     sleeveRadius,
-    pixelsPerMm,
-    scaleMaximumX,
     thimbleLeft,
     thimbleTop,
     thimbleBottom,
@@ -362,8 +432,7 @@ function drawInternalMicrometer(
   context.lineTo(sleeveEndX, referenceY);
   context.stroke();
   for (let markTicks = 1_500; markTicks >= 500; markTicks -= 50) {
-    const x =
-      scaleMaximumX + ((1_500 - markTicks) / 100) * pixelsPerMm;
+    const x = getInternalMicrometerScaleMarkX(layout, markTicks);
     if (x > sleeveEndX + 1) continue;
     const whole = markTicks % 100 === 0;
     const tickHeight = whole ? B * 0.34 : B * 0.24;
@@ -572,6 +641,15 @@ function drawInternalMicrometer(
     "5–15",
     (capLeft + capRight) / 2,
     axisY + B * 0.02,
+  );
+
+  drawPersistentTeachingScale(
+    context,
+    layout,
+    ticks,
+    scaleNumbersVisible,
+    ink,
+    accent,
   );
 
   // Horizontal inside dimension between the two carbide pin faces.

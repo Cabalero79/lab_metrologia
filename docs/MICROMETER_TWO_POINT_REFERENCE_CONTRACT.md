@@ -105,3 +105,19 @@ O estado inteiro em centésimos deve dirigir simultaneamente o vão, o curso axi
 - [x] Os estados `5,00`, `7,36` e `15,00 mm` foram inspecionados em navegador real.
 - [x] A silhueta foi verificada em desktop, `844 × 390` e `320 × 700` sem rolagem horizontal.
 - [ ] Responsável do produto aprova visualmente este refinamento.
+
+## 8. Aprovação com ressalva — legibilidade da escala
+
+O responsável do produto aprovou a estrutura mecânica em 24/08/2026, com duas condições antes do aceite sem ressalvas:
+
+- a numeração completa deve permanecer disponível para professor e aluno durante todo o curso;
+- o afastamento entre a orelha fixa e o extremo `15` da escala, que fica próximo
+  à orelha, deve ser preservado.
+
+Decisão de projeção: a escala física continua sofrendo a oclusão real do tambor. Uma escala didática fixa, derivada dos mesmos datums e do mesmo estado inteiro, repete `15, 13, 11, 9, 7, 5` acima do corpo e mantém um cursor vinho coincidente com a costura do tambor. O afastamento entre a orelha e o extremo `15` passa a ser um datum explícito de `0,18 × B`.
+
+- [x] Escala física e escala didática usam os mesmos pontos axiais.
+- [x] Todos os números permanecem visíveis de `5,00` a `15,00 mm`.
+- [x] Cursor didático e costura do tambor representam o mesmo estado exato.
+- [x] Afastamento junto à orelha é invariável em toda a matriz responsiva.
+- [ ] Responsável do produto aprova a solução didática sem ressalvas.

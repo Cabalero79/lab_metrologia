@@ -8,7 +8,9 @@ import {
 } from "../lib/internal-micrometer.ts";
 import {
   INTERNAL_MICROMETER_GEOMETRY_RATIOS,
+  INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS,
   getInternalMicrometerGeometry,
+  getInternalMicrometerScaleMarkX,
 } from "../lib/internal-micrometer-geometry.ts";
 
 const EPSILON = 1e-9;
@@ -147,10 +149,23 @@ test("escala principal encontra a borda do tambor nos limites de 5 e 15 mm", () 
       maximum.scaleMaximumX,
       `${viewport.name}: escala absoluta permanece fixa`,
     );
-    assert.ok(
-      minimum.scaleMaximumX - minimum.sleeveStartX <= minimum.B * 0.16,
-      `${viewport.name}: números começam junto ao início da bainha`,
+    close(
+      minimum.scaleHeadClearancePx,
+      INTERNAL_MICROMETER_GEOMETRY_RATIOS.scaleHeadClearance * minimum.B,
+      `${viewport.name}: afastamento da escala junto à orelha`,
     );
+    close(
+      minimum.scaleMaximumX - minimum.sleeveStartX,
+      minimum.scaleHeadClearancePx,
+      `${viewport.name}: início da escala usa o datum da orelha`,
+    );
+    for (const markTicks of INTERNAL_MICROMETER_MAIN_SCALE_LABEL_TICKS) {
+      const minimumX = getInternalMicrometerScaleMarkX(minimum, markTicks);
+      const maximumX = getInternalMicrometerScaleMarkX(maximum, markTicks);
+      close(minimumX, maximumX, `${viewport.name}/${markTicks}: rótulo fixo`);
+      assert.ok(minimumX >= minimum.scaleMaximumX - EPSILON);
+      assert.ok(minimumX <= minimum.scaleMinimumX + EPSILON);
+    }
   }
 });
 
