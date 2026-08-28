@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  CALIPER_SCALE_LEGIBILITY,
+  getCaliperDetailZoom,
   getScalePresentation,
   getVernierLabelInterval,
 } from "../lib/caliper-presentation.ts";
@@ -51,8 +53,8 @@ test("as duas resoluções em polegadas compartilham a mesma projeção", () => 
   assert.deepEqual(fractional, decimal);
 });
 
-test("nônio fracionário numera somente 0, 4 e 8 como na referência", () => {
-  const interval = getVernierLabelInterval("in-1/128", 8, 2);
+test("nônio fracionário preserva 0, 4 e 8 quando há espaço", () => {
+  const interval = getVernierLabelInterval("in-1/128", 8, 4);
   const numberedMarks = Array.from(
     { length: 9 },
     (_, index) => index,
@@ -60,4 +62,21 @@ test("nônio fracionário numera somente 0, 4 e 8 como na referência", () => {
 
   assert.equal(interval, 4);
   assert.deepEqual(numberedMarks, [0, 4, 8]);
+});
+
+test("nônio fracionário reduz rótulos antes de permitir colisão", () => {
+  assert.equal(getVernierLabelInterval("in-1/128", 8, 2), 8);
+});
+
+test("lupa prioriza passo legível e limita o zoom por viewport", () => {
+  const mobileZoom = getCaliperDetailZoom(320, 0.81, 4.2);
+  const landscapeZoom = getCaliperDetailZoom(844, 0.81, 2.4);
+  const desktopZoom = getCaliperDetailZoom(1_211, 2.7, 4.5);
+
+  assert.equal(mobileZoom, 4.2);
+  assert.equal(landscapeZoom, 3.6);
+  assert.equal(desktopZoom, 2.8);
+  assert.ok(
+    mobileZoom * 0.81 >= CALIPER_SCALE_LEGIBILITY.minimumDetailPitchPx,
+  );
 });

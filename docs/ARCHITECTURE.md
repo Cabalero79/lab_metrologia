@@ -46,9 +46,37 @@ Projeta os landmarks do imicro a partir do tick inteiro: contatos, bainha, costu
 
 Implementa o canvas, o arraste axial, toque, teclado, ajuste fino, lupa, resposta ocultável e tela cheia do micrômetro. O gesto é calculado desde a origem do ponteiro e cancelado também em perda de foco ou visibilidade.
 
+### `lib/external-micrometer.ts`
+
+Modelo inteiro do micrômetro externo. Um tick equivale a `0,001 mm`; os perfis quantizam esse estado em passos exatos de 10 ticks (`0,01 mm`) ou 1 tick (`0,001 mm`). A faixa é `0–25 mm`, o passo do fuso é `0,50 mm`, o tambor possui 50 divisões centesimais e o nônio resolve o resto no perfil milesimal.
+
+### `lib/external-micrometer-geometry.ts`
+
+Projeta arco em C, contatos coaxiais, fuso, bucha, trava, bainha, costura, tambor, recartilha e catraca. A mesma translação governa o vão, a face móvel e a costura.
+
+### `app/components/ExternalMicrometerWorkbench.tsx`
+
+Orquestra o terceiro instrumento, incluindo seleção centesimal/milesimal, arraste determinístico de uma resolução por pixel, teclado, ajuste fino, sorteio, ocultação da resposta e tela cheia.
+
+### `lib/semicircular-protractor.ts`
+
+Modelo inteiro do transferidor semicircular. O estado canônico é a leitura em minutos de arco no intervalo fechado `300–10.800`, quantizada a `5′`. A projeção física usa a própria leitura e o complementar deriva `10.800′ − leitura`, sem estados paralelos.
+
+### `lib/semicircular-protractor-geometry.ts`
+
+Projeta corpo semicircular, base, pivô, régua e escala. A lupa usa uma janela localizada com pelo menos `7 CSS px` por divisão de `5′` e não altera o modelo.
+
+### `lib/semicircular-protractor-interaction.ts`
+
+Converte a posição física do ponteiro no semicírculo para a leitura quantizada a `5′`, limitada a `300–10.800′`, e traduz o arraste horizontal da lupa para o mesmo estado.
+
+### `app/components/SemicircularProtractorWorkbench.tsx`
+
+Orquestra o quarto instrumento, incluindo arraste direto, ajuste fino de `5′`, teclado, leitura complementar, lupa localizada, sorteio, resposta ocultável e tela cheia.
+
 ### `app/components/MetrologyLab.tsx`
 
-Seleciona o instrumento ativo e preserva, separadamente durante a sessão, a medida e os estados pedagógicos de cada ferramenta. Apenas a ferramenta ativa é renderizada, mantendo um único `h1` e um único landmark principal no HTML.
+Seleciona o instrumento ativo e preserva, separadamente durante a sessão, a medida e os estados pedagógicos das quatro ferramentas. Apenas a ferramenta ativa é renderizada, mantendo um único `h1` e um único landmark principal no HTML.
 
 ### `worker/index.ts`
 

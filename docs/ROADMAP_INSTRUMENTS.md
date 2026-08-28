@@ -2,7 +2,7 @@
 
 ## 1. Estado e limite deste documento
 
-O paquímetro universal foi o primeiro instrumento do produto. O micrômetro interno de duas pontas foi implementado e aprovado visualmente em 24/08/2026; permanece local enquanto aguarda validação metrológica especializada e autorização de publicação. O micrômetro externo e o interno de três contatos continuam futuros.
+O paquímetro universal foi o primeiro instrumento do produto. O micrômetro interno de duas pontas foi implementado e aprovado visualmente em 24/08/2026. O micrômetro externo centesimal/milesimal entrou na interface local a partir da referência `Exemplos/M_externo.webp` e aguarda aceite visual final e validação metrológica especializada. O interno de três contatos continua futuro.
 
 ## 2. Base reaproveitável
 
@@ -50,19 +50,19 @@ interface InstrumentModel {
 
 Esse esboço não deve ser copiado sem revisão. Alguns perfis futuros, como 0,0001″, não são representados exatamente pela constante atual de 80.000 ticks por milímetro. Antes de ampliar a faixa de resoluções, a equipe deve escolher entre aumentar a unidade canônica comum ou usar uma razão inteira exata por perfil. Ponto flutuante acumulado não é uma alternativa aceitável.
 
-## 3. Micrômetro externo
+## 3. Micrômetro externo — protótipo local implementado
 
 ### Objetivo pedagógico
 
 Ensinar a leitura combinada da bainha e do tambor, o contato correto com a peça e o uso da catraca ou fricção sem transformar a simulação em um mostrador digital.
 
-### Recorte recomendado para a primeira versão
+### Recorte adotado na primeira versão
 
 - micrômetro externo de 0–25 mm;
 - passo de fuso de 0,5 mm por volta como configuração inicial a validar;
 - bainha com marcas de 1 mm e 0,5 mm;
-- tambor com 50 divisões, oferecendo resolução de 0,01 mm;
-- modo opcional com nônio de 0,001 mm somente depois de aprovar o perfil básico;
+- tambor com 50 divisões centesimais;
+- perfil centesimal de 0,01 mm e perfil com nônio de 10 divisões para resolução final de 0,001 mm, conforme a referência escolhida pelo responsável do produto;
 - contato entre bigorna e fuso representado sem deformação fictícia da peça;
 - catraca didática com estado de “contato atingido”, se o comportamento for validado.
 

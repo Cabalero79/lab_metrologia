@@ -563,6 +563,18 @@ a[href] {
   background: var(--surface-panel);
 }
 
+.goniometer-stage {
+  background: var(--surface-panel);
+}
+
+.goniometer-canvas {
+  touch-action: none;
+}
+
+.goniometer-hint span {
+  color: var(--brand);
+}
+
 .stage-legend {
   position: absolute;
   z-index: 2;
@@ -609,7 +621,24 @@ a[href] {
 }
 
 .micrometer-control-deck {
-  grid-template-columns: minmax(190px, 0.9fr) auto minmax(150px, 190px) auto;
+  grid-template-columns: minmax(250px, 1fr) auto minmax(150px, 190px) auto;
+}
+
+.external-resolution-control {
+  min-width: 0;
+}
+
+.external-resolution-control legend {
+  margin-bottom: 0.3rem;
+}
+
+.external-resolution-options {
+  gap: 0.35rem;
+  overflow: visible;
+}
+
+.external-resolution-options button {
+  min-width: 108px;
 }
 
 .micrometer-specification {
@@ -879,7 +908,8 @@ a[href] {
     grid-template-columns: minmax(190px, 1fr) auto minmax(150px, 0.7fr);
   }
 
-  .micrometer-control-deck .micrometer-specification {
+  .micrometer-control-deck .micrometer-specification,
+  .micrometer-control-deck .external-resolution-control {
     grid-column: 1;
     grid-row: 1;
   }
@@ -1074,6 +1104,7 @@ a[href] {
   }
 
   .micrometer-control-deck .micrometer-specification,
+  .micrometer-control-deck .external-resolution-control,
   .micrometer-control-deck .micrometer-step-controls,
   .micrometer-control-deck .conversion-output,
   .micrometer-control-deck .practice-actions {
@@ -1083,6 +1114,10 @@ a[href] {
   .micrometer-control-deck .micrometer-specification {
     grid-row: 1;
     min-height: 54px;
+  }
+
+  .micrometer-control-deck .external-resolution-control {
+    grid-row: 1;
   }
 
   .micrometer-control-deck .micrometer-step-controls {
@@ -1211,6 +1246,10 @@ a[href] {
 
   .instrument-picker select {
     width: clamp(122px, 42vw, 142px);
+  }
+
+  .reading-breakdown {
+    display: none;
   }
 }
 
@@ -1542,6 +1581,7 @@ a[href] {
   }
 
   .micrometer-control-deck .micrometer-specification,
+  .micrometer-control-deck .external-resolution-control,
   .micrometer-control-deck .micrometer-step-controls,
   .micrometer-control-deck .conversion-output,
   .micrometer-control-deck .practice-actions {
@@ -1552,6 +1592,10 @@ a[href] {
   .micrometer-control-deck .micrometer-specification {
     min-height: 44px;
     padding: 0.25rem 0.4rem;
+  }
+
+  .micrometer-control-deck .external-resolution-options button {
+    min-height: 44px;
   }
 
   .micrometer-control-deck .micrometer-specification small {

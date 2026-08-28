@@ -26,10 +26,8 @@ import {
   type InternalMicrometerGeometry,
 } from "../../lib/internal-micrometer-geometry";
 import { getInternalMicrometerDragTicks } from "../../lib/internal-micrometer-interaction";
-import type {
-  InstrumentId,
-  InstrumentNavigationProps,
-} from "./instrument-types";
+import { InstrumentSelector } from "./InstrumentSelector";
+import type { InstrumentNavigationProps } from "./instrument-types";
 
 const INITIAL_MICROMETER_TICKS = 736;
 
@@ -627,28 +625,6 @@ function drawInternalMicrometer(
     dimensionY - B * 0.23,
   );
   context.restore();
-}
-
-function InstrumentSelector({
-  activeInstrument,
-  onInstrumentChange,
-  className = "instrument-picker",
-}: InstrumentNavigationProps & { readonly className?: string }) {
-  return (
-    <label className={className}>
-      <span>Instrumento</span>
-      <select
-        aria-label="Instrumento de medição"
-        value={activeInstrument}
-        onChange={(event) =>
-          onInstrumentChange(event.target.value as InstrumentId)
-        }
-      >
-        <option value="caliper">Paquímetro universal</option>
-        <option value="internal-micrometer">Micrômetro interno</option>
-      </select>
-    </label>
-  );
 }
 
 export function InternalMicrometerWorkbench({

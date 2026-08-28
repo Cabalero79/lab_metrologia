@@ -11,7 +11,7 @@
     "start": "vinext start",
     "test": "npm run test:build && npm run test:unit && npm run test:smoke",
     "test:build": "node tests/build-with-retry.mjs",
-    "test:unit": "node --experimental-strip-types --test tests/caliper-math.test.mjs tests/caliper-contract.test.mjs tests/caliper-presentation.test.mjs tests/caliper-geometry.test.mjs tests/internal-micrometer-math.test.mjs tests/internal-micrometer-geometry.test.mjs tests/internal-micrometer-interaction.test.mjs",
+    "test:unit": "node --experimental-strip-types --test tests/caliper-math.test.mjs tests/caliper-contract.test.mjs tests/caliper-presentation.test.mjs tests/caliper-geometry.test.mjs tests/internal-micrometer-math.test.mjs tests/internal-micrometer-geometry.test.mjs tests/internal-micrometer-interaction.test.mjs tests/external-micrometer-math.test.mjs tests/external-micrometer-geometry.test.mjs tests/external-micrometer-interaction.test.mjs tests/semicircular-protractor-math.test.mjs tests/semicircular-protractor-geometry.test.mjs tests/semicircular-protractor-interaction.test.mjs tests/instrument-catalog.test.mjs",
     "test:smoke": "node --test tests/rendered-html.test.mjs tests/security-headers.test.mjs tests/build-artifacts.test.mjs",
     "test:ci": "npm run lint && npm run typecheck && npm test",
     "typecheck": "tsc --noEmit",

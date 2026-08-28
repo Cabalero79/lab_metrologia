@@ -39,6 +39,7 @@ yarn-error.log*
 /outputs/
 /output/
 /.playwright-cli/
+/.codex-remote-attachments/
 /.impeccable/live/sessions/
 /work/
 *.tsbuildinfo

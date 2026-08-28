@@ -10,7 +10,7 @@ Professores, instrutores e estudantes de metrologia, mecânica, manufatura e ár
 
 ## Product Purpose
 
-Criar uma plataforma web de estudos de metrologia que reproduza instrumentos analógicos de forma interativa, começando pelo paquímetro universal e avançando para o micrômetro interno centesimal. Cada ferramenta deve permitir ajuste por mouse, toque ou teclado, respeitar seus próprios perfis e limites e ocultar a resposta para exercícios em sala. O sucesso significa oferecer uma experiência confiável, sem publicidade, downloads inesperados ou dependência de tecnologias descontinuadas.
+Criar uma plataforma web de estudos de metrologia que reproduza instrumentos analógicos de forma interativa, começando pelo paquímetro universal e avançando para os micrômetros interno centesimal e externo milesimal e para o transferidor semicircular de leitura direta. Cada ferramenta deve permitir ajuste por mouse, toque ou teclado, respeitar seus próprios perfis e limites e ocultar a resposta para exercícios em sala. O sucesso significa oferecer uma experiência confiável, sem publicidade, downloads inesperados ou dependência de tecnologias descontinuadas.
 
 ## Brand Personality
 

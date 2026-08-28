@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
   },
   openGraph: {
-    title: "Paquímetro Universal Virtual | Cabalero_Automações",
+    title: "Laboratório de Metrologia | Cabalero_Automações",
     description:
-      "Aprenda metrologia manipulando um paquímetro universal com nônio em milímetros e polegadas.",
+      "Aprenda metrologia manipulando paquímetro universal, micrômetros e transferidor semicircular.",
     locale: "pt_BR",
     type: "website",
     images: [
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1731,
         height: 909,
-        alt: "Paquímetro universal virtual da Cabalero_Automações",
+        alt: "Laboratório virtual de metrologia da Cabalero_Automações",
       },
     ],
   },

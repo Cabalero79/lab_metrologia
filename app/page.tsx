@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { MetrologyLab } from "./components/MetrologyLab";
 
 export const metadata: Metadata = {
-  title: "Paquímetro Universal Virtual | Micrômetro Interno",
+  title: "Paquímetro, Micrômetros e Transferidor Virtual",
   description:
-    "Laboratório didático de paquímetro universal e micrômetro interno para estudos de metrologia.",
+    "Laboratório didático de paquímetro universal, micrômetros interno e externo e transferidor semicircular para estudos de metrologia.",
 };
 
 export default function Home() {

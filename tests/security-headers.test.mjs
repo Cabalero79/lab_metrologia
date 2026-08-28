@@ -45,6 +45,7 @@ test("CSP restringe scripts, enquadramento, objetos, formulários e rede", async
   assert.deepEqual(policy.get("frame-ancestors"), ["'self'"]);
   assert.deepEqual(policy.get("form-action"), ["'self'"]);
   assert.deepEqual(policy.get("connect-src"), ["'self'"]);
+  assert.deepEqual(policy.get("worker-src"), ["'self'"]);
   const scriptSources = policy.get("script-src") ?? [];
   assert.ok(scriptSources.includes("'self'"));
   assert.ok(!scriptSources.includes("'unsafe-eval'"));

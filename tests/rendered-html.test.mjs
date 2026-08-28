@@ -11,11 +11,14 @@ test("renderiza o laboratório de metrologia em português", async () => {
 
   const html = await response.text();
   assert.match(html, /lang="pt-BR"/);
-  assert.match(html, /Paquímetro Universal Virtual/);
+  assert.match(html, /Paquímetro, Micrômetros e Transferidor Virtual/);
+  assert.match(html, /Paquímetro universal com nônio/);
   assert.match(html, /Cabalero_Automações/);
   assert.match(html, /Engenharia de Software aplicada à Indústria/);
   assert.match(html, /Laboratório de metrologia/);
   assert.match(html, /Micrômetro interno/);
+  assert.match(html, /Micrômetro externo/);
+  assert.match(html, /Transferidor semicircular/);
   assert.match(html, /Instrumento de medição/);
   assert.match(html, /role="slider"/);
   assert.match(html, /Ocultar medida/);
@@ -58,16 +61,19 @@ test("não incorpora navegação, downloads ou conteúdo ativo de terceiros", as
 });
 
 test("mantém a implementação livre de conteúdo executável e HTML inseguro", async () => {
-  const [component, micrometer, platform, page, layout, packageJson] = await Promise.all([
+  const [component, micrometer, externalMicrometer, protractor, selector, platform, page, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/components/CaliperWorkbench.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/components/InternalMicrometerWorkbench.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/ExternalMicrometerWorkbench.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/SemicircularProtractorWorkbench.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/InstrumentSelector.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/components/MetrologyLab.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  const source = `${component}\n${micrometer}\n${platform}\n${page}\n${layout}`;
+  const source = `${component}\n${micrometer}\n${externalMicrometer}\n${protractor}\n${selector}\n${platform}\n${page}\n${layout}`;
   assert.doesNotMatch(source, /dangerouslySetInnerHTML|eval\(|javascript:|\.exe\b/i);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(component, /onPointerDown/);
@@ -85,5 +91,18 @@ test("mantém a implementação livre de conteúdo executável e HTML inseguro",
   assert.match(micrometer, /onPointerCancel/);
   assert.match(micrometer, /visibilitychange/);
   assert.match(micrometer, /aria-valuemin=\{5\}/);
+  assert.match(externalMicrometer, /EXTERNAL_MICROMETER_MIN_TICKS/);
+  assert.match(externalMicrometer, /onPointerCancel/);
+  assert.match(externalMicrometer, /visibilitychange/);
+  assert.match(externalMicrometer, /aria-valuemax=\{25\}/);
+  assert.match(externalMicrometer, /getExternalMicrometerDragTicks/);
+  assert.match(protractor, /PROTRACTOR_MAX_ARC_MINUTES/);
+  assert.match(protractor, /getSemicircularProtractorArcMinutesFromPointer/);
+  assert.match(protractor, /onPointerCancel/);
+  assert.match(protractor, /visibilitychange/);
+  assert.match(protractor, /aria-valuetext/);
+  assert.match(selector, /INSTRUMENT_OPTIONS\.map/);
   assert.match(platform, /activeInstrument/);
+  assert.match(platform, /external-micrometer/);
+  assert.match(platform, /semicircular-protractor/);
 });

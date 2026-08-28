@@ -26,6 +26,7 @@ import {
   ticksToMm,
 } from "../../lib/caliper";
 import {
+  getCaliperDetailZoom,
   getScalePresentation,
   getVernierLabelInterval,
 } from "../../lib/caliper-presentation";
@@ -33,10 +34,8 @@ import {
   getCaliperGeometry,
   type CaliperGeometry,
 } from "../../lib/caliper-geometry";
-import type {
-  InstrumentId,
-  InstrumentNavigationProps,
-} from "./instrument-types";
+import { InstrumentSelector } from "./InstrumentSelector";
+import type { InstrumentNavigationProps } from "./instrument-types";
 
 const INITIAL_TICKS = mmToTicks(58.35);
 
@@ -96,7 +95,11 @@ function getDetailViewport(
   const sourceRight = vernierEndX + Math.max(18, mainDivisionPx);
   const sourceWidth = Math.max(1, sourceRight - sourceLeft);
   const horizontalZoom = (width * 0.82) / sourceWidth;
-  const zoom = Math.min(2.4, Math.max(1.55, horizontalZoom));
+  const zoom = getCaliperDetailZoom(
+    width,
+    layout.vernierStepPx,
+    horizontalZoom,
+  );
   const presentation = getScalePresentation(scale.unit, layout);
 
   return {
@@ -313,18 +316,18 @@ function drawInstrument(
   const accent = "#7c2145";
 
   context.clearRect(0, 0, width, height);
+  const viewportLayout = detailMode
+    ? getInstrumentLayout(width, height, detailAnchorTicks ?? ticks, scale)
+    : null;
+  const detailViewport = viewportLayout
+    ? getDetailViewport(width, height, viewportLayout, scale)
+    : null;
+  const projectionScale = detailViewport?.zoom ?? 1;
   context.save();
-  if (detailMode) {
-    const viewportLayout = getInstrumentLayout(
-      width,
-      height,
-      detailAnchorTicks ?? ticks,
-      scale,
-    );
-    const viewport = getDetailViewport(width, height, viewportLayout, scale);
-    context.translate(viewport.targetX, viewport.targetY);
-    context.scale(viewport.zoom, viewport.zoom);
-    context.translate(-viewport.focusX, -viewport.focusY);
+  if (detailViewport) {
+    context.translate(detailViewport.targetX, detailViewport.targetY);
+    context.scale(detailViewport.zoom, detailViewport.zoom);
+    context.translate(-detailViewport.focusX, -detailViewport.focusY);
   }
   context.lineJoin = "round";
   context.lineCap = "square";
@@ -546,20 +549,48 @@ function drawInstrument(
   context.fillStyle = metalMid;
   context.fillRect(upperPlateLeft + 2, vernierBottom - 6, Math.max(0, sliderRight - upperPlateLeft - 4), 4);
 
+  const vernierPlateHeight = scale.unit === "in"
+    ? upperPlateBottom - sliderTop
+    : vernierBottom - vernierTop;
+  const projectedPlateHeight = vernierPlateHeight * projectionScale;
+  const vernierScreenFontSize = Math.max(
+    detailMode ? 14 : projectedPlateHeight >= 14 ? 10 : 9,
+    Math.min(detailMode ? 17 : 11, B * projectionScale * 0.12),
+  );
+  const vernierFontSize = vernierScreenFontSize / projectionScale;
+  const renderVernierLabels = detailMode || projectedPlateHeight >= 14;
   const labelEvery = getVernierLabelInterval(
     scale.id,
     scale.vernierDivisions,
-    vernierStepPx,
+    vernierStepPx * projectionScale,
+    vernierScreenFontSize * 1.35 + 4,
   );
   context.textAlign = "center";
   context.fillStyle = ink;
-  context.font = `600 ${Math.max(8, Math.min(11, width / 100))}px Arial, sans-serif`;
+  context.font = `650 ${vernierFontSize}px Arial, sans-serif`;
   const vernierTickBaselineY = scalePresentation.vernierTickBaselineY;
+  const labelGap = 2 / projectionScale;
+  const labelAscent = vernierFontSize * 0.78;
+  const availableMajorTickHeight = scalePresentation.vernierTickDirection > 0
+    ? scalePresentation.vernierLabelY -
+      labelAscent -
+      vernierTickBaselineY -
+      labelGap
+    : vernierTickBaselineY -
+      (scalePresentation.vernierLabelY + vernierFontSize * 0.22) -
+      labelGap;
+  const maximumMajorTickHeight = renderVernierLabels
+    ? Math.max(2 / projectionScale, availableMajorTickHeight)
+    : vernierPlateHeight * 0.72;
 
   for (let index = 0; index <= scale.vernierDivisions; index += 1) {
     const x = movingScaleZeroX + index * vernierStepPx;
     const major = index === 0 || index === scale.vernierDivisions || index % labelEvery === 0;
-    const tickHeight = major ? beamHeight * 0.28 : beamHeight * 0.18;
+    const tickHeight = major
+      ? Math.min(beamHeight * 0.28, maximumMajorTickHeight)
+      : Math.min(beamHeight * 0.18, maximumMajorTickHeight * 0.66);
+    context.strokeStyle = !renderVernierLabels && index === 0 ? accent : ink;
+    context.lineWidth = !renderVernierLabels && index === 0 ? 1.8 : 1;
     context.beginPath();
     context.moveTo(x, vernierTickBaselineY);
     context.lineTo(
@@ -567,7 +598,7 @@ function drawInstrument(
       vernierTickBaselineY + tickHeight * scalePresentation.vernierTickDirection,
     );
     context.stroke();
-    if (major) {
+    if (major && renderVernierLabels) {
       const labelValue =
         scale.vernierDivisions === 20
           ? index / 2
@@ -577,6 +608,7 @@ function drawInstrument(
       context.fillText(String(labelValue), x, scalePresentation.vernierLabelY);
     }
   }
+  context.strokeStyle = ink;
 
   // Lock screw with a short neck and a cylindrical head.
   context.fillStyle = metalDark;
@@ -1140,19 +1172,10 @@ export function CaliperWorkbench({
           </span>
         </a>
         <div className="header-actions">
-          <label className="instrument-picker">
-            <span>Instrumento</span>
-            <select
-              aria-label="Instrumento de medição"
-              value={activeInstrument}
-              onChange={(event) =>
-                onInstrumentChange(event.target.value as InstrumentId)
-              }
-            >
-              <option value="caliper">Paquímetro universal</option>
-              <option value="internal-micrometer">Micrômetro interno</option>
-            </select>
-          </label>
+          <InstrumentSelector
+            activeInstrument={activeInstrument}
+            onInstrumentChange={onInstrumentChange}
+          />
           <button className="icon-text-button" type="button" onClick={toggleFullscreen}>
             <span aria-hidden="true">⛶</span>
             {isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
@@ -1165,19 +1188,12 @@ export function CaliperWorkbench({
           <div>
             <p className="eyebrow">Laboratório de metrologia</p>
             <h1 id="instrument-title">Paquímetro universal com nônio</h1>
-            <label className="stage-instrument-picker">
-              <span>Instrumento</span>
-              <select
-                aria-label="Instrumento de medição na bancada"
-                value={activeInstrument}
-                onChange={(event) =>
-                  onInstrumentChange(event.target.value as InstrumentId)
-                }
-              >
-                <option value="caliper">Paquímetro universal</option>
-                <option value="internal-micrometer">Micrômetro interno</option>
-              </select>
-            </label>
+            <InstrumentSelector
+              className="stage-instrument-picker"
+              compactLabel
+              activeInstrument={activeInstrument}
+              onInstrumentChange={onInstrumentChange}
+            />
           </div>
           <div className="stage-aside">
             <p className="interaction-hint">
