@@ -99,9 +99,9 @@ Estados `5,00`, `7,36` e `15,00 mm` foram verificados em navegador real. Mouse, 
 - `10c63e5` — recorte da graduação do tambor pelo envelope físico e ajuste vertical dos números da bainha;
 - `a28c547` — revisão de código, limpeza de resíduos e fortalecimento do harness.
 
-Esta atualização do handoff registra somente a sincronização de contexto e documentação. Não cria um novo marco geométrico nem indica que as mudanças locais foram commitadas.
+O commit de integração `745a2d6` reúne o micrômetro externo, o histórico do goniômetro universal, o transferidor semicircular ativo e a rodada de legibilidade. Ele registra a estrutura integrada do laboratório, mas não substitui os marcos visuais aprovados nem cria aceite metrológico para os instrumentos que ainda dependem dessa validação.
 
-As implementações locais do micrômetro externo, do goniômetro histórico, do transferidor semicircular ativo e da rodada de legibilidade ainda não possuem commit próprio. Não inventar hash nem tratar o `HEAD` atual como marco visual dessas mudanças.
+Os arquivos e testes do goniômetro universal permanecem versionados somente como histórico e estão fora da suíte ativa executada por `test:unit`, pois essa variante deixou o catálogo. Não reativar nem remover esse material sem uma decisão explícita do produto.
 
 ## 5. Harness vigente
 
@@ -116,7 +116,7 @@ Ele executa:
 1. ESLint com regras React e jsx-a11y;
 2. `tsc --noEmit` em modo estrito;
 3. build Vinext/Cloudflare;
-4. 68 testes unitários, geométricos, de interação e legibilidade;
+4. a suíte ativa de testes unitários, geométricos, de interação e legibilidade;
 5. 10 testes de smoke, SSR, artefatos e cabeçalhos do Worker.
 
 Em 26/08/2026, `npm run test:ci` passou integralmente após a rodada de legibilidade: lint, TypeScript, build, `76/76` testes técnicos e `10/10` smoke. O smoke obsoleto que ainda esperava o título “Paquímetro Universal Virtual” foi sincronizado com o título atual do laboratório.
@@ -187,6 +187,6 @@ Não estão pendentes: família do micrômetro interno, faixa `5–15 mm`, resol
 
 ## 9. Estado do repositório esperado
 
-O `HEAD` continua em `139a48e` (`main`, alinhado a `origin/main`), mas a árvore de trabalho contém a implementação local do micrômetro externo, o goniômetro universal histórico, o transferidor semicircular ativo, contratos, testes e a rodada de legibilidade ainda não commitados. Esse estado é intencional e deve ser preservado. Não limpar, resetar ou substituir esses arquivos por versões do `HEAD`.
+A integração do micrômetro externo, do goniômetro universal histórico, do transferidor semicircular ativo, dos contratos, dos testes e da rodada de legibilidade está registrada em `745a2d6`. Consultar `git status --short --branch` para o estado corrente em vez de presumir que essas implementações ainda estejam apenas na árvore de trabalho.
 
 `.codex-remote-attachments/` e anexos de referência do usuário permanecem fora dos commits, salvo pedido explícito. Antes de editar, conferir `git status --short` e distinguir as mudanças do produto dos anexos.
