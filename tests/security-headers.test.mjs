@@ -48,9 +48,26 @@ test("CSP restringe scripts, enquadramento, objetos, formulários e rede", async
   assert.deepEqual(policy.get("worker-src"), ["'self'"]);
   const scriptSources = policy.get("script-src") ?? [];
   assert.ok(scriptSources.includes("'self'"));
+  assert.ok(!scriptSources.includes("'unsafe-inline'"));
   assert.ok(!scriptSources.includes("'unsafe-eval'"));
   assert.ok(!scriptSources.some((source) => /^(?:https?:|data:|\*)/i.test(source)));
+  assert.equal(
+    scriptSources.filter((source) => /^'nonce-[a-f0-9]{32}'$/i.test(source)).length,
+    1,
+    "script-src deve conter exatamente um nonce aleatório",
+  );
   assert.ok(!csp.includes("*"), "CSP não deve conter curingas");
+});
+
+test("CSP gera um nonce novo para cada resposta", async () => {
+  const [first, second] = await Promise.all([renderWorker(), renderWorker()]);
+  const noncePattern = /'nonce-([a-f0-9]{32})'/i;
+  const firstNonce = first.headers.get("content-security-policy")?.match(noncePattern)?.[1];
+  const secondNonce = second.headers.get("content-security-policy")?.match(noncePattern)?.[1];
+
+  assert.ok(firstNonce);
+  assert.ok(secondNonce);
+  assert.notEqual(firstNonce, secondNonce);
 });
 
 test("cabeçalhos também protegem respostas 404", async () => {

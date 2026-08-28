@@ -22,6 +22,22 @@ interface ExecutionContext {
   passThroughOnException(): void;
 }
 
+function createContentSecurityPolicy(nonce: string): string {
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'self'",
+    "form-action 'self'",
+    "worker-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self'",
+  ].join("; ");
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -37,7 +53,15 @@ const worker = {
       }, allowedWidths);
     }
 
-    const response = await handler.fetch(request, env, ctx);
+    // A unique nonce keeps the RSC bootstrap functional without allowing every
+    // inline script. Vinext reads it from the request CSP and adds it to scripts.
+    const nonce = crypto.randomUUID().replaceAll("-", "");
+    const contentSecurityPolicy = createContentSecurityPolicy(nonce);
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
+    const securedRequest = new Request(request, { headers: requestHeaders });
+
+    const response = await handler.fetch(securedRequest, env, ctx);
     const securedResponse = new Response(response.body, response);
     securedResponse.headers.set("X-Content-Type-Options", "nosniff");
     securedResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -46,10 +70,7 @@ const worker = {
       "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
     );
     securedResponse.headers.set("Cross-Origin-Opener-Policy", "same-origin");
-    securedResponse.headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; worker-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'",
-    );
+    securedResponse.headers.set("Content-Security-Policy", contentSecurityPolicy);
     return securedResponse;
   },
 };

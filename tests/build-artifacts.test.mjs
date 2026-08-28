@@ -31,6 +31,14 @@ test("build produz worker, manifesto e ativos locais essenciais", async () => {
   }
 });
 
+test("artefato mantém observabilidade persistente desativada", async () => {
+  const wranglerConfig = JSON.parse(
+    await readFile(projectFile("dist/server/wrangler.json"), "utf8"),
+  );
+
+  assert.equal(wranglerConfig.observability?.enabled, false);
+});
+
 test("artefato publicado não contém arquivos executáveis legados", async () => {
   const manifest = await readFile(projectFile("dist/client/.vite/manifest.json"), "utf8");
   assert.doesNotMatch(manifest, /\.(?:exe|msi|bat|cmd|com)(?:["?#]|$)/i);

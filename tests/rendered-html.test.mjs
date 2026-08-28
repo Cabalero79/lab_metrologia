@@ -60,6 +60,20 @@ test("não incorpora navegação, downloads ou conteúdo ativo de terceiros", as
   assert.doesNotMatch(html, /javascript:|data:text\/html/i);
 });
 
+test("todo script renderizado usa o nonce declarado pela CSP", async () => {
+  const response = await renderWorker();
+  const csp = response.headers.get("content-security-policy") ?? "";
+  const nonce = csp.match(/'nonce-([a-f0-9]{32})'/i)?.[1];
+  const html = await response.text();
+  const scriptTags = html.match(/<script\b[^>]*>/gi) ?? [];
+
+  assert.ok(nonce, "nonce ausente na CSP");
+  assert.ok(scriptTags.length > 0, "HTML deve conter scripts de inicialização RSC");
+  for (const tag of scriptTags) {
+    assert.match(tag, new RegExp(`\\bnonce=["']${nonce}["']`, "i"));
+  }
+});
+
 test("mantém a implementação livre de conteúdo executável e HTML inseguro", async () => {
   const [component, micrometer, externalMicrometer, protractor, selector, platform, page, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/components/CaliperWorkbench.tsx", import.meta.url), "utf8"),

@@ -15,6 +15,9 @@ const devServerHost = process.env.VITE_DEV_HOST;
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+  // O produto não coleta telemetria; impeça a persistência automática de logs
+  // de invocação no artefato do Worker.
+  observability: { enabled: false },
   d1_databases: d1
     ? [
         {

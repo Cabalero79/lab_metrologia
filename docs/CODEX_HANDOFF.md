@@ -117,7 +117,7 @@ Ele executa:
 2. `tsc --noEmit` em modo estrito;
 3. build Vinext/Cloudflare;
 4. a suíte ativa de testes unitários, geométricos, de interação e legibilidade;
-5. 10 testes de smoke, SSR, artefatos e cabeçalhos do Worker.
+5. a suíte de smoke, SSR, artefatos e cabeçalhos do Worker.
 
 Em 26/08/2026, `npm run test:ci` passou integralmente após a rodada de legibilidade: lint, TypeScript, build, `76/76` testes técnicos e `10/10` smoke. O smoke obsoleto que ainda esperava o título “Paquímetro Universal Virtual” foi sincronizado com o título atual do laboratório.
 
@@ -146,6 +146,17 @@ e deixando a marca `10` visível em vez de escondida sob o contorno. A fase zero
 do tambor e o zero do nônio não mudaram. Playwright conferiu `0,000`, `10,000`
 e `25,000 mm` em 320 px, desktop e `844 × 390`, sem erros de console; o gate
 `npm run test:ci` passou com `69/69` testes técnicos e `10/10` smoke.
+
+Em 28/08/2026, a rodada de segurança removeu o alerta transitivo de
+`image-size` ao atualizar Vinext para `1.0.0-beta.8`, substituiu
+`script-src 'unsafe-inline'` por nonce criptográfico único por resposta,
+versionou o gate em `.github/workflows/ci.yml` e desativou explicitamente a
+persistência automática de logs do Worker. Após `npm ci`, a auditoria completa
+retornou zero vulnerabilidades e `npm run test:ci` passou com `69/69` testes
+técnicos e `13/13` smoke. O relatório vigente é
+`security_best_practices_report.md`. Em navegador real, a hidratação, a lupa,
+o fechamento por `Escape` e a troca mm/polegada funcionaram sem erros ou avisos
+no console.
 
 ## 6. Skills e ordem de trabalho
 
