@@ -25,10 +25,6 @@ export const EXTERNAL_MICROMETER_GEOMETRY_RATIOS = {
   contactPixelsPerMm: 0.1,
   sleeveStartX: 5.32,
   zeroSeamX: 5.94,
-  // The etched graduation must remain visible beside the finite-width seam.
-  // Both still share the same axial travel; this is only the physical lead of
-  // the mark's centre relative to the thimble edge.
-  sleeveScaleLead: 0.025,
   thimbleConeLength: 2.05,
   gripLength: 1.86,
   neckLength: 0.4,
@@ -234,7 +230,6 @@ export interface ExternalMicrometerGeometry {
   readonly bossRight: number;
   readonly sleeveStartX: number;
   readonly zeroSeamX: number;
-  readonly sleeveScaleLeadPx: number;
   readonly thimbleLeft: number;
   readonly thimbleConeRight: number;
   readonly gripLeft: number;
@@ -339,7 +334,6 @@ export function getExternalMicrometerGeometry(
   const bossRight = originX + r.bossRight * B;
   const sleeveStartX = originX + r.sleeveStartX * B;
   const zeroSeamX = originX + r.zeroSeamX * B;
-  const sleeveScaleLeadPx = r.sleeveScaleLead * B;
   const thimbleLeft = zeroSeamX + travelPx;
   const thimbleConeRight = thimbleLeft + r.thimbleConeLength * B;
   const gripLeft = thimbleConeRight;
@@ -372,7 +366,6 @@ export function getExternalMicrometerGeometry(
     bossRight,
     sleeveStartX,
     zeroSeamX,
-    sleeveScaleLeadPx,
     thimbleLeft,
     thimbleConeRight,
     gripLeft,
@@ -402,13 +395,12 @@ export function getExternalMicrometerGeometry(
 export function getExternalMicrometerScaleMarkX(
   layout: Pick<
     ExternalMicrometerGeometry,
-    "zeroSeamX" | "sleeveScaleLeadPx" | "pixelsPerMm"
+    "zeroSeamX" | "pixelsPerMm"
   >,
   markTicks: number,
 ): number {
   return (
-    layout.zeroSeamX -
-    layout.sleeveScaleLeadPx +
+    layout.zeroSeamX +
     (markTicks / EXTERNAL_MICROMETER_TICKS_PER_MM) * layout.pixelsPerMm
   );
 }

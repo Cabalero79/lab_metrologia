@@ -152,10 +152,9 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
       `${viewport.name}: curso do tambor`,
     );
     close(
-      getExternalMicrometerScaleMarkX(minimum, EXTERNAL_MICROMETER_MAX_TICKS) +
-        minimum.sleeveScaleLeadPx,
+      getExternalMicrometerScaleMarkX(minimum, EXTERNAL_MICROMETER_MAX_TICKS),
       maximum.thimbleLeft,
-      `${viewport.name}: marca 25 preserva o mesmo curso da costura final`,
+      `${viewport.name}: marca 25 compartilha o datum da costura final`,
     );
     const canonical = getExternalMicrometerGeometry(
       viewport.width,
@@ -167,13 +166,9 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
       10_000,
     );
     close(
-      canonical.thimbleLeft - canonicalMarkX,
-      canonical.sleeveScaleLeadPx,
-      `${viewport.name}: marca 10 permanece exposta junto ao tambor`,
-    );
-    assert.ok(
-      canonicalMarkX < canonical.thimbleLeft,
-      `${viewport.name}: contorno do tambor não oculta a marca 10`,
+      canonicalMarkX,
+      canonical.thimbleLeft,
+      `${viewport.name}: marca 10 e costura do tambor compartilham o mesmo datum`,
     );
     assert.ok(
       maximum.spindleFaceX < maximum.bossLeft,

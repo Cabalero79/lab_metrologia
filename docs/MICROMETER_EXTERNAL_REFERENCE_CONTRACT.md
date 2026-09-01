@@ -71,7 +71,7 @@ medição são partes estruturais da referência.
 | Face do fuso na pose | `x≈0,20` |
 | Centro da bucha | `x≈0,37`, `y≈0,12` |
 | Início da bainha | `x≈0,43` |
-| Costura bainha/tambor | `x≈0,56` na pose canônica; a marca gravada imediatamente anterior permanece exposta |
+| Costura bainha/tambor | `x≈0,56` na pose canônica; em medidas inteiras, a graduação correspondente compartilha exatamente esse datum |
 | Início da recartilha | `x≈0,70` |
 | Início da catraca | `x≈0,89` |
 | Extremo direito | `x=1,00` |
@@ -144,11 +144,11 @@ Em ambos, um pixel de arraste corresponde exatamente a um passo selecionado.
 O estado inteiro dirige simultaneamente o vão, a posição do fuso, a costura, a
 fase circular, o nônio, a cota e o valor acessível.
 
-Como traço e contorno possuem espessura física, o centro da graduação da bainha
-precede a borda do tambor por uma folga constante de `0,025 × B`. A folga não
-altera a leitura nem o curso: ela impede que, em posições exatas como
-`10,000 mm`, a própria costura encubra o traço de `10 mm`. A fase `0` do tambor
-continua coincidente com a linha de referência.
+A graduação longitudinal e a borda esquerda do tambor usam o mesmo datum axial.
+Em posições inteiras como `10,000 mm`, a marca de `10 mm` coincide exatamente
+com a costura, enquanto a fase `0` do tambor coincide com a linha de referência.
+A espessura visual do contorno não pode ser compensada deslocando a escala, pois
+isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
 
 ## 6. Incertezas e limites
 
@@ -167,6 +167,7 @@ continua coincidente com a linha de referência.
 - [x] Pose `10,000 mm` gera quadro referência/render/sobreposição/diferença.
 - [x] Limites `0,000` e `25,000 mm` preservam topologia e escala.
 - [x] Bainha, tambor e nônio recompõem a mesma leitura milesimal.
+- [x] Em `10,000 mm`, marca `10`, costura do tambor, fase `0` e zero do nônio concordam.
 - [x] Perfil centesimal representa todos os 2.501 valores de `0,00` a `25,00 mm`.
 - [x] Arraste, toque, teclado, ajuste fino, sorteio, ocultação, lupa e tela cheia compartilham o mesmo estado.
 - [x] Desktop, celular horizontal e `320 px` preservam a silhueta.
@@ -221,3 +222,11 @@ continua coincidente com a linha de referência.
   degrau lateral ou espaço visível;
 - batente e caixa continuam desenhados depois do quadro, preservando a leitura
   das peças e ocultando qualquer artefato de antialias na união.
+
+## 12. Correção do datum longitudinal em 31/08/2026
+
+- removida a folga artificial de `0,025 × B` entre graduação da bainha e costura;
+- `0,000`, `10,000` e `25,000 mm` passam a usar o mesmo datum geométrico para
+  marca longitudinal e borda esquerda do tambor;
+- o modelo inteiro, a decomposição em bainha/tambor/nônio e o curso axial foram
+  preservados; a mudança é exclusivamente da projeção da escala longitudinal.

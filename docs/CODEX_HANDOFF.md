@@ -139,13 +139,14 @@ o catálogo; seus arquivos permanecem como histórico local.
 
 Na revisão `a28c547`, o detector do Impeccable retornou zero achados. Na rodada local do micrômetro externo, Playwright validou `5,50 mm` por arraste centesimal, incremento milesimal de um pixel, 320 px, celular horizontal, ampliação, limite máximo e console sem erros. Em 25/08/2026, a tentativa de usar o contorno circular de `Exemplos/ferradura.png` foi rejeitada pelo responsável do produto porque invadia o batente esquerdo e interferia na circunferência da trava. A geometria vigente é o U quadrado com cantos inferiores arredondados registrado em `EXTERNAL_MICROMETER_SQUARE_FRAME_RATIOS`; o contorno circular permanece apenas como histórico. A inspeção em `25,000 mm` ainda deve preservar a haste exposta no fim do curso. Playwright multi-engine versionado, axe automatizado e baselines visuais continuam pendentes no roadmap do harness; não alegar que já existem.
 
-Em 28/08/2026, a pose canônica `10,000 mm` do micrômetro externo recebeu
-uma correção localizada na graduação da bainha: o centro do traço gravado
-precede a borda finita do tambor por `0,025 × B`, mantendo o mesmo curso axial
-e deixando a marca `10` visível em vez de escondida sob o contorno. A fase zero
-do tambor e o zero do nônio não mudaram. Playwright conferiu `0,000`, `10,000`
-e `25,000 mm` em 320 px, desktop e `844 × 390`, sem erros de console; o gate
-`npm run test:ci` passou com `69/69` testes técnicos e `10/10` smoke.
+Em 31/08/2026, a pose canônica `10,000 mm` do micrômetro externo recebeu
+uma correção localizada no datum da graduação da bainha: foi removida a folga
+artificial de `0,025 × B`, de modo que marca `10`, costura do tambor, fase zero
+e zero do nônio representem a mesma posição física. O modelo inteiro, a
+decomposição da leitura e o curso axial não mudaram. A validação deve conferir
+`0,000`, `10,000` e `25,000 mm` em 320 px, desktop e `844 × 390`, incluindo lupa.
+Playwright confirmou essas poses sem erros ou avisos no console, e
+`npm run test:ci` passou com `69/69` testes técnicos e `17/17` smoke.
 
 Em 28/08/2026, a rodada de segurança removeu o alerta transitivo de
 `image-size` ao atualizar Vinext para `1.0.0-beta.8`, substituiu
