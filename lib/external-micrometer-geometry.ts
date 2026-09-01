@@ -405,6 +405,17 @@ export function getExternalMicrometerScaleMarkX(
   );
 }
 
+export function isExternalMicrometerScaleMarkExposed(
+  layout: Pick<
+    ExternalMicrometerGeometry,
+    "B" | "zeroSeamX" | "pixelsPerMm" | "thimbleLeft"
+  >,
+  markTicks: number,
+): boolean {
+  const markX = getExternalMicrometerScaleMarkX(layout, markTicks);
+  return markX <= layout.thimbleLeft + layout.B * 1e-9;
+}
+
 export function getExternalMicrometerProgress(ticks: number): number {
   return snapExternalMicrometerTicks(ticks) / EXTERNAL_MICROMETER_MAX_TICKS;
 }

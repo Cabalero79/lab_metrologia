@@ -11,6 +11,7 @@ import {
   getExternalMicrometerGeometry,
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
+  isExternalMicrometerScaleMarkExposed,
 } from "../lib/external-micrometer-geometry.ts";
 
 const EPSILON = 1e-9;
@@ -177,6 +178,47 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
     assert.ok(
       maximum.bossLeft - maximum.spindleFaceX >= maximum.B * 0.25,
       `${viewport.name}: haste preserva trecho visivel no limite maximo`,
+    );
+  }
+});
+
+test("rótulo inteiro só aparece quando sua graduação alcança a costura", () => {
+  for (const viewport of VIEWPORTS) {
+    const nineMillimetres = getExternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      9_000,
+    );
+    const immediatelyBeforeTen = getExternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      9_999,
+    );
+    const tenMillimetres = getExternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      10_000,
+    );
+
+    assert.equal(
+      isExternalMicrometerScaleMarkExposed(nineMillimetres, 9_000),
+      true,
+      `${viewport.name}: graduação de 9 mm está exposta`,
+    );
+    assert.equal(
+      isExternalMicrometerScaleMarkExposed(nineMillimetres, 10_000),
+      false,
+      `${viewport.name}: rótulo 10 não antecipa a leitura 9,000 mm`,
+    );
+    assert.equal(
+      isExternalMicrometerScaleMarkExposed(immediatelyBeforeTen, 10_000),
+      false,
+      `${viewport.name}: rótulo 10 permanece oculto em 9,999 mm`,
+    );
+    assert.equal(
+      isExternalMicrometerScaleMarkExposed(tenMillimetres, 10_000),
+      true,
+      `${viewport.name}: rótulo 10 aparece no datum de 10,000 mm`,
     );
   }
 });

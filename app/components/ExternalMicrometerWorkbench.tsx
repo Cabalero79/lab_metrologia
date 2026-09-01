@@ -29,6 +29,7 @@ import {
   getExternalMicrometerGeometry,
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
+  isExternalMicrometerScaleMarkExposed,
   type ExternalMicrometerGeometry,
 } from "../../lib/external-micrometer-geometry";
 import { getExternalMicrometerDragTicks } from "../../lib/external-micrometer-interaction";
@@ -530,7 +531,12 @@ function drawExternalMicrometer(
     const numberedMark =
       markTicks % sleeveNumberIntervalTicks === 0 ||
       markTicks === EXTERNAL_MICROMETER_MAX_TICKS;
-    if (whole && numberedMark && scaleNumbersVisible) {
+    if (
+      whole &&
+      numberedMark &&
+      scaleNumbersVisible &&
+      isExternalMicrometerScaleMarkExposed(layout, markTicks)
+    ) {
       context.font = `760 ${sleeveNumberFontSize}px Arial, sans-serif`;
       context.textAlign = "right";
       context.textBaseline = "bottom";
