@@ -41,6 +41,12 @@ const CENTESIMAL_FIXTURES = [
   { ticks: 25_000, display: "25,00 mm", sleeve: 25_000, thimble: 0 },
 ];
 
+const CALIBRATION_ORACLE = {
+  ticksPerMillimetre: 1_000,
+  spindlePitchTicks: 500,
+  thimbleIncrementTicks: 10,
+};
+
 test("perfil milesimal preserva faixa, passo, tambor e nônio", () => {
   assert.equal(EXTERNAL_MICROMETER_TICKS_PER_MM, 1_000);
   assert.equal(EXTERNAL_MICROMETER_MAX_TICKS, 25_000);
@@ -118,6 +124,35 @@ test("todos os 25001 valores são exatos, idempotentes e monotônicos", () => {
     assert.ok(ticks > previous);
     assert.doesNotMatch(formatExternalMicrometerReading(ticks), /NaN|Infinity/);
     previous = ticks;
+  }
+});
+
+test("oráculo independente recompõe bainha, tambor e nônio em toda a faixa", () => {
+  const oracle = CALIBRATION_ORACLE;
+
+  for (let ticks = 0; ticks <= 25_000; ticks += 1) {
+    const expectedPhase = ticks % oracle.spindlePitchTicks;
+    const expectedSleeve = ticks - expectedPhase;
+    const expectedThimble =
+      Math.floor(expectedPhase / oracle.thimbleIncrementTicks) *
+      oracle.thimbleIncrementTicks;
+    const expectedVernier = expectedPhase - expectedThimble;
+    const reading = decomposeExternalMicrometerReading(ticks);
+
+    assert.equal(reading.totalTicks, ticks, `${ticks}: estado total`);
+    assert.equal(reading.sleeveTicks, expectedSleeve, `${ticks}: bainha`);
+    assert.equal(reading.thimbleTicks, expectedThimble, `${ticks}: tambor`);
+    assert.equal(reading.vernierTicks, expectedVernier, `${ticks}: nônio`);
+    assert.equal(
+      reading.sleeveTicks + reading.thimbleTicks + reading.vernierTicks,
+      ticks,
+      `${ticks}: recomposição`,
+    );
+    assert.equal(
+      externalMicrometerTicksToMm(ticks),
+      ticks / oracle.ticksPerMillimetre,
+      `${ticks}: conversão para milímetros`,
+    );
   }
 });
 

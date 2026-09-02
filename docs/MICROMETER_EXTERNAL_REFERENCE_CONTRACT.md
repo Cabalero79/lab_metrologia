@@ -239,3 +239,14 @@ isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
   tambor, impedindo que a ordem de pintura apague visualmente o traço coincidente;
 - em `10,000 mm`, marca `10`, costura, zero do tambor e zero do nônio permanecem
   simultaneamente visíveis e derivados do mesmo estado inteiro.
+
+## 14. Matriz independente de calibração em 01/09/2026
+
+- um oráculo de teste separado do modelo recompõe os `25.001` estados por passo
+  de fuso de `500` ticks, incremento centesimal de `10` ticks e resto milesimal;
+- a projeção é verificada em `N,000`, `N,100`, `N,109` e `N,499 mm` para cada
+  milímetro de `0` a `25`, em desktop, projetor, celular horizontal e 320 px;
+- cada pose compara de forma independente a distância entre contatos, o curso
+  da costura, a graduação longitudinal, a divisão do tambor e a do nônio;
+- a revisão histórica `aabc4c9` não satisfaz esta matriz: sua folga visual de
+  `0,025 × B` equivale a um deslocamento longitudinal constante de `0,25 mm`.

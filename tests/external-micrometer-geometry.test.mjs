@@ -23,6 +23,12 @@ const VIEWPORTS = [
   { name: "mínimo", width: 320, height: 380 },
 ];
 const READINGS = [0, 1, 499, 500, 5_000, 12_507, 24_999, 25_000];
+const CALIBRATION_OFFSETS = [0, 100, 109, 499];
+const CALIBRATION_POSES = Array.from({ length: 26 }, (_, millimetres) =>
+  CALIBRATION_OFFSETS
+    .map((offset) => millimetres * 1_000 + offset)
+    .filter((ticks) => ticks <= 25_000),
+).flat();
 
 function close(actual, expected, message, tolerance = EPSILON) {
   assert.ok(
@@ -180,6 +186,60 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
       maximum.bossLeft - maximum.spindleFaceX >= maximum.B * 0.25,
       `${viewport.name}: haste preserva trecho visivel no limite maximo`,
     );
+  }
+});
+
+test("matriz independente calibra contatos, costura, bainha e fase em toda a faixa", () => {
+  for (const viewport of VIEWPORTS) {
+    for (const ticks of CALIBRATION_POSES) {
+      const layout = getExternalMicrometerGeometry(
+        viewport.width,
+        viewport.height,
+        ticks,
+      );
+      const expectedMillimetres = ticks / 1_000;
+      const expectedPixelsPerMillimetre = layout.B * 0.1;
+      const expectedWholeTicks = Math.floor(ticks / 1_000) * 1_000;
+      const expectedWholeMillimetres = expectedWholeTicks / 1_000;
+      const expectedPhase = ticks % 500;
+      const expectedThimbleDivision = Math.floor(expectedPhase / 10);
+      const expectedVernierDivision = expectedPhase % 10;
+      const label = `${viewport.name}/${expectedMillimetres.toFixed(3)} mm`;
+
+      close(
+        layout.pixelsPerMm,
+        expectedPixelsPerMillimetre,
+        `${label}: passo axial independente`,
+      );
+      close(
+        layout.contactSpanPx / expectedPixelsPerMillimetre,
+        expectedMillimetres,
+        `${label}: distância entre contatos`,
+      );
+      close(
+        (layout.thimbleLeft - layout.zeroSeamX) /
+          expectedPixelsPerMillimetre,
+        expectedMillimetres,
+        `${label}: curso da costura`,
+      );
+      close(
+        (getExternalMicrometerScaleMarkX(layout, expectedWholeTicks) -
+          layout.zeroSeamX) /
+          expectedPixelsPerMillimetre,
+        expectedWholeMillimetres,
+        `${label}: graduação longitudinal`,
+      );
+      assert.equal(
+        layout.thimbleDivision,
+        expectedThimbleDivision,
+        `${label}: divisão centesimal`,
+      );
+      assert.equal(
+        layout.vernierDivision,
+        expectedVernierDivision,
+        `${label}: divisão milesimal`,
+      );
+    }
   }
 });
 
