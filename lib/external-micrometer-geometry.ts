@@ -405,6 +405,16 @@ export function getExternalMicrometerScaleMarkX(
   );
 }
 
+export function getExternalMicrometerScaleLabelPresentation(
+  layout: Pick<ExternalMicrometerGeometry, "zeroSeamX" | "pixelsPerMm">,
+  markTicks: number,
+): { readonly x: number; readonly textAlign: "center" } {
+  return {
+    x: getExternalMicrometerScaleMarkX(layout, markTicks),
+    textAlign: "center",
+  };
+}
+
 export function isExternalMicrometerScaleMarkExposed(
   layout: Pick<
     ExternalMicrometerGeometry,

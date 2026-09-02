@@ -27,6 +27,7 @@ import {
 import {
   EXTERNAL_MICROMETER_SQUARE_FRAME_RATIOS,
   getExternalMicrometerGeometry,
+  getExternalMicrometerScaleLabelPresentation,
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
   isExternalMicrometerScaleMarkExposed,
@@ -538,13 +539,17 @@ function drawExternalMicrometer(
       scaleNumbersVisible &&
       isExternalMicrometerScaleMarkExposed(layout, markTicks)
     ) {
+      const labelPresentation = getExternalMicrometerScaleLabelPresentation(
+        layout,
+        markTicks,
+      );
       context.font = `760 ${sleeveNumberFontSize}px Arial, sans-serif`;
-      context.textAlign = "right";
+      context.textAlign = labelPresentation.textAlign;
       context.textBaseline = "bottom";
       drawScaleText(
         context,
         String(markTicks / EXTERNAL_MICROMETER_TICKS_PER_MM),
-        x - B * 0.05,
+        labelPresentation.x,
         sleeveNumberBottomY,
         ink,
       );

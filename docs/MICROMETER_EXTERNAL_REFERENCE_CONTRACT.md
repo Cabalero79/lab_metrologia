@@ -250,3 +250,12 @@ isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
   da costura, a graduação longitudinal, a divisão do tambor e a do nônio;
 - a revisão histórica `aabc4c9` não satisfaz esta matriz: sua folga visual de
   `0,025 × B` equivale a um deslocamento longitudinal constante de `0,25 mm`.
+
+## 15. Revelação progressiva dos números longitudinais em 01/09/2026
+
+- cada número é centralizado na coordenada de sua própria graduação;
+- o número não é deslocado para a graduação anterior para permanecer inteiro;
+- quando a costura alcança `5`, `10`, `15`, `20` ou `25 mm`, o tambor recorta o
+  número na coincidência e o revela progressivamente conforme avança;
+- essa oclusão preserva a associação visual entre número e traço sem alterar o
+  modelo inteiro, o curso axial ou a decomposição da leitura.

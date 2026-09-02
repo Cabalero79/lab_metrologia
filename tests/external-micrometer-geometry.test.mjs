@@ -9,6 +9,7 @@ import {
   EXTERNAL_MICROMETER_GEOMETRY_RATIOS,
   EXTERNAL_MICROMETER_SQUARE_FRAME_RATIOS,
   getExternalMicrometerGeometry,
+  getExternalMicrometerScaleLabelPresentation,
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
   isExternalMicrometerScaleMarkExposed,
@@ -280,6 +281,35 @@ test("rótulo inteiro só aparece quando sua graduação alcança a costura", ()
       isExternalMicrometerScaleMarkExposed(tenMillimetres, 10_000),
       true,
       `${viewport.name}: rótulo 10 aparece no datum de 10,000 mm`,
+    );
+  }
+});
+
+test("número longitudinal permanece centralizado na própria graduação", () => {
+  for (const viewport of VIEWPORTS) {
+    const layout = getExternalMicrometerGeometry(
+      viewport.width,
+      viewport.height,
+      10_000,
+    );
+
+    for (const markTicks of [0, 5_000, 10_000]) {
+      const label = getExternalMicrometerScaleLabelPresentation(
+        layout,
+        markTicks,
+      );
+      close(
+        label.x,
+        getExternalMicrometerScaleMarkX(layout, markTicks),
+        `${viewport.name}/${markTicks}: âncora do número`,
+      );
+      assert.equal(label.textAlign, "center");
+    }
+
+    close(
+      getExternalMicrometerScaleLabelPresentation(layout, 10_000).x,
+      layout.thimbleLeft,
+      `${viewport.name}: o tambor recorta progressivamente o número 10`,
     );
   }
 });
