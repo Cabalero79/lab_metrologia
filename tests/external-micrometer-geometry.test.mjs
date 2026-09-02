@@ -12,6 +12,7 @@ import {
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
   isExternalMicrometerScaleMarkExposed,
+  isExternalMicrometerWholeMarkAtSeam,
 } from "../lib/external-micrometer-geometry.ts";
 
 const EPSILON = 1e-9;
@@ -221,6 +222,14 @@ test("rótulo inteiro só aparece quando sua graduação alcança a costura", ()
       `${viewport.name}: rótulo 10 aparece no datum de 10,000 mm`,
     );
   }
+});
+
+test("graduação inteira coincidente permanece identificável na costura", () => {
+  assert.equal(isExternalMicrometerWholeMarkAtSeam(0), true);
+  assert.equal(isExternalMicrometerWholeMarkAtSeam(9_999), false);
+  assert.equal(isExternalMicrometerWholeMarkAtSeam(10_000), true);
+  assert.equal(isExternalMicrometerWholeMarkAtSeam(10_500), false);
+  assert.equal(isExternalMicrometerWholeMarkAtSeam(25_000), true);
 });
 
 test("fase do tambor e nônio atravessam a meia volta exatamente", () => {

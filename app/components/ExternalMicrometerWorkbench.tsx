@@ -30,6 +30,7 @@ import {
   getExternalMicrometerScaleMarkX,
   getExternalMicrometerVernierPresentation,
   isExternalMicrometerScaleMarkExposed,
+  isExternalMicrometerWholeMarkAtSeam,
   type ExternalMicrometerGeometry,
 } from "../../lib/external-micrometer-geometry";
 import { getExternalMicrometerDragTicks } from "../../lib/external-micrometer-interaction";
@@ -609,6 +610,27 @@ function drawExternalMicrometer(
   context.strokeStyle = ink;
   context.lineWidth = outlineWidth;
   context.stroke(thimble);
+
+  // At exact whole millimetres the sleeve graduation and the thimble seam
+  // share one datum. Redraw the coincident lower segment after the thimble so
+  // the moving body cannot visually erase the physical graduation.
+  if (isExternalMicrometerWholeMarkAtSeam(reading.totalTicks)) {
+    const seamGraduationBottom = sleeveScaleY + wholeScaleLength;
+    context.save();
+    context.strokeStyle = metalLight;
+    context.lineWidth = outlineWidth + Math.max(1.4, B * 0.022);
+    context.beginPath();
+    context.moveTo(thimbleLeft, sleeveScaleY);
+    context.lineTo(thimbleLeft, seamGraduationBottom);
+    context.stroke();
+    context.strokeStyle = ink;
+    context.lineWidth = Math.max(0.85, B * 0.014);
+    context.beginPath();
+    context.moveTo(thimbleLeft, sleeveScaleY);
+    context.lineTo(thimbleLeft, seamGraduationBottom);
+    context.stroke();
+    context.restore();
+  }
 
   context.save();
   context.clip(thimble);

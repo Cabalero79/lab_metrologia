@@ -230,3 +230,12 @@ isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
   marca longitudinal e borda esquerda do tambor;
 - o modelo inteiro, a decomposição em bainha/tambor/nônio e o curso axial foram
   preservados; a mudança é exclusivamente da projeção da escala longitudinal.
+
+## 13. Visibilidade da graduação coincidente em 01/09/2026
+
+- em leituras inteiras, a graduação longitudinal e a costura continuam usando
+  exatamente a mesma coordenada, sem folga artificial;
+- o segmento da graduação abaixo da linha de referência é redesenhado depois do
+  tambor, impedindo que a ordem de pintura apague visualmente o traço coincidente;
+- em `10,000 mm`, marca `10`, costura, zero do tambor e zero do nônio permanecem
+  simultaneamente visíveis e derivados do mesmo estado inteiro.

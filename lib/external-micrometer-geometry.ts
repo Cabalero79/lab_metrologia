@@ -416,6 +416,11 @@ export function isExternalMicrometerScaleMarkExposed(
   return markX <= layout.thimbleLeft + layout.B * 1e-9;
 }
 
+export function isExternalMicrometerWholeMarkAtSeam(ticks: number): boolean {
+  const snapped = snapExternalMicrometerTicks(ticks);
+  return snapped % EXTERNAL_MICROMETER_TICKS_PER_MM === 0;
+}
+
 export function getExternalMicrometerProgress(ticks: number): number {
   return snapExternalMicrometerTicks(ticks) / EXTERNAL_MICROMETER_MAX_TICKS;
 }
