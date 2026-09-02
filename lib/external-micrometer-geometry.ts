@@ -32,6 +32,15 @@ export const EXTERNAL_MICROMETER_GEOMETRY_RATIOS = {
 } as const;
 
 /**
+ * Optical calibration requested by the product owner on 01/09/2026.
+ *
+ * The exact reading datum remains on the longitudinal graduation. Only the
+ * visible leading edge of the thimble shell receives this half-centesimal
+ * preload, so the integer measurement model and axial travel stay unchanged.
+ */
+export const EXTERNAL_MICROMETER_OPTICAL_SEAM_OFFSET_TICKS = -5;
+
+/**
  * Contorno externo rastreado de `Exemplos/ferradura.png` com OpenCV
  * (`threshold=80`, `RETR_EXTERNAL`, `approxPolyDP epsilon=1.5`).
  *
@@ -230,6 +239,7 @@ export interface ExternalMicrometerGeometry {
   readonly bossRight: number;
   readonly sleeveStartX: number;
   readonly zeroSeamX: number;
+  readonly readingSeamX: number;
   readonly thimbleLeft: number;
   readonly thimbleConeRight: number;
   readonly gripLeft: number;
@@ -334,7 +344,12 @@ export function getExternalMicrometerGeometry(
   const bossRight = originX + r.bossRight * B;
   const sleeveStartX = originX + r.sleeveStartX * B;
   const zeroSeamX = originX + r.zeroSeamX * B;
-  const thimbleLeft = zeroSeamX + travelPx;
+  const readingSeamX = zeroSeamX + travelPx;
+  const thimbleLeft =
+    readingSeamX +
+    (EXTERNAL_MICROMETER_OPTICAL_SEAM_OFFSET_TICKS /
+      EXTERNAL_MICROMETER_TICKS_PER_MM) *
+      pixelsPerMm;
   const thimbleConeRight = thimbleLeft + r.thimbleConeLength * B;
   const gripLeft = thimbleConeRight;
   const gripRight = gripLeft + r.gripLength * B;
@@ -366,6 +381,7 @@ export function getExternalMicrometerGeometry(
     bossRight,
     sleeveStartX,
     zeroSeamX,
+    readingSeamX,
     thimbleLeft,
     thimbleConeRight,
     gripLeft,
@@ -418,12 +434,12 @@ export function getExternalMicrometerScaleLabelPresentation(
 export function isExternalMicrometerScaleMarkExposed(
   layout: Pick<
     ExternalMicrometerGeometry,
-    "B" | "zeroSeamX" | "pixelsPerMm" | "thimbleLeft"
+    "B" | "zeroSeamX" | "pixelsPerMm" | "readingSeamX"
   >,
   markTicks: number,
 ): boolean {
   const markX = getExternalMicrometerScaleMarkX(layout, markTicks);
-  return markX <= layout.thimbleLeft + layout.B * 1e-9;
+  return markX <= layout.readingSeamX + layout.B * 1e-9;
 }
 
 export function isExternalMicrometerWholeMarkAtSeam(ticks: number): boolean {

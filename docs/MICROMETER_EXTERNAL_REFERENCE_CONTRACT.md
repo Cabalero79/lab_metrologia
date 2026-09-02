@@ -144,11 +144,11 @@ Em ambos, um pixel de arraste corresponde exatamente a um passo selecionado.
 O estado inteiro dirige simultaneamente o vão, a posição do fuso, a costura, a
 fase circular, o nônio, a cota e o valor acessível.
 
-A graduação longitudinal e a borda esquerda do tambor usam o mesmo datum axial.
-Em posições inteiras como `10,000 mm`, a marca de `10 mm` coincide exatamente
-com a costura, enquanto a fase `0` do tambor coincide com a linha de referência.
-A espessura visual do contorno não pode ser compensada deslocando a escala, pois
-isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
+A graduação longitudinal e o datum matemático da leitura usam a mesma coordenada
+axial. Em posições inteiras como `10,000 mm`, a marca de `10 mm` coincide
+exatamente com esse datum, enquanto a fase `0` do tambor coincide com a linha de
+referência. A borda visível da carcaça recebe somente a pré-carga óptica descrita
+na seção 16; a escala, os contatos e o estado inteiro não são deslocados.
 
 ## 6. Incertezas e limites
 
@@ -259,3 +259,13 @@ isso produziria uma leitura geometricamente anterior ao valor verdadeiro.
   número na coincidência e o revela progressivamente conforme avança;
 - essa oclusão preserva a associação visual entre número e traço sem alterar o
   modelo inteiro, o curso axial ou a decomposição da leitura.
+
+## 16. Calibração óptica de meio centésimo em 01/09/2026
+
+- por validação visual do responsável do produto, a borda visível do tambor
+  recebe uma pré-carga constante de `−0,005 mm` para a esquerda;
+- o datum matemático permanece exatamente na graduação correspondente à leitura;
+- contatos, escala longitudinal, fase do tambor, nônio e valor acessível continuam
+  derivados do mesmo estado inteiro, sem erro acumulado ao longo da faixa;
+- o teste geométrico verifica a diferença constante de `−5 ticks` em todas as
+  poses de referência e em desktop, projetor, celular horizontal e 320 px.

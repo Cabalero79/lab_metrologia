@@ -7,6 +7,7 @@ import {
 } from "../lib/external-micrometer.ts";
 import {
   EXTERNAL_MICROMETER_GEOMETRY_RATIOS,
+  EXTERNAL_MICROMETER_OPTICAL_SEAM_OFFSET_TICKS,
   EXTERNAL_MICROMETER_SQUARE_FRAME_RATIOS,
   getExternalMicrometerGeometry,
   getExternalMicrometerScaleLabelPresentation,
@@ -162,8 +163,8 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
     );
     close(
       getExternalMicrometerScaleMarkX(minimum, EXTERNAL_MICROMETER_MAX_TICKS),
-      maximum.thimbleLeft,
-      `${viewport.name}: marca 25 compartilha o datum da costura final`,
+      maximum.readingSeamX,
+      `${viewport.name}: marca 25 compartilha o datum exato final`,
     );
     const canonical = getExternalMicrometerGeometry(
       viewport.width,
@@ -176,8 +177,8 @@ test("vão, costura e escala usam o mesmo curso axial", () => {
     );
     close(
       canonicalMarkX,
-      canonical.thimbleLeft,
-      `${viewport.name}: marca 10 e costura do tambor compartilham o mesmo datum`,
+      canonical.readingSeamX,
+      `${viewport.name}: marca 10 e datum exato compartilham a mesma posição`,
     );
     assert.ok(
       maximum.spindleFaceX < maximum.bossLeft,
@@ -218,10 +219,10 @@ test("matriz independente calibra contatos, costura, bainha e fase em toda a fai
         `${label}: distância entre contatos`,
       );
       close(
-        (layout.thimbleLeft - layout.zeroSeamX) /
+        (layout.readingSeamX - layout.zeroSeamX) /
           expectedPixelsPerMillimetre,
         expectedMillimetres,
-        `${label}: curso da costura`,
+        `${label}: curso do datum exato`,
       );
       close(
         (getExternalMicrometerScaleMarkX(layout, expectedWholeTicks) -
@@ -308,9 +309,33 @@ test("número longitudinal permanece centralizado na própria graduação", () =
 
     close(
       getExternalMicrometerScaleLabelPresentation(layout, 10_000).x,
-      layout.thimbleLeft,
-      `${viewport.name}: o tambor recorta progressivamente o número 10`,
+      layout.readingSeamX,
+      `${viewport.name}: o número 10 permanece no datum exato`,
     );
+  }
+});
+
+test("borda visual do tambor recebe calibração óptica de meio centésimo à esquerda", () => {
+  assert.equal(EXTERNAL_MICROMETER_OPTICAL_SEAM_OFFSET_TICKS, -5);
+
+  for (const viewport of VIEWPORTS) {
+    for (const ticks of READINGS) {
+      const layout = getExternalMicrometerGeometry(
+        viewport.width,
+        viewport.height,
+        ticks,
+      );
+      close(
+        (layout.thimbleLeft - layout.readingSeamX) / layout.pixelsPerMm,
+        -0.005,
+        `${viewport.name}/${ticks}: pré-carga óptica da borda`,
+      );
+      close(
+        (layout.readingSeamX - layout.zeroSeamX) / layout.pixelsPerMm,
+        ticks / EXTERNAL_MICROMETER_TICKS_PER_MM,
+        `${viewport.name}/${ticks}: datum matemático preservado`,
+      );
+    }
   }
 });
 
